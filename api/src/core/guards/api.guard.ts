@@ -1,0 +1,73 @@
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  HttpException,
+  Logger,
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { AuthenticationClient } from 'authing-js-sdk'
+
+@Injectable()
+export class ApiGuard implements CanActivate {
+  private readonly logger = new Logger(ApiGuard.name)
+  private readonly authing = new AuthenticationClient({
+    appId: this.configService.get('auth.authingAppId'),
+    appHost: this.configService.get('auth.authingAppHost'),
+  })
+
+  constructor(private readonly configService: ConfigService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    try {
+      const request = context.switchToHttp().getRequest<Request>()
+      const token = request.headers['token'] || request['query']['token']
+      if (
+        this.configService.get('auth.superToken') &&
+        token === this.configService.get('auth.superToken')
+      ) {
+        delete request['query']['token']
+        return true
+      }
+
+      /**
+       * AUTHING 认证
+       */
+      const { status } = await this.authing.checkLoginStatus(token)
+
+      if (status) {
+        return true
+      } else {
+        this.logger.debug(`apiGuard - canActivate - token: ${token}`)
+        throw new HttpException('未登录', 700)
+      }
+      /**
+       * BG-AUTHING 认证
+       */
+
+      // const response = await axios.post(
+      //   `${this.configService.get<string>(
+      //     'auth.server',
+      //   )}/auth/permissions/check`,
+      //   {
+      //     path: request.url,
+      //     action: request.method,
+      //   },
+      //   {
+      //     headers: {
+      //       token,
+      //     },
+      //   },
+      // )
+      // this.logger.verbose(`${JSON.stringify(response.data)}`)
+      // if (response.data.err === 0) {
+      //   return response.data.data.permission
+      // } else {
+      //   throw new HttpException('未登录', 700)
+      // }
+      // return true
+    } catch (e) {
+      throw new HttpException('未登录', 700)
+    }
+  }
+}

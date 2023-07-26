@@ -1,0 +1,54 @@
+#app {
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+
+  .el-aside {
+    width: auto;
+    height: 100%;
+
+    .el-menu {
+      height: 100%;
+    }
+  }
+
+  .el-main {
+    height: 100%;
+    overflow: auto;
+    padding: 0
+  }
+}
+
+.classic-table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+.classic-table tr td,
+.classic-table tr th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+.classic-table tr td .columnFK,
+.classic-table tr th .columnFK {
+  font-weight: bold;
+  color: #f00;
+}
+.classic-table tr td > .rowNotNull {
+  font-weight: bold;
+}
+.classic-table tr th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04aa6d;
+  color: #fff;
+}
+.classic-table tr .rowDisable {
+  color: #d3d3d3;
+}
+.classic-table tr.relationRow {
+  background-color: #f2f2f2;
+}

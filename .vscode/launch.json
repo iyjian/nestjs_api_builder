@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "type": "node",
+          "request": "launch",
+          "name": "nestjs",
+          "sourceMaps": true,
+          "program": "${workspaceFolder}/api/dist/main.js",
+          "envFile": "${workspaceFolder}/api/.env",
+          "cwd": "${workspaceRoot}/api",
+          "preLaunchTask": "nest-api-build",
+          "console": "integratedTerminal",
+      }
+  ]
+}

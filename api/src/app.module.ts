@@ -1,0 +1,65 @@
+import { CacheModule, Module } from '@nestjs/common'
+import { EnumModule } from './features/enum/enum.module'
+import configuration from './config/configuration'
+import redisStore from 'cache-manager-ioredis'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { SequelizeModule } from '@nestjs/sequelize'
+import { BaseModule } from './features/base/base.module'
+import { CodegenModule } from './features/codegen/codegen.module'
+import { CodingModule } from './features/coding/coding.module'
+import { ToolModule } from './features/tool/tool.module'
+import { ThirdModule } from './features/third/third.module'
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
+    SequelizeModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        dialect: 'mysql',
+        host: configService.get('mysql.host'),
+        port: +configService.get<number>('mysql.port'),
+        username: configService.get('mysql.username'),
+        password: configService.get('mysql.password'),
+        database: configService.get('mysql.db'),
+        models: [],
+        autoLoadModels: true,
+        synchronize: true,
+        logging: false,
+        sync: {
+          alter: false,
+        },
+        pool: {
+          max: 100,
+          min: 0,
+          idle: 10000,
+        },
+        timezone: '+08:00',
+      }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      useFactory: (configService: ConfigService) => {
+        return {
+          store: redisStore,
+          host: configService.get('redis.host'),
+          port: +configService.get<number>('redis.port'),
+          db: +configService.get<number>('redis.db'),
+          ttl: 0,
+        }
+      },
+      inject: [ConfigService],
+      isGlobal: true,
+    }),
+    EnumModule,
+    BaseModule,
+    CodegenModule,
+    CodingModule,
+    ToolModule,
+    ThirdModule,
+  ],
+})
+export class AppModule {}

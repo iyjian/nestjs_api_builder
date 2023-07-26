@@ -1,0 +1,19 @@
+version: "3.5"
+
+services:
+  devtool-api:
+    image: bigcruise/devtoolapi
+    restart: always
+    build:
+      context: ./api
+    env_file:
+      - ./api/.env
+  devtool-ui:
+    image: iyjian/devfront
+    build:
+      context: ./front
+    restart: always
+    env_file:
+      - ./api/.env    
+    ports:
+      - 53001:3000

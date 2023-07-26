@@ -1,0 +1,19 @@
+{
+  "name": "bg-devtools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "startall": "concurrently \"cd api && yarn start:dev\" \"cd front && yarn dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@gitlab.bigcruise.cn:422/bg/bg-devtools.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
