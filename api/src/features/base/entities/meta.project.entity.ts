@@ -119,4 +119,20 @@ export class MetaProject extends BaseModel<MetaProject> {
   })
   @codeGen('7827')
   repoName: string
+
+  @Column({
+    allowNull: true,
+    type: DataType.STRING(255),
+    comment: 'gitlabToken',
+  })
+  @codeGen('9144')
+  gitlabToken?: string
+
+  @Column({
+    allowNull: true,
+    type: DataType.STRING(255),
+    comment: 'gitlabHost',
+  })
+  @codeGen('9145')
+  gitlabHost?: string
 }

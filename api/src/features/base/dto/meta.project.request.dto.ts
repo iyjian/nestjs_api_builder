@@ -44,7 +44,7 @@ export class CreateMetaProjectRequestDTO {
 
   @codeGen('4913')
   @ApiProperty({
-    description: '是否严格过滤请求中的参数',
+    description: '是否严格检查请求中的参数',
     required: false,
   })
   @Transform(getTransformer('booleanTransformer'))
@@ -92,6 +92,20 @@ export class CreateMetaProjectRequestDTO {
   })
   @IsNotEmpty()
   repoName: string
+
+  @codeGen('9144')
+  @ApiProperty({
+    description: 'gitlabToken',
+    required: false,
+  })
+  gitlabToken?: string
+
+  @codeGen('9145')
+  @ApiProperty({
+    description: 'gitlabHost',
+    required: false,
+  })
+  gitlabHost?: string
 }
 
 export class UpdateMetaProjectRequestDTO {
@@ -134,7 +148,7 @@ export class UpdateMetaProjectRequestDTO {
 
   @codeGen('4913')
   @ApiProperty({
-    description: '是否严格过滤请求中的参数',
+    description: '是否严格检查请求中的参数',
     required: false,
   })
   @Transform(getTransformer('booleanTransformer'))
@@ -181,6 +195,20 @@ export class UpdateMetaProjectRequestDTO {
     required: false,
   })
   repoName?: string
+
+  @codeGen('9144')
+  @ApiProperty({
+    description: 'gitlabToken',
+    required: false,
+  })
+  gitlabToken?: string
+
+  @codeGen('9145')
+  @ApiProperty({
+    description: 'gitlabHost',
+    required: false,
+  })
+  gitlabHost?: string
 }
 
 export class FindOneMetaProjectRequestDTO {
@@ -223,7 +251,7 @@ export class FindOneMetaProjectRequestDTO {
 
   @codeGen('4913')
   @ApiProperty({
-    description: '是否严格过滤请求中的参数',
+    description: '是否严格检查请求中的参数',
     required: false,
   })
   @Transform(getTransformer('booleanTransformer'))
@@ -270,6 +298,20 @@ export class FindOneMetaProjectRequestDTO {
     required: false,
   })
   repoName?: string
+
+  @codeGen('9144')
+  @ApiProperty({
+    description: 'gitlabToken',
+    required: false,
+  })
+  gitlabToken?: string
+
+  @codeGen('9145')
+  @ApiProperty({
+    description: 'gitlabHost',
+    required: false,
+  })
+  gitlabHost?: string
 }
 
 export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
@@ -312,7 +354,7 @@ export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
 
   @codeGen('4913')
   @ApiProperty({
-    description: '是否严格过滤请求中的参数',
+    description: '是否严格检查请求中的参数',
     required: false,
   })
   @Transform(getTransformer('booleanTransformer'))
@@ -359,4 +401,18 @@ export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
     required: false,
   })
   repoName?: string
+
+  @codeGen('9144')
+  @ApiProperty({
+    description: 'gitlabToken',
+    required: false,
+  })
+  gitlabToken?: string
+
+  @codeGen('9145')
+  @ApiProperty({
+    description: 'gitlabHost',
+    required: false,
+  })
+  gitlabHost?: string
 }
