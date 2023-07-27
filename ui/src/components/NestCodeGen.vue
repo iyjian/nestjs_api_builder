@@ -664,7 +664,6 @@ const checkMove = (evt: any) => {
  * 强制刷新页面里的缓存
  */
 if (table.value.id) {
-  // store.dispatch("switchTable", table.id);
   await store.switchTableAsync(table.value.id);
 }
 

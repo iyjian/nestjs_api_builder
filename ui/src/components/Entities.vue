@@ -255,9 +255,8 @@ export default defineComponent({
       }
     },
     async configEntity(table: TableSimple) {
-      // store.dispatch("switchTable", table.id);
       console.log(`Entities - configEntity - tableId: ${table.id}`);
-      await store.switchTable(table.id);
+      await store.switchTableAsync(table.id);
       this.$router.push("/nestCodeGen");
     },
   },
