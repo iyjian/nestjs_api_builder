@@ -144,38 +144,20 @@ export class CodegenControllerService {
       ${methodCode}
     }
     `
-
-    if (table.project.version === 2) {
-      code = this.codegenUtilService.ensureImports(code, {
-        './../dto': {
-          identifiers: [
-            `FindAll${table.className}RequestDTO`,
-            `Create${table.className}RequestDTO`,
-            `Update${table.className}RequestDTO`,
-          ],
-        },
-      })
-      code = this.codegenUtilService.ensureImports(code, {
-        [`./../services`]: {
-          identifiers: [`${table.className}Service`],
-        },
-      })
-    } else {
-      code = this.codegenUtilService.ensureImports(code, {
-        './dto': {
-          identifiers: [
-            `FindAll${table.className}RequestDTO`,
-            `Create${table.className}RequestDTO`,
-            `Update${table.className}RequestDTO`,
-          ],
-        },
-      })
-      code = this.codegenUtilService.ensureImports(code, {
-        [`./${table.dotName}.service`]: {
-          identifiers: [`${table.className}Service`],
-        },
-      })
-    }
+    code = this.codegenUtilService.ensureImports(code, {
+      './../dto': {
+        identifiers: [
+          `FindAll${table.className}RequestDTO`,
+          `Create${table.className}RequestDTO`,
+          `Update${table.className}RequestDTO`,
+        ],
+      },
+    })
+    code = this.codegenUtilService.ensureImports(code, {
+      [`./../services`]: {
+        identifiers: [`${table.className}Service`],
+      },
+    })
 
     // 生成controller的Swagger响应结构和响应数据示例
 

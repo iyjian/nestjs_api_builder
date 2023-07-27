@@ -199,11 +199,7 @@ export class MetaTable extends BaseModel<MetaTable> {
   })
   get serviceDirectory(): string {
     if (this.getDataValue('module') && this.project) {
-      if (this.project.version === 2) {
-        return `${this.moduleDirectory}/services`
-      } else {
-        return `${this.moduleDirectory}`
-      }
+      return `${this.moduleDirectory}/services`
     } else {
       return ''
     }
@@ -215,11 +211,7 @@ export class MetaTable extends BaseModel<MetaTable> {
   })
   get controllerDirectory(): string {
     if (this.getDataValue('module') && this.project) {
-      if (this.project.version === 2) {
-        return `${this.moduleDirectory}/controllers`
-      } else {
-        return `${this.moduleDirectory}`
-      }
+      return `${this.moduleDirectory}/controllers`
     } else {
       return ''
     }

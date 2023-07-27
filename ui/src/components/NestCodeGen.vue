@@ -117,8 +117,8 @@
         <el-checkbox label="mdu" />
         <el-checkbox label="dto/idx" />
         <el-checkbox label="enty/idx" />
-        <el-checkbox v-if="table?.project?.version === 2" label="ctl/idx" />
-        <el-checkbox v-if="table?.project?.version === 2" label="serv/idx" />
+        <el-checkbox label="ctl/idx" />
+        <el-checkbox label="serv/idx" />
         <el-checkbox label="mdu/idx" />
         <el-checkbox label="schema" />
       </el-checkbox-group>
