@@ -7,8 +7,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      // '@': path.resolve(__dirname, './src'),
-      "@/": `${path.resolve(__dirname, "src")}/`,
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {
@@ -20,4 +19,7 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ['@authing/native-js-ui-components']
+  }
 });
