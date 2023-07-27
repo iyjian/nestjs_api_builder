@@ -5,6 +5,7 @@ specifiers:
   '@alicloud/openapi-client': ^0.4.5
   '@alicloud/tea-util': ^1.4.5
   '@gitbeaker/node': ^35.8.0
+  '@gitbeaker/rest': ^39.8.0
   '@nestjs/cli': ^8.0.0
   '@nestjs/common': ^8.0.0
   '@nestjs/config': ^2.1.0
@@ -89,6 +90,7 @@ dependencies:
   '@alicloud/openapi-client': registry.npmmirror.com/@alicloud/openapi-client/0.4.5
   '@alicloud/tea-util': registry.npmmirror.com/@alicloud/tea-util/1.4.5
   '@gitbeaker/node': registry.npmmirror.com/@gitbeaker/node/35.8.0
+  '@gitbeaker/rest': 39.8.0
   '@nestjs/common': registry.npmmirror.com/@nestjs/common/8.4.7_t3livvr4rnphsnpp4otxjboi6u
   '@nestjs/config': registry.npmmirror.com/@nestjs/config/2.2.0_q6tehokzwy3z4akuawpn6kiwbe
   '@nestjs/core': registry.npmmirror.com/@nestjs/core/8.4.7_tdkocbskemo2uwka4xhsbznrba
@@ -171,6 +173,110 @@ devDependencies:
   typescript: registry.npmmirror.com/typescript/4.9.4
 
 packages:
+
+  /@colors/colors/1.5.0:
+    resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
+    engines: {node: '>=0.1.90'}
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@gitbeaker/core/39.8.0:
+    resolution: {integrity: sha512-Ti5UfDAsE8gKLk78iG4hLAmPJ33E10x5/7dNb2HJ98G4MlrfPWyTW8XboCZATC+jA9c11DWTwtGW//NJOfOd9g==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      '@gitbeaker/requester-utils': 39.8.0
+      qs: 6.11.2
+      xcase: 2.0.1
+    dev: false
+
+  /@gitbeaker/requester-utils/39.8.0:
+    resolution: {integrity: sha512-307Qu7i7YVHlrOBF1LTeGvAkE5AY57nSBRXcCpzox4DS3kGMHUFVaJbWEBUA1YOxz60umUd40Y2GvPwRj9GCXQ==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      qs: 6.11.2
+      xcase: 2.0.1
+    dev: false
+
+  /@gitbeaker/rest/39.8.0:
+    resolution: {integrity: sha512-rRVQRuC9z2G0AHgPdgX7XuuhkJbJGZxEcIbVcGNluk1KP4yies+P4cupHShNEfd4GNVIfdsh01GQaR3JzjBAaw==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      '@gitbeaker/core': 39.8.0
+      '@gitbeaker/requester-utils': 39.8.0
+    dev: false
+
+  /call-bind/1.0.2:
+    resolution: {integrity: sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==}
+    dependencies:
+      function-bind: 1.1.1
+      get-intrinsic: 1.2.0
+    dev: false
+
+  /fsevents/2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /function-bind/1.1.1:
+    resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
+    dev: false
+
+  /get-intrinsic/1.2.0:
+    resolution: {integrity: sha512-L049y6nFOuom5wGyRc3/gdTLO94dySVKRACj1RmJZBQXlbTMhtNIgkWkUHq+jYmZvKf14EW1EoJnnjbmoHij0Q==}
+    dependencies:
+      function-bind: 1.1.1
+      has: 1.0.3
+      has-symbols: 1.0.3
+    dev: false
+
+  /graceful-fs/4.2.10:
+    resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
+    dev: true
+
+  /has-symbols/1.0.3:
+    resolution: {integrity: sha512-l3LCuF6MgDNwTDKkdYGEihYjt5pRPbEg46rtlmnSPlUbgmB8LOIrKJbYYFBSbnPaJexMKtiPO8hmeRjRz2Td+A==}
+    engines: {node: '>= 0.4'}
+    dev: false
+
+  /has/1.0.3:
+    resolution: {integrity: sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==}
+    engines: {node: '>= 0.4.0'}
+    dependencies:
+      function-bind: 1.1.1
+    dev: false
+
+  /object-inspect/1.12.3:
+    resolution: {integrity: sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==}
+    dev: false
+
+  /qs/6.11.2:
+    resolution: {integrity: sha512-tDNIz22aBzCDxLtVH++VnTfzxlfeK5CbqohpSqpJgj1Wg/cQbStNAz3NuqCs5vV+pjBsK4x4pN9HlVh7rcYRiA==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      side-channel: 1.0.4
+    dev: false
+
+  /side-channel/1.0.4:
+    resolution: {integrity: sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==}
+    dependencies:
+      call-bind: 1.0.2
+      get-intrinsic: 1.2.0
+      object-inspect: 1.12.3
+    dev: false
+
+  /source-map/0.6.1:
+    resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
+    engines: {node: '>=0.10.0'}
+    dev: true
+    optional: true
+
+  /xcase/2.0.1:
+    resolution: {integrity: sha512-UmFXIPU+9Eg3E9m/728Bii0lAIuoc+6nbrNUKaRPJOFp91ih44qqGlWtxMB6kXFrRD6po+86ksHM5XHCfk6iPw==}
+    dev: false
 
   registry.npmmirror.com/@alicloud/credentials/2.2.6:
     resolution: {integrity: sha512-jG+msY77dHmAF3x+8VTy7fEgORyXLHmDci8t92HeipBdCHsPptDegA++GEwKgR7f6G4wvafYt+aqMZ1iligdrQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@alicloud/credentials/-/credentials-2.2.6.tgz}
@@ -827,15 +933,6 @@ packages:
     version: 0.2.3
     dev: true
 
-  registry.npmmirror.com/@colors/colors/1.5.0:
-    resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@colors/colors/-/colors-1.5.0.tgz}
-    name: '@colors/colors'
-    version: 1.5.0
-    engines: {node: '>=0.1.90'}
-    requiresBuild: true
-    dev: true
-    optional: true
-
   registry.npmmirror.com/@cspotcode/source-map-support/0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz}
     name: '@cspotcode/source-map-support'
@@ -1100,7 +1197,7 @@ packages:
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dependencies:
       callsites: registry.npmmirror.com/callsites/3.1.0
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: 4.2.10
       source-map: registry.npmmirror.com/source-map/0.6.1
     dev: true
 
@@ -1123,7 +1220,7 @@ packages:
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dependencies:
       '@jest/test-result': registry.npmmirror.com/@jest/test-result/27.5.1
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: 4.2.10
       jest-haste-map: registry.npmmirror.com/jest-haste-map/27.5.1
       jest-runtime: registry.npmmirror.com/jest-runtime/27.5.1
     transitivePeerDependencies:
@@ -2705,7 +2802,7 @@ packages:
       babel-plugin-istanbul: registry.npmmirror.com/babel-plugin-istanbul/6.1.1
       babel-preset-jest: registry.npmmirror.com/babel-preset-jest/27.5.1_@babel+core@7.20.12
       chalk: registry.npmmirror.com/chalk/4.1.2
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: 4.2.10
       slash: registry.npmmirror.com/slash/3.0.0
     transitivePeerDependencies:
       - supports-color
@@ -3102,7 +3199,7 @@ packages:
       normalize-path: registry.npmmirror.com/normalize-path/3.0.0
       readdirp: registry.npmmirror.com/readdirp/3.6.0
     optionalDependencies:
-      fsevents: registry.npmmirror.com/fsevents/2.3.2
+      fsevents: 2.3.2
     dev: true
 
   registry.npmmirror.com/chownr/1.1.4:
@@ -3190,7 +3287,7 @@ packages:
     dependencies:
       string-width: registry.npmmirror.com/string-width/4.2.3
     optionalDependencies:
-      '@colors/colors': registry.npmmirror.com/@colors/colors/1.5.0
+      '@colors/colors': 1.5.0
     dev: true
 
   registry.npmmirror.com/cli-width/3.0.0:
@@ -3924,7 +4021,7 @@ packages:
       esutils: registry.npmmirror.com/esutils/2.0.3
       optionator: registry.npmmirror.com/optionator/0.8.3
     optionalDependencies:
-      source-map: registry.npmmirror.com/source-map/0.6.1
+      source-map: 0.6.1
     dev: true
 
   registry.npmmirror.com/eslint-config-prettier/8.6.0_eslint@8.33.0:
@@ -4570,16 +4667,6 @@ packages:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/fs.realpath/-/fs.realpath-1.0.0.tgz}
     name: fs.realpath
     version: 1.0.0
-
-  registry.npmmirror.com/fsevents/2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/fsevents/-/fsevents-2.3.2.tgz}
-    name: fsevents
-    version: 2.3.2
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-    requiresBuild: true
-    dev: true
-    optional: true
 
   registry.npmmirror.com/function-bind/1.1.1:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/function-bind/-/function-bind-1.1.1.tgz}
@@ -5487,7 +5574,7 @@ packages:
       micromatch: registry.npmmirror.com/micromatch/4.0.5
       walker: registry.npmmirror.com/walker/1.0.8
     optionalDependencies:
-      fsevents: registry.npmmirror.com/fsevents/2.3.2
+      fsevents: 2.3.2
     dev: true
 
   registry.npmmirror.com/jest-jasmine2/27.5.1:
@@ -5692,7 +5779,7 @@ packages:
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dependencies:
       '@types/node': registry.npmmirror.com/@types/node/16.18.11
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: 4.2.10
     dev: true
 
   registry.npmmirror.com/jest-snapshot/27.5.1:
@@ -5972,7 +6059,7 @@ packages:
     dependencies:
       universalify: registry.npmmirror.com/universalify/2.0.0
     optionalDependencies:
-      graceful-fs: registry.npmmirror.com/graceful-fs/4.2.10
+      graceful-fs: 4.2.10
     dev: true
 
   registry.npmmirror.com/jsonschema/1.4.1:

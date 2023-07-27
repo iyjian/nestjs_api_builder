@@ -1,4 +1,4 @@
-import { Gitlab } from '@gitbeaker/node'
+import { Gitlab } from '@gitbeaker/rest'
 import 'dotenv/config'
 
 const api = new Gitlab({
@@ -11,9 +11,10 @@ const api = new Gitlab({
   // let users = await api.Users.all();
 
   // Or using Promise-Then notation
-  const projects = await api.Projects.all()
-
+  console.log(`getAllProjects - start`)
+  const projects = await api.Projects.all({membership: true})
   for (const project of projects) {
     console.log(project.id, project.name)
   }
+  console.log(`getAllProjects - done`)
 })()
