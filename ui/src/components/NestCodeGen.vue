@@ -92,12 +92,13 @@
     <div class="info">
       <div class="info-left">
         <div style="margin-right: 10px">tableId: {{ table.id }}</div>
-
+        <el-space>
         <ERPreviewer :tableId="table.id"> </ERPreviewer>
         <ColumnSummary :columns="computedReadyColumns"></ColumnSummary>
         <ParseImg />
         <IndexManager :tableId="store.table.id" />
         <SyncPreview :tableId="store.table.id" />
+      </el-space>
         <!-- <div
           id="srcImg"
           style="width: 400px; height: 40px; border: 1px solid gray"
