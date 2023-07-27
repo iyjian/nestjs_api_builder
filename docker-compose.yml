@@ -1,19 +1,23 @@
 version: "3.5"
 
 services:
-  devtool-api:
-    image: iyjian/api
+  api:
+    image: iyjian/nestjs-builder-api  
+    # image: iyjian/api
+    # build:
+    #   context: ./api    
     restart: always
-    build:
-      context: ./api
+    environment:
+      - PORT=3000    
     env_file:
       - ./api/.env
-  devtool-ui:
-    image: iyjian/devfront
-    build:
-      context: ./ui
+  ui:
+    image: iyjian/nestjs-builder-ui
+    # image: iyjian/devfront
+    # build:
+    #   context: ./ui
     restart: always
     env_file:
       - ./api/.env
     ports:
-      - 53001:3000
+      - 53001:80

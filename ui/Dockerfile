@@ -1,6 +1,34 @@
+# FROM node:18-alpine as builder
+
+# WORKDIR /usr/src/build
+
+# ADD package.json .
+
+# ADD pnpm-lock.yaml .
+
+# ENV VITE_API_ENDPOINT=/api
+
+# RUN npm install -g pnpm && pnpm i
+
+# COPY . .
+
+# RUN pnpm build
+
+# FROM node:18-alpine
+
+# WORKDIR /usr/src/app
+
+# COPY --from=builder /usr/src/build/dist /usr/src/app/dist
+# COPY --from=builder /usr/src/build/index.js /usr/src/app
+
+# RUN yarn add static-web-proxy
+
+# ENTRYPOINT ["node", "index"]
+
+# EXPOSE 3000
 FROM node:18-alpine as builder
 
-WORKDIR /usr/src/build
+WORKDIR /app
 
 ADD package.json .
 
@@ -14,15 +42,16 @@ COPY . .
 
 RUN pnpm build
 
-FROM node:18-alpine
+RUN ls /app/dist
 
-WORKDIR /usr/src/app
+FROM nginx:stable-alpine as production-stage
 
-COPY --from=builder /usr/src/build/dist /usr/src/app/dist
-COPY --from=builder /usr/src/build/index.js /usr/src/app
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN yarn add static-web-proxy
+COPY ./quickStart/nginx/nginx.conf /etc/nginx/nginx.conf
 
-ENTRYPOINT ["node", "index"]
+COPY ./quickStart/nginx/site-enabled/default.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 3000
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
