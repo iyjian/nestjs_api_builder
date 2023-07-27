@@ -124,11 +124,11 @@ export default defineComponent({
         this.dialog.visible = true;
       }
     },
-    configEntity(table: TableSimple) {
-      // store.dispatch("switchTable", table.id);
-      store.switchTable(table.id);
-      this.$router.push("/nestCodeGen");
-    },
+    // async configEntity(table: TableSimple) {
+    //   // store.dispatch("switchTable", table.id);
+    //   await store.switchTableAsync(table.id);
+    //   this.$router.push("/nestCodeGen");
+    // },
   },
   watch: {
     projectId: {
