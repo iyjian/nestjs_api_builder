@@ -112,7 +112,7 @@ export class DEVToolApiClient extends RequestBase {
     return response.data.data;
   }
 
-  async getProjectInfo(projectId: string) {
+  async getProjectInfo(projectId: number) {
     const response = await this.request.get(`/metaProject/${projectId}`);
     return response.data.data;
   }

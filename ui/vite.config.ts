@@ -18,6 +18,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
+    hmr: true,
   },
   optimizeDeps: {
     include: ['@authing/native-js-ui-components']
