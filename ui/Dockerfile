@@ -23,6 +23,6 @@ COPY --from=builder /usr/src/build/index.js /usr/src/app
 
 RUN yarn add static-web-proxy
 
-ENTRYPOINT ["node", "index"] 
+ENTRYPOINT ["node", "index"]
 
 EXPOSE 3000
