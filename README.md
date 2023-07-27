@@ -40,16 +40,16 @@ https://blog.csdn.net/stay_foolish12/article/details/123655750
 docker pull paddlecloud/paddlenlp:develop-cpu-latest
 
 ## 已经解决
-[x] 实体定义中如果有自依赖，在import的时候会把自己这个class也import进来（需要剔除）。
-[x] 先新建一个字段叫column, 待字段保存后, 再把这个字段改为columnId, 并设置为外键, 由于外键会自动新建一个叫column的字段，所以此时会报重复。
-[x] hasMany的生成需要加as? 如果 A表中2个字段依赖B表，则B表应该有两个hasMany
-[x] page和pageSize需要设置默认值,否则在接口调用的时候不方便
-[x] controller里的方法名字需要加上实体名，否则如果有需要把controller合并的时候会名字冲突(注意这里是controller) (不应该有这个合并controller的场景)
-[x] service中需要加一个findOne的方法，不仅仅是findById
-[x] 前端需要增加 无需创建 选项，因为有些字段是内部字段，通过内部逻辑创建的，无需通过接口传入。
-[x] dataType迁移，需要用dataTypeId 而不是文字
-[x] removeTable removeColumn需要做依赖检测  因为字段上有metaColumn.refTableId会有关联表
-[x] 软删除表的时候也需要软删除字段(现在是不允许删除有依赖关系的表以及字段)
+[x] 实体定义中如果有自依赖，在import的时候会把自己这个class也import进来（需要剔除）。  
+[x] 先新建一个字段叫column, 待字段保存后, 再把这个字段改为columnId, 并设置为外键, 由于外键会自动新建一个叫column的字段，所以此时会报重复。  
+[x] hasMany的生成需要加as? 如果 A表中2个字段依赖B表，则B表应该有两个hasMany  
+[x] page和pageSize需要设置默认值,否则在接口调用的时候不方便  
+[x] controller里的方法名字需要加上实体名，否则如果有需要把controller合并的时候会名字冲突(注意这里是controller) (不应该有这个合并controller的场景)  
+[x] service中需要加一个findOne的方法，不仅仅是findById  
+[x] 前端需要增加 无需创建 选项，因为有些字段是内部字段，通过内部逻辑创建的，无需通过接口传入。  
+[x] dataType迁移，需要用dataTypeId 而不是文字  
+[x] removeTable removeColumn需要做依赖检测  因为字段上有metaColumn.refTableId会有关联表  
+[x] 软删除表的时候也需要软删除字段(现在是不允许删除有依赖关系的表以及字段)  
 
 通过加可查询/可创建/可搜索/可更新来解决
 
