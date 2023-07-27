@@ -276,7 +276,7 @@ export const projectTableStore = defineStore("projectTable", {
       this.emptyTable();
       this.emptyCode();
       const projectInfo = await devToolApiClient.getProjectInfo(
-        projectId.toString()
+        projectId
       );
       this.updateProject(projectInfo);
       const allTables = await devToolApiClient.loadAllTables(
