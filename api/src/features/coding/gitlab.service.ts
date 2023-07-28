@@ -4,6 +4,7 @@ import { Gitlab, Types } from '@gitbeaker/node'
 import { ConfigService } from '@nestjs/config'
 import { CommitAction } from './dto/coding.dto'
 import { GitlabRemoveDirectoryRequestDTO } from './dto/gitlab.dto'
+import { MetaProjectService } from '../base/services/meta.project.service'
 
 export type CommitFile = {
   filePath: string
@@ -42,12 +43,33 @@ export class GitlabService {
   private readonly logger = new Logger(GitlabService.name)
   private gitlabClient: InstanceType<typeof Gitlab>
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly metaProjectService: MetaProjectService,
+  ) {
     this.gitlabClient = new Gitlab({
       host: this.configService.get('gitlab.host'),
       token: this.configService.get('gitlab.token'),
     })
   }
+
+  async getGitlabClient (repoId: number) {
+    const project = await this.metaProjectService.findOneMetaProject2({repoId})
+    if (project && project.gitlabHost && project.gitlabToken) {
+      // project设置过token
+      return new Gitlab({
+        host: project.gitlabHost,
+        token: project.gitlabToken,
+      })
+    } else {
+      // project没有设置过token
+      return new Gitlab({
+        host: this.configService.get('gitlab.host'),
+        token: this.configService.get('gitlab.token'),
+      })
+    }
+  }
+
   /**
    * 获取指定仓库、指定路径的文件内容
    *
@@ -72,7 +94,8 @@ export class GitlabService {
       this.logger.debug(
         `gitService - getFileContent - request: repoId: ${repoId} branch: ${branch} fullFilePath: ${fullFilePath}`,
       )
-      const result = await this.gitlabClient.RepositoryFiles.show(
+      const gitlabClient = await this.getGitlabClient(repoId)
+      const result = await gitlabClient.RepositoryFiles.show(
         repoId,
         fullFilePath,
         branch,
@@ -132,9 +155,10 @@ export class GitlabService {
     this.logger.debug(
       `gitService - getFilesContent - repoId: ${repoId} branch: ${branch} directory: ${directory}`,
     )
+    const gitlabClient = await this.getGitlabClient(repoId)
     const codes: Code[] = []
 
-    const files = await this.gitlabClient.Repositories.tree(repoId, {
+    const files = await gitlabClient.Repositories.tree(repoId, {
       ref: branch,
       path: directory,
       recursive,
@@ -169,8 +193,8 @@ export class GitlabService {
       `gitService - getFilesContent - repoId: ${repoId} branch: ${branch} directory: ${directory}`,
     )
     const codes: Code[] = []
-
-    const files = await this.gitlabClient.Repositories.tree(repoId, {
+    const gitlabClient = await this.getGitlabClient(repoId)
+    const files = await gitlabClient.Repositories.tree(repoId, {
       ref: branch,
       path: directory,
       recursive,
@@ -189,7 +213,7 @@ export class GitlabService {
       directory,
       comment = `delete directory: ${directory}`,
     } = gitlabRemoveDirectoryRequest
-
+    
     const files = await this.getFiles(+repoId, branch, directory, true)
 
     const commitFiles = files
@@ -256,7 +280,8 @@ export class GitlabService {
       `gitService - commitFiles - repoId: ${repoId}, branch: ${branch}, comment: ${comment}`,
     )
     this.logger.debug(JSON.stringify(commitFiles, null, 2))
-    await this.gitlabClient.Commits.create(repoId, branch, comment, commitFiles)
+    const gitlabClient = await this.getGitlabClient(repoId)
+    await gitlabClient.Commits.create(repoId, branch, comment, commitFiles)
   }
 
   /**
@@ -272,6 +297,7 @@ export class GitlabService {
     newBranch: string,
     sourceBranch: string,
   ): Promise<Types.BranchSchema> {
-    return this.gitlabClient.Branches.create(repoId, newBranch, sourceBranch)
+    const gitlabClient = await this.getGitlabClient(repoId)
+    return gitlabClient.Branches.create(repoId, newBranch, sourceBranch)
   }
 }

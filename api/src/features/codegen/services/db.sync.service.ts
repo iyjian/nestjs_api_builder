@@ -100,7 +100,7 @@ export class DBSyncService {
    * @returns
    */
   private async getProjectConnection(projectId: number): Promise<Sequelize> {
-    const project = await this.metaProjectService.findOneMetaProject(projectId)
+    const project = await this.metaProjectService.findOneMetaProjectById(projectId)
     const config = this.targetDBConnections[projectId]?.config
 
     if (

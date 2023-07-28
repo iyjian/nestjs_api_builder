@@ -39,7 +39,7 @@ export class MetaProjectController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.metaProjectService.findOneMetaProject(+id)
+    return this.metaProjectService.findOneMetaProjectById(+id)
   }
 
   @Delete(':id')

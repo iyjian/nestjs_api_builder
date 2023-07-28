@@ -23,7 +23,7 @@ export class MetaProjectService extends BaseService {
 
   async createMetaProject(metaProjectObj: CreateMetaProjectRequestDTO) {
     const metaProject = await this.metaProjectModel.create(metaProjectObj)
-    return this.findOneMetaProject(metaProject.id)
+    return this.findOneMetaProjectById(metaProject.id)
   }
 
   async findAllMetaProject(
@@ -54,8 +54,17 @@ export class MetaProjectService extends BaseService {
     return metaProjects
   }
 
-  async findOneMetaProject(id: number) {
+  async findOneMetaProjectById(id: number) {
     const metaProject = await this.metaProjectModel.findByPk(id, {
+      include: this.include,
+    })
+    return metaProject
+  }
+
+  async findOneMetaProject2(findAllQueryMetaProject: FindAllMetaProjectRequestDTO,) {
+    const { page, pageSize, skipPaging, ...payload } = findAllQueryMetaProject
+    const metaProject = await this.metaProjectModel.findOne({
+      where: payload,
       include: this.include,
     })
     return metaProject
