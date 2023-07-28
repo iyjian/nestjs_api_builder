@@ -539,7 +539,7 @@ export class CodegenServiceService {
       branch,
       table.serviceFilePath,
     )
-    console.timeEnd('getServiceCode-getFileContent')
+    console.timeEnd(`getServiceCode - getFileContent - repoId: ${table.project.repoId} branch:${branch} serviceFilePath: ${table.serviceFilePath}`)
 
     if (contentResult.err === 0) {
       // 如果service代码已经存在
