@@ -9,6 +9,7 @@ import { CodegenModule } from './features/codegen/codegen.module'
 import { CodingModule } from './features/coding/coding.module'
 import { ToolModule } from './features/tool/tool.module'
 import { ThirdModule } from './features/third/third.module'
+import fs from 'fs'
 
 @Module({
   imports: [
@@ -38,6 +39,9 @@ import { ThirdModule } from './features/third/third.module'
           idle: 10000,
         },
         timezone: '+08:00',
+        dialectOptions: {
+          ssl: fs.readFileSync('/etc/ssl/certs/ca-certificates.crt')
+        }
       }),
       inject: [ConfigService],
     }),
