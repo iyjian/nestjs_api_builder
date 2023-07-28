@@ -39,9 +39,9 @@ import fs from 'fs'
           idle: 10000,
         },
         timezone: '+08:00',
-        dialectOptions: {
-          ssl: fs.readFileSync('/etc/ssl/certs/ca-certificates.crt')
-        }
+        dialectOptions: configService.get('mysql.sslCert') ? {
+          ssl: fs.readFileSync(configService.get('mysql.sslCert'))
+        }: undefined
       }),
       inject: [ConfigService],
     }),

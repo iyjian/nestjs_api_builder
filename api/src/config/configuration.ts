@@ -18,7 +18,7 @@ export default (): any => ({
     username: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWD,
     db: process.env.MYSQL_DB,
-    ssl: process.env.MYSQL_SSL === 'true',
+    sslCert: process.env.MYSQL_SSL_CERT,
   },
   redis: {
     host: process.env.REDIS_HOST,
