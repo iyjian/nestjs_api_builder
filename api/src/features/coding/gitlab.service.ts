@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { Code } from '../../core/interfaces/CodeType'
-import { Gitlab, Types } from '@gitbeaker/node'
+import { BranchSchema, Camelize, Gitlab } from '@gitbeaker/rest'
 import { ConfigService } from '@nestjs/config'
 import { CommitAction } from './dto/coding.dto'
 import { GitlabRemoveDirectoryRequestDTO } from './dto/gitlab.dto'
@@ -47,13 +47,13 @@ export class GitlabService {
     private readonly configService: ConfigService,
     private readonly metaProjectService: MetaProjectService,
   ) {
-    this.gitlabClient = new Gitlab({
-      host: this.configService.get('gitlab.host'),
-      token: this.configService.get('gitlab.token'),
-    })
+    // this.gitlabClient = new Gitlab({
+    //   host: this.configService.get('gitlab.host'),
+    //   token: this.configService.get('gitlab.token'),
+    // })
   }
 
-  async getGitlabClient (repoId: number) {
+  async getGitlabClient (repoId: number): Promise<InstanceType<typeof Gitlab>> {
     const project = await this.metaProjectService.findOneMetaProject2({repoId})
     if (project && project.gitlabHost && project.gitlabToken) {
       // project设置过token
@@ -158,11 +158,18 @@ export class GitlabService {
     const gitlabClient = await this.getGitlabClient(repoId)
     const codes: Code[] = []
 
-    const files = await gitlabClient.Repositories.tree(repoId, {
+    // const files = await gitlabClient.Repositories.tree(repoId, {
+    //   ref: branch,
+    //   path: directory,
+    //   recursive,
+    //   per_page: 10000,
+    // })
+
+    const files = await gitlabClient.Repositories.allRepositoryTrees(repoId, {
       ref: branch,
       path: directory,
       recursive,
-      per_page: 10000,
+      perPage: 10000,
     })
 
     // 改成promise.all
@@ -188,17 +195,23 @@ export class GitlabService {
     branch: string,
     directory: string,
     recursive: boolean = false,
-  ) {
+  ): Promise<any> {
     this.logger.debug(
       `gitService - getFilesContent - repoId: ${repoId} branch: ${branch} directory: ${directory}`,
     )
     const codes: Code[] = []
     const gitlabClient = await this.getGitlabClient(repoId)
-    const files = await gitlabClient.Repositories.tree(repoId, {
+    // const files = await gitlabClient.Repositories.tree(repoId, {
+    //   ref: branch,
+    //   path: directory,
+    //   recursive,
+    //   per_page: 10000,
+    // })
+    const files = await gitlabClient.Repositories.allRepositoryTrees(repoId, {
       ref: branch,
       path: directory,
       recursive,
-      per_page: 10000,
+      perPage: 10000,
     })
 
     return files
@@ -296,7 +309,7 @@ export class GitlabService {
     repoId: number,
     newBranch: string,
     sourceBranch: string,
-  ): Promise<Types.BranchSchema> {
+  ): Promise<BranchSchema | Camelize<BranchSchema>> {
     const gitlabClient = await this.getGitlabClient(repoId)
     return gitlabClient.Branches.create(repoId, newBranch, sourceBranch)
   }
