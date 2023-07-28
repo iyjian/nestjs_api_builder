@@ -127,7 +127,6 @@ import {
 } from "@element-plus/icons-vue";
 import { TableSimple, Project } from "@/types";
 import moment from "moment";
-// import { useStore } from "@/store";
 import { projectTableStore } from "@/store/projectTable";
 
 let store: ReturnType<typeof projectTableStore>;
@@ -255,9 +254,15 @@ export default defineComponent({
       }
     },
     async configEntity(table: TableSimple) {
-      console.log(`Entities - configEntity - tableId: ${table.id}`);
-      await store.switchTableAsync(table.id);
-      this.$router.push("/nestCodeGen");
+      try {
+        this.tableLoading = true
+        console.log(`Entities - configEntity - tableId: ${table.id}`);
+        await store.switchTableAsync(table.id);
+        this.tableLoading = false
+        this.$router.push("/nestCodeGen");
+      } catch (e) {
+        this.tableLoading = false
+      }
     },
   },
   watch: {

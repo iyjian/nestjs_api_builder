@@ -284,10 +284,6 @@ export const projectTableStore = defineStore("projectTable", {
       );
       this.updateTables(allTables);
     },
-    // async reloadProjectTables({state, commit }, projectId) {
-    //   const allTables = await devToolApiClient.loadAllTables(projectId);
-    //   commit("updateTables", allTables);
-    // },
     /**
      * 切换表
      *
@@ -301,10 +297,6 @@ export const projectTableStore = defineStore("projectTable", {
       const table = await devToolApiClient.getTableInfo(tableId);
       this.updateTable(table);
       this.updatePersistTable(table);
-      // commit("updateTable", table);
-      // commit("updatePersistTable", table);
-      // dispatch("addEmptyColumn");
-      // dispatch("triggerCodePreview");
       await this.addEmptyColumn();
       await this.triggerCodePreviewAsync();
     },
@@ -320,9 +312,7 @@ export const projectTableStore = defineStore("projectTable", {
         // 老字段(已经同步到数据库里的字段)
         await devToolApiClient.deleteColumn(column.id);
         const table = await devToolApiClient.getTableInfo(this.table.id);
-        // commit("updateTable", table);
         this.updateTable(table);
-        // commit("updatePersistTable", table);
         this.updatePersistTable(table);
       } else {
         this.table.columns = this.table.columns
@@ -342,12 +332,6 @@ export const projectTableStore = defineStore("projectTable", {
     addEmptyColumn() {
       if (this.isTableValid) {
         if (this.table.columns.length === 0) {
-          // commit(
-          //   "addColumn",
-          //   _.extend(_.clone(columnTemplate), {
-          //     order: this.totalColumns + 1,
-          //   })
-          // );
           this.addColumn(
             _.extend(_.clone(columnTemplate), {
               order: this.totalColumns + 1,
@@ -417,15 +401,12 @@ export const projectTableStore = defineStore("projectTable", {
           );
           this.status.tableSaving = true;
           const clonedTable = _.cloneDeep(this.table);
-          // clonedTable.columns = clonedTable.columns.map(
-          //   (column, index) => (column.order = index + 1)
-          // );
+
           for (const i in clonedTable.columns) {
             clonedTable.columns[i].order = parseInt(i) + 1;
           }
+
           const savedTable = await devToolApiClient.saveEntity(this.table);
-          // store.commit("updateTable", savedTable);
-          // store.commit("updatePersistTable", savedTable);
           this.updateTable(savedTable);
           this.updatePersistTable(savedTable);
         }
@@ -445,9 +426,7 @@ export const projectTableStore = defineStore("projectTable", {
           return code;
         });
 
-        // dispatch("addEmptyColumn");
-        await this.addEmptyColumn();
-        // commit("toPreviewMode");
+        this.addEmptyColumn();
         this.toPreviewMode();
         console.log("debug...............");
         this.status.tableSaving = false;
@@ -473,7 +452,6 @@ export const projectTableStore = defineStore("projectTable", {
       }
 
       this.status.previewTimer = setTimeout(async () => {
-        // await dispatch("triggerCodePreview");
         await this.triggerCodePreviewAsync();
         this.status.isTriggerCodePreviewThrottleCalling = false;
         this.status.previewTimer = undefined;
@@ -482,6 +460,5 @@ export const projectTableStore = defineStore("projectTable", {
   },
   persist: {
     enabled: true,
-    // strategies: [{ storage: localStorage2, paths: ["projectTable"] }],
   },
 });
