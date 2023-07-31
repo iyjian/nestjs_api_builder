@@ -14,6 +14,13 @@ import {
   FindAllMetaProjectRequestDTO,
   UpdateMetaProjectRequestDTO,
 } from '../dto'
+import {
+  ApiPaginatedResponse,
+  ApiFindOneResponse,
+  ApiPatchResponse,
+  ApiDeleteResponse,
+  codeGen,
+} from './../../../core'
 
 @Controller('metaProject')
 export class MetaProjectController {

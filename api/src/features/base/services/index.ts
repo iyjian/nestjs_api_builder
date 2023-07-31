@@ -1,2 +1,8 @@
 export { LogService } from './log.service'
 export { RouteService } from './route.service'
+export { MetaProjectService } from './meta.project.service'
+export { FrontProjectService } from './front.project.service'
+export { MetaColumnService } from './meta.column.service'
+export { MetaDataTypeService } from './meta.data.type.service'
+export { MetaTableService } from './meta.table.service'
+export { ProjectModuleService } from './project.module.service'

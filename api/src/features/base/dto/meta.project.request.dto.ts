@@ -106,6 +106,22 @@ export class CreateMetaProjectRequestDTO {
     required: false,
   })
   gitlabHost?: string
+
+  @codeGen('9146')
+  @ApiProperty({
+    description: '用户id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  userId?: number
+
+  @codeGen('9147')
+  @ApiProperty({
+    description: '是否公开',
+    required: false,
+  })
+  @Transform(getTransformer('booleanTransformer'))
+  isPublic?: boolean
 }
 
 export class UpdateMetaProjectRequestDTO {
@@ -209,6 +225,22 @@ export class UpdateMetaProjectRequestDTO {
     required: false,
   })
   gitlabHost?: string
+
+  @codeGen('9146')
+  @ApiProperty({
+    description: '用户id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  userId?: number
+
+  @codeGen('9147')
+  @ApiProperty({
+    description: '是否公开',
+    required: false,
+  })
+  @Transform(getTransformer('booleanTransformer'))
+  isPublic?: boolean
 }
 
 export class FindOneMetaProjectRequestDTO {
@@ -312,6 +344,22 @@ export class FindOneMetaProjectRequestDTO {
     required: false,
   })
   gitlabHost?: string
+
+  @codeGen('9146')
+  @ApiProperty({
+    description: '用户id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  userId?: number
+
+  @codeGen('9147')
+  @ApiProperty({
+    description: '是否公开',
+    required: false,
+  })
+  @Transform(getTransformer('booleanTransformer'))
+  isPublic?: boolean
 }
 
 export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
@@ -415,4 +463,20 @@ export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
     required: false,
   })
   gitlabHost?: string
+
+  @codeGen('9146')
+  @ApiProperty({
+    description: '用户id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  userId?: number
+
+  @codeGen('9147')
+  @ApiProperty({
+    description: '是否公开',
+    required: false,
+  })
+  @Transform(getTransformer('booleanTransformer'))
+  isPublic?: boolean
 }

@@ -7,11 +7,12 @@ export {
   CreateMetaProjectRequestDTO,
   UpdateMetaProjectRequestDTO,
   FindAllMetaProjectRequestDTO,
+  FindOneMetaProjectRequestDTO,
 } from './meta.project.request.dto'
 export {
-  CreateMetaTableRequestDTO as CreateMetaTableRequestDto,
-  UpdateMetaTableRequestDTO as UpdateMetaTableRequestDto,
-  FindAllMetaTableRequestDTO as FindAllMetaTableDto,
+  CreateMetaTableRequestDTO,
+  UpdateMetaTableRequestDTO,
+  FindAllMetaTableRequestDTO,
 } from './meta.table.request.dto'
 export {
   CreateMetaColumnRequestDTO,

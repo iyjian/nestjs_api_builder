@@ -135,4 +135,21 @@ export class MetaProject extends BaseModel<MetaProject> {
   })
   @codeGen('9145')
   gitlabHost?: string
+
+  @Column({
+    allowNull: true,
+    type: DataType.INTEGER,
+    comment: '用户id',
+  })
+  @codeGen('9146')
+  userId?: number
+
+  @Column({
+    allowNull: true,
+    type: DataType.BOOLEAN,
+    defaultValue: true,
+    comment: '是否公开',
+  })
+  @codeGen('9147')
+  isPublic?: boolean
 }

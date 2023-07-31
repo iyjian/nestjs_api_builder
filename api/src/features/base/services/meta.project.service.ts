@@ -61,7 +61,9 @@ export class MetaProjectService extends BaseService {
     return metaProject
   }
 
-  async findOneMetaProject2(findAllQueryMetaProject: FindAllMetaProjectRequestDTO,) {
+  async findOneMetaProject2(
+    findAllQueryMetaProject: FindAllMetaProjectRequestDTO,
+  ) {
     const { page, pageSize, skipPaging, ...payload } = findAllQueryMetaProject
     const metaProject = await this.metaProjectModel.findOne({
       where: payload,

@@ -6,6 +6,8 @@ export {
   MetaProject,
   FrontProject,
   ProjectModule,
+  Log,
+  Route,
 } from './entities'
 export { MetaColumnService } from './services/meta.column.service'
 export { MetaDataTypeService } from './services/meta.data.type.service'
@@ -19,5 +21,13 @@ export { FrontProjectController } from './controllers/front.project.controller'
 export { FrontProjectService } from './services/front.project.service'
 export { ProjectModuleController } from './controllers/project.module.controller'
 export { ProjectModuleService } from './services/project.module.service'
-
-export { RouteService, LogService } from './services'
+export {
+  RouteService,
+  LogService,
+  MetaProjectService,
+  FrontProjectService,
+  MetaColumnService,
+  MetaDataTypeService,
+  MetaTableService,
+  ProjectModuleService,
+} from './services'
