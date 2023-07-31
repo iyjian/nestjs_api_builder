@@ -40,3 +40,7 @@ jobs:
         context: ./ui
         push: true
         tags: iyjian/nestjs-builder-ui:latest
+    -
+      name: notify
+      run: curl --data-urlencode "content=api-builder build done" https://h.tltr.top/g/Tdi7Fjg
+      
