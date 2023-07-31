@@ -33,8 +33,6 @@ import { ProjectModuleController } from './controllers/project.module.controller
 import { ProjectModuleService } from './services/project.module.service'
 import { SwaggerController } from './controllers/swagger.controller'
 import { LogService, RouteService } from './services'
-import { MetaProjectController } from './meta.project.controller'
-import { MetaProjectService } from './meta.project.service'
 
 @Module({
   imports: [

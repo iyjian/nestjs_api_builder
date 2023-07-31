@@ -4,9 +4,9 @@ import { BaseService } from '../../../core'
 import { Op, Sequelize, Transaction, QueryTypes } from 'sequelize'
 import { Sequelize as Sequelize2 } from 'sequelize-typescript'
 import {
-  UpdateMetaTableRequestDto,
-  CreateMetaTableRequestDto,
-  FindAllMetaTableDto,
+  UpdateMetaTableRequestDTO,
+  CreateMetaTableRequestDTO,
+  FindAllMetaTableRequestDTO,
 } from '../dto'
 import { MetaTable } from '../entities/meta.table.entity'
 import { MetaColumn } from '../entities/meta.column.entity'
@@ -33,7 +33,7 @@ export class MetaTableService extends BaseService {
   }
 
   async createMetaTable(
-    metaTableObj: CreateMetaTableRequestDto,
+    metaTableObj: CreateMetaTableRequestDTO,
     transaction?: Transaction,
   ) {
     const metaTable = await this.metaTableModel.create(metaTableObj, {
@@ -65,7 +65,7 @@ export class MetaTableService extends BaseService {
     // }
   }
 
-  async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableDto) {
+  async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableRequestDTO) {
     const { page, pageSize, skipPaging, ...payload } = findAllQueryMetaTable
 
     const metaTables = await this.metaTableModel.findAndCountAll({
@@ -234,7 +234,7 @@ export class MetaTableService extends BaseService {
 
   async updateMetaTable(
     id: number,
-    updateMetaTableDto: UpdateMetaTableRequestDto,
+    updateMetaTableDto: UpdateMetaTableRequestDTO,
     transaction?: Transaction,
   ) {
     const metaTable = await this.metaTableModel.findByPk(id)

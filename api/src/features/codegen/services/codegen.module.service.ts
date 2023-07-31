@@ -115,31 +115,42 @@ export class CodegenModuleService {
       `${table.className}`,
     )
 
-    if (table.project.version === 1) {
-      updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
-        [`./${table.controllerFileName.replace(/\.ts$/, '')}`]: {
-          identifiers: [`${table.className}Controller`],
-        },
-        [`./${table.serviceFileName.replace(/\.ts$/, '')}`]: {
-          identifiers: [`${table.className}Service`],
-        },
-        [`./entities`]: {
-          identifiers: [`${table.className}`],
-        },
-      })
-    } else {
-      updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
-        [`./controllers`]: {
-          identifiers: [`${table.className}Controller`],
-        },
-        [`./services`]: {
-          identifiers: [`${table.className}Service`],
-        },
-        [`./entities`]: {
-          identifiers: [`${table.className}`],
-        },
-      })
-    }
+    // if (table.project.version === 1) {
+    //   updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
+    //     [`./${table.controllerFileName.replace(/\.ts$/, '')}`]: {
+    //       identifiers: [`${table.className}Controller`],
+    //     },
+    //     [`./${table.serviceFileName.replace(/\.ts$/, '')}`]: {
+    //       identifiers: [`${table.className}Service`],
+    //     },
+    //     [`./entities`]: {
+    //       identifiers: [`${table.className}`],
+    //     },
+    //   })
+    // } else {
+    //   updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
+    //     [`./controllers`]: {
+    //       identifiers: [`${table.className}Controller`],
+    //     },
+    //     [`./services`]: {
+    //       identifiers: [`${table.className}Service`],
+    //     },
+    //     [`./entities`]: {
+    //       identifiers: [`${table.className}`],
+    //     },
+    //   })
+    // }
+    updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
+      [`./controllers`]: {
+        identifiers: [`${table.className}Controller`],
+      },
+      [`./services`]: {
+        identifiers: [`${table.className}Service`],
+      },
+      [`./entities`]: {
+        identifiers: [`${table.className}`],
+      },
+    })
 
     updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
       [`@nestjs/sequelize`]: {

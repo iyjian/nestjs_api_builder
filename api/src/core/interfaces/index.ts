@@ -1,3 +1,3 @@
 export * from './requestDto'
-export * from './responseDto'
+export * from './response.dto'
 export * from './CodeType'

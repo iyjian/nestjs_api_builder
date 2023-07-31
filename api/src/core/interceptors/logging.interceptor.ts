@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import moment from 'moment'
-import { LogService } from 'src/features/base'
+import { LogService } from './../../features/base/services/log.service'
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {

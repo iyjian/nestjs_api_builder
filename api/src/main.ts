@@ -13,7 +13,7 @@ import { ApiGuard } from './core/guards'
 import * as Sentry from '@sentry/node'
 import logRoutes from './scripts/logRoutes'
 import setupSwagger from './scripts/setupSwagger'
-import { LogService } from './features/base'
+import { LogService } from './features/base/services/log.service'
 // import { run } from './scripts/seed'
 
 async function bootstrap() {
