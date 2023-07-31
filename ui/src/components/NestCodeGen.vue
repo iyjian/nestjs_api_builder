@@ -115,11 +115,11 @@
         <el-checkbox label="ctl" />
         <el-checkbox label="serv" />
         <el-checkbox label="mdu" />
-        <el-checkbox label="dto/idx" />
+        <!-- <el-checkbox label="dto/idx" />
         <el-checkbox label="enty/idx" />
         <el-checkbox label="ctl/idx" />
-        <el-checkbox label="serv/idx" />
-        <el-checkbox label="mdu/idx" />
+        <el-checkbox label="serv/idx" /> -->
+        <!-- <el-checkbox label="mdu/idx" /> -->
         <el-checkbox label="schema" />
       </el-checkbox-group>
     </div>
@@ -794,20 +794,10 @@ function setCodeTypes(shortcut: string) {
         "ctl",
         "serv",
         "mdu",
-        "dto/idx",
-        "enty/idx",
-        "mdu/idx",
+        // "dto/idx",
+        // "enty/idx",
+        // "mdu/idx",
       ]);
-      // store.commit("setSelectedCodeTypes", [
-      //   "enty",
-      //   "dto/req",
-      //   "ctl",
-      //   "serv",
-      //   "mdu",
-      //   "dto/idx",
-      //   "enty/idx",
-      //   "mdu/idx",
-      // ]);
     } else {
       store.setSelectedCodeTypes([
         "enty",
@@ -815,11 +805,11 @@ function setCodeTypes(shortcut: string) {
         "ctl",
         "serv",
         "mdu",
-        "dto/idx",
-        "enty/idx",
-        "ctl/idx",
-        "serv/idx",
-        "mdu/idx",
+        // "dto/idx",
+        // "enty/idx",
+        // "ctl/idx",
+        // "serv/idx",
+        // "mdu/idx",
         "schema",
       ]);
       // store.commit("setSelectedCodeTypes", [
