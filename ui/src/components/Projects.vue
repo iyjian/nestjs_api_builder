@@ -102,7 +102,7 @@ async function submit() {
     });
     postData.value.repo = result.ssh_url_to_repo;
     postData.value.repoId = result.id;
-    await devToolApiClient.postProject(postData);
+    await devToolApiClient.postProject(postData.value);
     await refreshTable();
     dialog.visible = false;
     dialog.button.loading = false;

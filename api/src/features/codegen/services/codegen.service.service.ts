@@ -186,7 +186,7 @@ export class CodegenServiceService {
           continue
         }
 
-        const importSpecifier = this.codegenUtilService.getImportPath(
+        const importSpecifier = this.codegenUtilService.getImportSpecifier(
           from,
           refTable.entityFilePath,
         )
@@ -220,11 +220,11 @@ export class CodegenServiceService {
       }
     }
     this.logger.debug(
-      `----------------getEntityImportsForService ${table.name}----------------`,
+      `----------------getModelImport ${table.name} from: ${from} ----------------`,
     )
     this.logger.debug(JSON.stringify(importsStruncture, null, 2))
     this.logger.debug(
-      `----------------getEntityImportsForService ${table.name}----------------`,
+      `----------------getModelImport ${table.name} from: ${from} ----------------`,
     )
     return this.codegenUtilService.compactImportsStruncture(importsStruncture)
   }
@@ -494,7 +494,7 @@ export class CodegenServiceService {
     })
 
     code = this.codegenUtilService.ensureImports(code, {
-      [this.codegenUtilService.getImportPath(
+      [this.codegenUtilService.getImportSpecifier(
         table.serviceFilePath,
         table.entityFilePath,
       )]: {
@@ -503,7 +503,10 @@ export class CodegenServiceService {
     })
 
     code = this.codegenUtilService.ensureImports(code, {
-      './../dto': {
+      [this.codegenUtilService.getImportSpecifier(
+        table.serviceFilePath,
+        table.dtoFilePath,
+      )]: {
         identifiers: [
           `FindAll${table.className}RequestDTO`,
           `FindOne${table.className}RequestDTO`,

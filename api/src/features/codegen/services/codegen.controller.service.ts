@@ -145,7 +145,10 @@ export class CodegenControllerService {
     }
     `
     code = this.codegenUtilService.ensureImports(code, {
-      './../dto': {
+      [this.codegenUtilService.getImportSpecifier(
+        table.controllerFilePath,
+        table.dtoFilePath,
+      )]: {
         identifiers: [
           `FindAll${table.className}RequestDTO`,
           `Create${table.className}RequestDTO`,
@@ -153,8 +156,12 @@ export class CodegenControllerService {
         ],
       },
     })
+
     code = this.codegenUtilService.ensureImports(code, {
-      [`./../services`]: {
+      [this.codegenUtilService.getImportSpecifier(
+        table.controllerFilePath,
+        table.serviceFilePath,
+      )]: {
         identifiers: [`${table.className}Service`],
       },
     })

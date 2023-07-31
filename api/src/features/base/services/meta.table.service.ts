@@ -42,29 +42,6 @@ export class MetaTableService extends BaseService {
     return this.findOneMetaTable(metaTable.id, transaction)
   }
 
-  async checkIntegraty(tableId: number) {
-    // TODO: 检测表定义和数据库的不一致性
-    // if (payload.projectId) {
-    //   const project = await this.projectService.findOneMetaProject(
-    //     payload.projectId,
-    //   )
-    //   if (project.dbUser) {
-    //     if (!(payload.projectId in this.targetDBConnections)) {
-    //       this.targetDBConnections[payload.projectId] = new Sequelize({
-    //         host: project.dbHost,
-    //         dialect: 'mysql',
-    //         database: project.dbName,
-    //         username: project.dbUser,
-    //         password: project.dbPassword,
-    //       })
-    //     }
-    //     const dbTables = await this.targetDBConnections[payload.projectId].query(`
-    //       select column_name,data_type from information_schema.columns where table_schema = 'portdb'
-    //     `, {type: QueryTypes.SELECT})
-    //   }
-    // }
-  }
-
   async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableRequestDTO) {
     const { page, pageSize, skipPaging, ...payload } = findAllQueryMetaTable
 
@@ -209,6 +186,12 @@ export class MetaTableService extends BaseService {
               model: MetaTable,
               required: false,
               as: 'refTable',
+              include: [
+                {
+                  model: MetaProject,
+                  attributes: ['baseDirectory']
+                }
+              ]
             },
             {
               model: MetaTable,

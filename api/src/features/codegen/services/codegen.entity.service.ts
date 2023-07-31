@@ -66,34 +66,14 @@ export class CodegenEntityService {
           column.relation,
         )
       ) {
-        if (
-          column.refTable.module === table.module &&
-          column.refTable.id !== table.id
-        ) {
-          /**
-           * 关联实体在同模块，且不是同一个实体(子依赖不需要导入)
-           */
-          if ('./' in importsStruncture) {
-            importsStruncture['./'].identifiers.push(column.refTable.className)
-          } else {
-            importsStruncture['./'] = {
-              identifiers: [column.refTable.className],
-            }
-          }
-        } else if (column.refTable.module !== table.module) {
-          /**
-           * 关联实体不在同模块
-           */
-          if (`./../../${column.refTable.module}` in importsStruncture) {
-            importsStruncture[
-              `./../../${column.refTable.module}`
-            ].identifiers.push(column.refTable.className)
-          } else {
-            importsStruncture[`./../../${column.refTable.module}`] = {
-              identifiers: [column.refTable.className],
-            }
-          }
+        const importSpecifier = this.codegenUtilService.getImportSpecifier(table.entityFilePath, column.refTable.entityFilePath)
+
+        if (importSpecifier in importsStruncture) {
+          importsStruncture[importSpecifier].identifiers.push(column.refTable.className)
+        } else {
+          importsStruncture[importSpecifier] = {identifiers: [column.refTable.className]}
         }
+
         importsStruncture['sequelize-typescript'].identifiers.push(
           column.relation,
         )

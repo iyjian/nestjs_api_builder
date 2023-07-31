@@ -68,14 +68,13 @@ export class CodegenModuleService {
       table.moduleClassName,
     )
 
-    const specifier = `./${path
-      .relative(path.dirname(table.appModuleFullPath), table.moduleFilePath)
-      .replace(/\.ts$/, '')}`
-
     updatedAppModuleCode = this.codegenUtilService.ensureImports(
       updatedAppModuleCode,
       {
-        [specifier]: {
+        [this.codegenUtilService.getImportSpecifier(
+          table.appModuleFullPath,
+          table.moduleFilePath,
+        )]: {
           identifiers: [table.moduleClassName],
         },
       },
@@ -115,39 +114,23 @@ export class CodegenModuleService {
       `${table.className}`,
     )
 
-    // if (table.project.version === 1) {
-    //   updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
-    //     [`./${table.controllerFileName.replace(/\.ts$/, '')}`]: {
-    //       identifiers: [`${table.className}Controller`],
-    //     },
-    //     [`./${table.serviceFileName.replace(/\.ts$/, '')}`]: {
-    //       identifiers: [`${table.className}Service`],
-    //     },
-    //     [`./entities`]: {
-    //       identifiers: [`${table.className}`],
-    //     },
-    //   })
-    // } else {
-    //   updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
-    //     [`./controllers`]: {
-    //       identifiers: [`${table.className}Controller`],
-    //     },
-    //     [`./services`]: {
-    //       identifiers: [`${table.className}Service`],
-    //     },
-    //     [`./entities`]: {
-    //       identifiers: [`${table.className}`],
-    //     },
-    //   })
-    // }
     updatedContent = this.codegenUtilService.ensureImports(updatedContent, {
-      [`./controllers`]: {
+      [this.codegenUtilService.getImportSpecifier(
+        table.moduleFilePath,
+        table.controllerFilePath,
+      )]: {
         identifiers: [`${table.className}Controller`],
       },
-      [`./services`]: {
+      [this.codegenUtilService.getImportSpecifier(
+        table.moduleFilePath,
+        table.serviceFilePath,
+      )]: {
         identifiers: [`${table.className}Service`],
       },
-      [`./entities`]: {
+      [this.codegenUtilService.getImportSpecifier(
+        table.moduleFilePath,
+        table.entityFilePath,
+      )]: {
         identifiers: [`${table.className}`],
       },
     })
