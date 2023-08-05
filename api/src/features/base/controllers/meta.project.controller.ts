@@ -20,6 +20,7 @@ import {
   ApiPatchResponse,
   ApiDeleteResponse,
   codeGen,
+  RequestUserId,
 } from './../../../core'
 
 @Controller('metaProject')
@@ -40,7 +41,7 @@ export class MetaProjectController {
   }
 
   @Get('')
-  findAll(@Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO) {
+  findAll(@RequestUserId() userId: string, @Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO) {
     return this.metaProjectService.findAllMetaProject(findAllQueryMetaProject)
   }
 

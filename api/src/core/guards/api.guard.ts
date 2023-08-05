@@ -32,10 +32,25 @@ export class ApiGuard implements CanActivate {
 
       /**
        * AUTHING 认证
+       * loginStatus:
+          {
+            code: 200,
+            message: '已登录',
+            status: true,
+            exp: 1692245610,
+            iat: 1691036010,
+            data: {
+              id: '63feb4dXXXXXXX59c5c8be',
+              userPoolId: '62280996eXXXXXXXXXXb3',
+              arn: null
+            }
+          }
        */
-      const { status } = await this.authing.checkLoginStatus(token)
+      const loginStatus = await this.authing.checkLoginStatus(token)
+      console.log(loginStatus, '------------')
 
-      if (status) {
+      if (loginStatus.status) {
+        request['locals'] = {userId: loginStatus.data.id}
         return true
       } else {
         this.logger.debug(`apiGuard - canActivate - token: ${token}`)
@@ -67,6 +82,7 @@ export class ApiGuard implements CanActivate {
       // }
       // return true
     } catch (e) {
+      console.log(e)
       throw new HttpException('未登录', 700)
     }
   }
