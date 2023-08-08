@@ -9,6 +9,7 @@ import Home from "./../views/HomeView.vue";
 import { AuthenticationClient } from "authing-js-sdk";
 import JOSNViewer from "./../views/JSONViewer.vue";
 import EnumReport from "./../components/EnumReport.vue";
+import { projectTableStore } from "@/store/projectTable";
 
 const authClient = new AuthenticationClient({
   appId: "62315258ab0a42505a0d6bb8",
@@ -112,6 +113,8 @@ router.beforeEach(async (to, from, next) => {
     if (user?.token) {
       const { status } = await authClient.checkLoginStatus(user.token);
       if (status) {
+        const store = projectTableStore();
+        await store.initAsync();
         next();
       } else {
         router.push("/login");
