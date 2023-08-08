@@ -83,9 +83,9 @@ export class DEVToolApiClient extends RequestBase {
     return response.data.data;
   }
 
-  public async loadAllTables(projectId: string) {
+  public async loadAllTables(projectId: string, simplify = false) {
     const response = await this.request.get(
-      `/metaTable?skipPaging=1&projectId=${projectId}`
+      `/metaTable?skipPaging=1&projectId=${projectId}&simplify=${simplify}`
     );
     return response.data.data.rows;
   }

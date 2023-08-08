@@ -171,7 +171,6 @@ export default defineComponent({
         return store.currentProjectId;
       },
       set(projectId: number) {
-        // store.commit("setCurrentProjectId", projectId);
         store.setCurrentProjectId(projectId);
       },
     },
@@ -226,7 +225,7 @@ export default defineComponent({
             await devToolApiClient.deleteTable(table.id);
 
             this.tables = await devToolApiClient.loadAllTables(
-              this.projectId.toString()
+              this.projectId.toString(), true
             );
 
             ElMessage({

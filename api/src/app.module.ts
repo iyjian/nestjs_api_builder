@@ -35,7 +35,7 @@ import fs from 'fs'
         },
         pool: {
           max: 100,
-          min: 0,
+          min: 10,
           idle: 10000,
         },
         timezone: '+08:00',

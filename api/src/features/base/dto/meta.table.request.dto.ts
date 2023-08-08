@@ -107,4 +107,10 @@ export class FindAllMetaTableRequestDTO extends PagingRequestDTO {
     required: false,
   })
   relationNodesForOne?: any
+
+  @ApiProperty({
+    description: '是否精简模式',
+    required: false,
+  })
+  simplify?: boolean
 }
