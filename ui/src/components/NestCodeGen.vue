@@ -68,7 +68,7 @@
 
       <el-button
         type="success"
-        @click="store.triggerCodePreviewAsync()"
+        @click="store.triggerCodePreviewAsync('saveButton')"
         :loading="state.tableSaving"
         :disabled="state.tableSaving"
       >
@@ -659,10 +659,8 @@ const checkMove = (evt: any) => {
   return !!evt.draggedContext.element.name && !!evt.relatedContext.element.name;
 };
 
-// store.dispatch("init");
-
 /**
- * 强制刷新页面里的缓存
+ * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
  */
 if (table.value.id) {
   await store.switchTableAsync(table.value.id);
@@ -835,8 +833,7 @@ function setCodeTypes(shortcut: string) {
 watch(
   () => store.status.selectedCodeTypes,
   async () => {
-    // store.dispatch("triggerCodePreview");
-    await store.triggerCodePreviewAsync();
+    await store.triggerCodePreviewAsync('selectedCodeTypesChanged');
   }
 );
 
@@ -850,8 +847,6 @@ watch(
 
     if (!_oldStringifiedTableDefinition) {
       // 首次加载则触发代码预览
-      // await store.dispatch("triggerCodePreview", true);
-      await store.triggerCodePreviewAsync(true);
       return;
     }
 

@@ -291,14 +291,14 @@ export const projectTableStore = defineStore("projectTable", {
      * @param tableId
      */
     async switchTableAsync(tableId: number) {
-      console.log(`projectTableStore - switchTable - tableId: ${tableId}`);
+      console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`);
       this.emptyTable();
       this.emptyCode();
       const table = await devToolApiClient.getTableInfo(tableId);
       this.updateTable(table);
       this.updatePersistTable(table);
-      await this.addEmptyColumn();
-      await this.triggerCodePreviewAsync();
+      this.addEmptyColumn();
+      await this.triggerCodePreviewAsync('switchTableAsync');
     },
 
     /**
@@ -370,8 +370,9 @@ export const projectTableStore = defineStore("projectTable", {
      * @param skipSaving
      * @returns
      */
-    async triggerCodePreviewAsync(skipSaving = false) {
+    async triggerCodePreviewAsync(source: string, skipSaving = false) {
       try {
+        console.log(`triggerCodePreviewAsync - start - source: ${source} skipSaving: ${skipSaving}`)
         if (!this.isTableValid) {
           console.log(`store - triggerCodePreview - not valid`);
           this.status.tableSaving = false;
@@ -452,7 +453,7 @@ export const projectTableStore = defineStore("projectTable", {
       }
 
       this.status.previewTimer = setTimeout(async () => {
-        await this.triggerCodePreviewAsync();
+        await this.triggerCodePreviewAsync('triggerCodePreviewThrottleAsync');
         this.status.isTriggerCodePreviewThrottleCalling = false;
         this.status.previewTimer = undefined;
       }, 1 * 1000);

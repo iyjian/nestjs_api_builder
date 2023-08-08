@@ -212,12 +212,9 @@ function getRelation(relationNodes?: any[]) {
 watch(
   () => props.tableId,
   (tableId, oldTableId) => {
-    console.log(
-      `CodePreview - watch - props.tableId - tableId: ${tableId} oldTableId: ${oldTableId}`
-    );
     if (tableId !== oldTableId) {
       console.log(
-        `CodePreview - watch - props.tableId - newTableId: ${tableId} oldTableId: ${oldTableId}`
+        `CodePreview - watch: props.tableId (changed) - tableId: ${tableId} oldTableId: ${oldTableId}`
       );
       console.log(
         "CodePreview - watch - table.value.relationNodes",
@@ -226,6 +223,10 @@ watch(
       );
       relations.value = getRelation(table.value.relationNodes);
       relationsOne.value = getRelation(table.value.relationNodesForOne);
+    } else {
+      console.log(
+      `CodePreview - watch: props.tableId (unchanged) - tableId: ${tableId} oldTableId: ${oldTableId}`
+    );
     }
   },
   {
