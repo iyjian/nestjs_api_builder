@@ -107,7 +107,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log(`beforeEach: to.path: ${to.path}`);
+  console.log(`router/index - beforeEach - from: ${from?.path} to.path: ${to?.path}`);
   if (to.path !== "/login" && to.path !== "/") {
     const user = await authClient.getCurrentUser();
     if (user?.token) {

@@ -298,7 +298,16 @@ export const projectTableStore = defineStore("projectTable", {
       this.updateTable(table);
       this.updatePersistTable(table);
       this.addEmptyColumn();
-      await this.triggerCodePreviewAsync('switchTableAsync');
+      // await this.triggerCodePreviewAsync('switchTableAsync');
+    },
+    async switchTableAsyncV2(tableId: number) {
+      console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`);
+      this.emptyCode();
+      const table = await devToolApiClient.getTableInfo(tableId);
+      this.updateTable(table);
+      this.updatePersistTable(table);
+      this.addEmptyColumn();
+      // await this.triggerCodePreviewAsync('switchTableAsync');
     },
 
     /**

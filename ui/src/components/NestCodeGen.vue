@@ -663,7 +663,9 @@ const checkMove = (evt: any) => {
  * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
  */
 if (table.value.id) {
-  await store.switchTableAsync(table.value.id);
+  // console.log(window.PerformanceNavigationTiming.)
+  // await store.switchTableAsync(table.value.id);
+  // await store.triggerCodePreviewAsync('switchTableAsync');
 }
 
 /**
@@ -772,17 +774,14 @@ async function openSetting(column: Column) {
 
 function toggerViewMode() {
   if (store.status.currentPreviewMode === "preview") {
-    // store.commit("toDiffMode");
     store.toDiffMode();
   } else {
-    // store.commit("toPreviewMode");
     store.toPreviewMode();
   }
 }
 
 function setCodeTypes(shortcut: string) {
   if (shortcut === "entity") {
-    // store.commit("setSelectedCodeTypes", ["enty"]);
     store.setSelectedCodeTypes(["enty"]);
   } else if (shortcut === "all") {
     if (table.value.project.version === 1) {
@@ -792,9 +791,6 @@ function setCodeTypes(shortcut: string) {
         "ctl",
         "serv",
         "mdu",
-        // "dto/idx",
-        // "enty/idx",
-        // "mdu/idx",
       ]);
     } else {
       store.setSelectedCodeTypes([
@@ -803,26 +799,8 @@ function setCodeTypes(shortcut: string) {
         "ctl",
         "serv",
         "mdu",
-        // "dto/idx",
-        // "enty/idx",
-        // "ctl/idx",
-        // "serv/idx",
-        // "mdu/idx",
         "schema",
       ]);
-      // store.commit("setSelectedCodeTypes", [
-      //   "enty",
-      //   "dto/req",
-      //   "ctl",
-      //   "serv",
-      //   "mdu",
-      //   "dto/idx",
-      //   "enty/idx",
-      //   "ctl/idx",
-      //   "serv/idx",
-      //   "mdu/idx",
-      //   "schema",
-      // ]);
     }
   }
 }
@@ -841,24 +819,26 @@ watch(
   stringifiedTable,
   async (_newStringifiedTableDefinition, _oldStringifiedTableDefinition) => {
     if (_newStringifiedTableDefinition === _oldStringifiedTableDefinition) {
-      console.log(`NestCodeGen - watch stringifiedTable - no change detected`);
+      console.log(`NestCodeGen - watch stringifiedTable - no change detected(exit)`);
       return;
     }
 
     if (!_oldStringifiedTableDefinition) {
       // 首次加载则触发代码预览
+      console.log(`NestCodeGen - watch stringifiedTable - new table(exit)`);      
+      await store.switchTableAsyncV2(table.value.id);
+      await store.triggerCodePreviewAsync('switchTableAsync');
       return;
     }
 
     // 检查是否需要增加下一列
-    // store.dispatch("addEmptyColumn");
-    await store.addEmptyColumn();
+    store.addEmptyColumn();
 
-    const newTable: Table = JSON.parse(_newStringifiedTableDefinition) as Table;
     const oldTable: Table = JSON.parse(_oldStringifiedTableDefinition) as Table;
+    const newTable: Table = JSON.parse(_newStringifiedTableDefinition) as Table;
 
     if (!oldTable.id && newTable.id) {
-      // await store.dispatch("refreshTables");
+      console.log(`NestCodeGen - watch stringifiedTable - refreshTableList`);
       await store.refreshTablesAsync();
     }
 
@@ -867,6 +847,9 @@ watch(
        * 切换表在TableList.vue里的emitShowEntity中处理，不需要在watch里处理
        * 调用了store中的**switchTable**方法
        */
+      console.log(`NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit)`);
+      await store.switchTableAsyncV2(table.value.id);
+      await store.triggerCodePreviewAsync('switchTableAsync');
       return;
     }
 
