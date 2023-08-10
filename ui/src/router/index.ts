@@ -115,7 +115,11 @@ router.beforeEach(async (to, from, next) => {
       if (status) {
         const store = projectTableStore();
         await store.initAsync();
-        next();
+        // next({
+        //   path: to.path,
+        //   replace: true
+        // });
+        next()
       } else {
         router.push("/login");
       }

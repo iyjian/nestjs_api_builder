@@ -574,7 +574,6 @@ export default {
 </script>
 
 <script lang="ts" setup>
-// import { useStore } from "@/store";
 import { projectTableStore } from "@/store/projectTable";
 import { ref, watch, computed, shallowRef, reactive, onMounted } from "vue";
 import CodePreivew from "./CodePreview.vue";
@@ -592,7 +591,12 @@ import IndexManager from "./IndexManager.vue";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/theme/dracula.css";
 import SyncPreview from "@/components/SyncPreview.vue";
-// const store = useStore();
+// import { useRoute } from 'vue-router'
+
+// const route = useRoute()
+
+// console.log(route)
+
 const store = projectTableStore();
 
 const codeMirrorOption = {
