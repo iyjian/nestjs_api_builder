@@ -575,7 +575,7 @@ export default {
 
 <script lang="ts" setup>
 import { projectTableStore } from "@/store/projectTable";
-import { ref, watch, computed, shallowRef, reactive, onMounted } from "vue";
+import { ref, watch, computed, shallowRef, reactive, onMounted, onActivated } from "vue";
 import CodePreivew from "./CodePreview.vue";
 import ERPreviewer from "./ERPreviewer.vue";
 import { devToolApiClient } from "@/plugins";
@@ -591,11 +591,28 @@ import IndexManager from "./IndexManager.vue";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/theme/dracula.css";
 import SyncPreview from "@/components/SyncPreview.vue";
-// import { useRoute } from 'vue-router'
 
-// const route = useRoute()
+import { getCurrentInstance } from 'vue'
+/** 两种用法
+    1. 从getCurrentInstance 中获取
+    2. template 中可直接通过$history 使用
+*/
+onActivated(async () => {
+  const ins = getCurrentInstance()
+  const routerHistory = ins?.proxy?.$history
+  console.log(111, routerHistory)
+  if ((routerHistory?.stack?.length && routerHistory.stack.length === 1)) {
+    /**
+    * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
+    */
+    if (table.value.id) {
+      console.log(`NestCodeGen - onActivated - refresh code preview`)
+      await store.switchTableAsync(table.value.id);
+      await store.triggerCodePreviewAsync('switchTableAsync');
+    }
 
-// console.log(route)
+  }
+})
 
 const store = projectTableStore();
 
@@ -663,14 +680,6 @@ const checkMove = (evt: any) => {
   return !!evt.draggedContext.element.name && !!evt.relatedContext.element.name;
 };
 
-/**
- * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
- */
-if (table.value.id) {
-  // console.log(window.PerformanceNavigationTiming.)
-  // await store.switchTableAsync(table.value.id);
-  // await store.triggerCodePreviewAsync('switchTableAsync');
-}
 
 /**
  * 关联表的选中与取消选中
