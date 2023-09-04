@@ -23,6 +23,16 @@ export class GitlabProjectService {
     })
   }
 
+  /**
+   * 创建项目
+   * 接口详情: https://docs.gitlab.com/ee/api/projects.html#create-project
+
+   * @param projectName 
+   * @param templateProjectId 
+   * @param visibility 
+   * @param namespaceId 
+   * @returns 
+   */
   public async createProject(
     projectName: string,
     templateProjectId: number = this.templateProjectId,
