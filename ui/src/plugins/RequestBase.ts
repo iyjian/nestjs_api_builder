@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { ElMessage } from "element-plus";
 import router from "./../router";
 export class RequestBase {
-  private readonly TIMEOUT = 100000;
+  private readonly TIMEOUT = 60 * 10 * 1000;
 
   protected request: AxiosInstance;
 
