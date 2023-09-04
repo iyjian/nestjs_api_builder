@@ -26,7 +26,8 @@ export class GitlabProjectService {
   public async createProject(
     projectName: string,
     templateProjectId: number = this.templateProjectId,
-    visibility: string = 'internal',
+    // private internal
+    visibility: string = 'private',
     namespaceId: number = this.namespaceId,
   ): Promise<Types.ProjectExtendedSchema> {
     const project = await this.gitlabClient.Projects.create({
