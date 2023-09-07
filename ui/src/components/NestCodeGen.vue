@@ -882,14 +882,14 @@ watch(
 
 .toolbar
   height 50px
-  padding 0px 20px
+  padding 0px 10px
   display flex
   align-items center
   *
     margin-right 5px
 .info
   height 50px
-  padding 3px 20px
+  padding 3px 10px
   font-size: 18px
   display flex
   flex-direction row
@@ -907,7 +907,7 @@ watch(
   flex-direction row
   overflow hidden
   .table-wrapper
-    padding 10px 10px
+    padding 10px 0px
     width 59%
     height  100%
     overflow scroll

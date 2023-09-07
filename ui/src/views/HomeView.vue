@@ -3,7 +3,7 @@
     <el-aside>
       <NavMenu />
     </el-aside>
-    <el-main>
+    <el-main style="padding: 0px 10px">
       <suspense>
         <router-view v-slot="{ Component }">
           <keep-alive>
