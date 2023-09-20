@@ -1,0 +1,19 @@
+variables:
+  # 项目名称必须要小写, 且不能有空格
+  PROJECT_NAME: "nestjs-builder-api"
+  DOCKER_REPO: "chenawy-docker.pkg.coding.net/jcjy/docker"
+  # PROJECT_PATH: "/home/bgoffice3/wc-projects/nest_sequelize_template"
+
+stages:
+  - devDeploy
+  - build
+
+build:
+  stage: build-api
+  tags:
+    - jcjy
+  script:
+    - docker build -t dummy/${PROJECT_NAME}:$CI_COMMIT_REF_NAME .
+    - docker tag dummy/${PROJECT_NAME}:$CI_COMMIT_REF_NAME ${DOCKER_REPO}/${PROJECT_NAME}:$CI_COMMIT_REF_NAME
+    - docker push ${DOCKER_REPO}/${PROJECT_NAME}:$CI_COMMIT_REF_NAME
+    - curl --data-urlencode "content=${PROJECT_NAME} build done" https://h.tltr.top/g/Tdi7Fjg
