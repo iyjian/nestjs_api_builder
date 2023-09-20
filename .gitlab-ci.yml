@@ -3,7 +3,7 @@ variables:
   DOCKER_REPO: "chenawy-docker.pkg.coding.net/jcjy/docker"
 
 stages:
-  - build
+  - build-api
 
 build:
   stage: build-api
