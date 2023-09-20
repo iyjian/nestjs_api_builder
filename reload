@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker pull chenawy-docker.pkg.coding.net/jcjy/docker/nestjs-builder-api && \
-docker pull chenawy-docker.pkg.coding.net/jcjy/docker/nestjs-builder-ui && \
+docker pull chenawy-docker.pkg.coding.net/jcjy/docker/nestjs-builder-api:dev && \
+docker pull chenawy-docker.pkg.coding.net/jcjy/docker/nestjs-builder-ui:dev && \
 docker-compose down && \
 docker-compose up -d
