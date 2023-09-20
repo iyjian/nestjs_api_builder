@@ -5,7 +5,6 @@ variables:
   # PROJECT_PATH: "/home/bgoffice3/wc-projects/nest_sequelize_template"
 
 stages:
-  - devDeploy
   - build
 
 build:
