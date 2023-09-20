@@ -1,8 +1,6 @@
 variables:
-  # 项目名称必须要小写, 且不能有空格
   PROJECT_NAME: "nestjs-builder-api"
   DOCKER_REPO: "chenawy-docker.pkg.coding.net/jcjy/docker"
-  # PROJECT_PATH: "/home/bgoffice3/wc-projects/nest_sequelize_template"
 
 stages:
   - build
