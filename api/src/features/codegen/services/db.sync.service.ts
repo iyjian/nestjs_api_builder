@@ -111,6 +111,16 @@ export class DBSyncService {
       config.host !== project.dbHost ||
       config.port !== project.dbPort
     ) {
+      console.log({
+        host: project.dbHost,
+        dialect: 'mysql',
+        database: project.dbName,
+        username: project.dbUser,
+        password: project.dbPassword,
+        port: parseInt(project.dbPort),
+        logging: false,
+      })
+      
       // 如果没有初始化过数据库链接或者数据库链接的参数变了则初始化数据库链接
       this.targetDBConnections[projectId] = new Sequelize({
         host: project.dbHost,
