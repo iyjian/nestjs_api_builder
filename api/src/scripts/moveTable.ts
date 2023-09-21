@@ -268,6 +268,7 @@ async function moveTable(
     host: process.env.MYSQL_HOST,
     dialect: 'mysql',
     database: process.env.MYSQL_DB,
+    port: parseInt(process.env.MYSQL_PORT || '3306'),
     username: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWD,
     models: [MetaTable, MetaColumn, MetaProject, MetaDataType],
@@ -275,8 +276,8 @@ async function moveTable(
   })
 
   const srcProjectName = 'nest_sequelize_template'
-  const targetProjectName = '港口后台系统'
-  const srcTableName = 't_attachment'
+  const targetProjectName = process.argv[2]
+  const srcTableName = process.argv[3] // 't_attachment'
 
   const srcProject = await MetaProject.findOne({
     where: {
@@ -314,4 +315,6 @@ async function moveTable(
     delete from t_meta_table where projectId = 7 and name in ('t_route', 't_log');
     delete from t_meta_column where tableId in (select id from t_meta_table where projectId = 7 and name in ('t_route', 't_log'));
     set FOREIGN_KEY_CHECKS=1;
+
+    npx ts-node src/scripts/moveTable.ts 教学资源库api t_enum
 */
