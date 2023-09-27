@@ -1,7 +1,7 @@
 variables:
   PROJECT_NAME: "nestjs-builder-api"
   PROJECT_NAME2: "nestjs-builder-ui"
-  DOCKER_REPO: "chenawy-docker.pkg.coding.net/jcjy/docker"
+  DOCKER_REPO: "iyjian-docker.pkg.coding.net/jcjy/docker"
 
 stages:
   - build-api
