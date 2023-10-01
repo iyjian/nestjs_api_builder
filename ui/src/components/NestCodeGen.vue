@@ -836,6 +836,10 @@ watch(
 watch(
   stringifiedTable,
   async (_newStringifiedTableDefinition, _oldStringifiedTableDefinition) => {
+    console.log(`-------NestCodeGen-------`)
+    console.log(_newStringifiedTableDefinition)
+    console.log(_oldStringifiedTableDefinition)
+    console.log(`-------NestCodeGen-------`)
     if (_newStringifiedTableDefinition === _oldStringifiedTableDefinition) {
       console.log(
         `NestCodeGen - watch stringifiedTable - no change detected(exit)`,

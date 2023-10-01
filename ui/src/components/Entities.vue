@@ -252,8 +252,8 @@ export default defineComponent({
         this.tableLoading = true
         console.log(`Entities - configEntity - tableId: ${table.id}`)
         await store.switchTableAsyncV2(table.id)
+        await store.triggerCodePreviewAsync('switchTableAsync')
         this.$router.push('/nestCodeGen')
-        // alert('fuck')
         this.tableLoading = false
       } catch (e) {
         this.tableLoading = false
