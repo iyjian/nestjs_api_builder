@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia'
 import {
   Column,
   Table,
@@ -8,45 +8,45 @@ import {
   GitInfo,
   Project,
   RelationNode,
-} from "@/types";
-import _ from "lodash";
-import { ElMessage } from "element-plus";
-import { getDiff } from "@/libs/CodeUtil";
-import { devToolApiClient } from "@/plugins";
+} from '@/types'
+import _ from 'lodash'
+import { ElMessage } from 'element-plus'
+import { getDiff } from '@/libs/CodeUtil'
+import { devToolApiClient } from '@/plugins'
 
 export interface State {
-  currentProjectId?: number;
-  table: Table;
-  persistTable: Table;
-  tables: TableSimple[];
-  status: NestCodeGenState;
-  gitInfo: GitInfo;
-  projects: Project[];
-  dataTypes: DataType[];
+  currentProjectId?: number
+  table: Table
+  persistTable: Table
+  tables: TableSimple[]
+  status: NestCodeGenState
+  gitInfo: GitInfo
+  projects: Project[]
+  dataTypes: DataType[]
 }
 
 const columnTemplate: Column = {
-  name: "",
-  comment: "",
+  name: '',
+  comment: '',
   dataTypeId: 1,
   allowNull: true,
   refTableId: undefined,
-  defaultValue: "",
-  enumKeys: "",
+  defaultValue: '',
+  enumKeys: '',
   isEnable: true,
   searchable: false,
   findable: true,
   createable: true,
   updateable: true,
   order: 0,
-  getCode: "",
-  setCode: "",
-  enumTypeCode: "",
-  remark: "",
-  sampleData: "",
-};
+  getCode: '',
+  setCode: '',
+  enumTypeCode: '',
+  remark: '',
+  sampleData: '',
+}
 
-export const projectTableStore = defineStore("projectTable", {
+export const projectTableStore = defineStore('projectTable', {
   state: (): State => ({
     currentProjectId: undefined,
     projects: [],
@@ -54,14 +54,14 @@ export const projectTableStore = defineStore("projectTable", {
     dataTypes: [],
     table: {
       id: 0,
-      name: "",
-      module: "",
-      comment: "",
+      name: '',
+      module: '',
+      comment: '',
       project: {
-        id: "",
-        name: "",
-        repo: "",
-        repoId: "",
+        id: '',
+        name: '',
+        repo: '',
+        repoId: '',
       },
       columns: [] as Column[],
       relationNodes: undefined,
@@ -69,14 +69,14 @@ export const projectTableStore = defineStore("projectTable", {
     // 在数据库里的table状态
     persistTable: {
       id: 0,
-      name: "",
-      module: "",
-      comment: "",
+      name: '',
+      module: '',
+      comment: '',
       project: {
-        id: "",
-        name: "",
-        repo: "",
-        repoId: "",
+        id: '',
+        name: '',
+        repo: '',
+        repoId: '',
       },
       columns: [] as Column[],
     },
@@ -88,23 +88,23 @@ export const projectTableStore = defineStore("projectTable", {
       ERPreviewer: false,
       previewTimer: undefined,
       skipNextSaving: false,
-      selectedCodeTypes: ["enty"],
-      currentPreviewMode: "preview",
+      selectedCodeTypes: ['enty'],
+      currentPreviewMode: 'preview',
     },
     gitInfo: {
-      sourceBranch: "dev",
+      sourceBranch: 'dev',
       // targetBranch: "",
-      comment: "",
-      mergeRequestUrl: "",
+      comment: '',
+      mergeRequestUrl: '',
       codes: [],
     },
   }),
   getters: {
     readyColumns(state) {
-      return state.table.columns.filter((column) => column && column.name);
+      return state.table.columns.filter((column) => column && column.name)
     },
     totalColumns(state): number {
-      return this.readyColumns.length;
+      return this.readyColumns.length
     },
     /**
      * 深层的对象的watch, new和old是同一个引用
@@ -112,12 +112,12 @@ export const projectTableStore = defineStore("projectTable", {
      * https://github.com/vuejs/vue/issues/2164#issuecomment-542766308
      */
     stringifiedTable(state) {
-      const clonedTable: any = _.cloneDeep(state.table);
-      clonedTable.columns = this.readyColumns;
-      return JSON.stringify(clonedTable);
+      const clonedTable: any = _.cloneDeep(state.table)
+      clonedTable.columns = this.readyColumns
+      return JSON.stringify(clonedTable)
     },
     stringifiedPersistTable(state) {
-      return JSON.stringify(state.persistTable);
+      return JSON.stringify(state.persistTable)
     },
     isTableValid(state) {
       if (
@@ -127,7 +127,7 @@ export const projectTableStore = defineStore("projectTable", {
         state.table.name &&
         state.table.columns.length === 0
       ) {
-        return true;
+        return true
       } else if (
         state.table &&
         state.table.module &&
@@ -138,106 +138,106 @@ export const projectTableStore = defineStore("projectTable", {
       ) {
         for (const column of state.table.columns) {
           if (column.isFK && !column.refTableId) {
-            ElMessage.error("外键字段必须设置依赖表");
-            return false;
+            ElMessage.error('外键字段必须设置依赖表')
+            return false
           }
-          if (column.dataType?.dataType === "enum" && !column.enumKeys) {
-            ElMessage.error("枚举值数据类型必须填写枚举值列表");
-            return false;
+          if (column.dataType?.dataType === 'enum' && !column.enumKeys) {
+            ElMessage.error('枚举值数据类型必须填写枚举值列表')
+            return false
           }
         }
-        return true;
+        return true
       } else {
-        return false;
+        return false
       }
     },
   },
   actions: {
     setCurrentProjectId(projectId: number) {
-      this.currentProjectId = projectId;
+      this.currentProjectId = projectId
     },
     updateTable(table: Table) {
-      this.table = table;
+      this.table = table
       console.log(
-        `store - mutations - table: ${this.table.id} update completed`
-      );
+        `store - mutations - table: ${this.table.id} update completed`,
+      )
     },
     updatePersistTable(table: Table) {
-      this.persistTable = _.cloneDeep(table);
+      this.persistTable = _.cloneDeep(table)
     },
     updateTables(tables: TableSimple[]) {
-      this.tables = tables;
+      this.tables = tables
     },
     updateProject(project: Project) {
-      this.table.project = project;
+      this.table.project = project
     },
     emptyTable() {
-      this.table.id = 0;
-      this.table.name = "";
-      this.table.module = "";
-      this.table.comment = "";
-      this.table.columns = [] as Column[];
-      this.table.relationNodes = undefined;
+      this.table.id = 0
+      this.table.name = ''
+      this.table.module = ''
+      this.table.comment = ''
+      this.table.columns = [] as Column[]
+      this.table.relationNodes = undefined
     },
     emptyCode() {
-      this.gitInfo.codes = [];
+      this.gitInfo.codes = []
     },
     toDiffMode() {
       this.gitInfo.codes.map((code) => {
-        code.showContent = getDiff(code.originContent, code.content);
+        code.showContent = getDiff(code.originContent, code.content)
         code.codeMirrorOptions = {
-          mode: "text/x-diff",
-          theme: "dracula",
+          mode: 'text/x-diff',
+          theme: 'dracula',
           lineNumbers: true,
           foldGutter: true,
           styleActiveLine: true,
           readOnly: true,
-        };
-      });
-      this.status.currentPreviewMode = "diff";
+        }
+      })
+      this.status.currentPreviewMode = 'diff'
     },
     toPreviewMode() {
       this.gitInfo.codes.map((code) => {
-        code.showContent = code.content;
+        code.showContent = code.content
         code.codeMirrorOptions = {
-          mode: "text/javascript",
-          theme: "dracula",
+          mode: 'text/javascript',
+          theme: 'dracula',
           lineNumbers: true,
           foldGutter: true,
           styleActiveLine: true,
           readOnly: true,
-        };
-      });
-      this.status.currentPreviewMode = "preview";
+        }
+      })
+      this.status.currentPreviewMode = 'preview'
     },
     addColumn(column: Column) {
-      console.log("addColumn", column);
-      this.table.columns.push(column);
+      console.log('addColumn', column)
+      this.table.columns.push(column)
     },
     setSelectedCodeTypes(payload: string[]) {
-      this.status.selectedCodeTypes = payload;
+      this.status.selectedCodeTypes = payload
     },
     setDataTypes(payload: DataType[]) {
-      this.dataTypes = payload;
+      this.dataTypes = payload
     },
     setProjects(payload: Project[]) {
-      this.projects = payload;
+      this.projects = payload
     },
     startSaving() {
-      console.log("debug...............");
-      this.status.tableSaving = true;
+      console.log('debug...............')
+      this.status.tableSaving = true
     },
     stopSaving() {
-      this.status.tableSaving = false;
+      this.status.tableSaving = false
     },
     setGitInfoSourceBranch(sourceBranch: string) {
-      this.gitInfo.sourceBranch = sourceBranch;
+      this.gitInfo.sourceBranch = sourceBranch
     },
     setGitInfoComment(comment: string) {
-      this.gitInfo.comment = comment;
+      this.gitInfo.comment = comment
     },
     setTableRelation(relationNodes: RelationNode[]) {
-      this.table.relationNodes = relationNodes;
+      this.table.relationNodes = relationNodes
     },
 
     /**
@@ -248,11 +248,11 @@ export const projectTableStore = defineStore("projectTable", {
     async refreshTablesAsync() {
       if (this.table.project.id) {
         const allTables = await devToolApiClient.loadAllTables(
-          this.table.project.id
-        );
-        this.updateTables(allTables);
+          this.table.project.id,
+        )
+        this.updateTables(allTables)
       } else {
-        console.log("refreshTables - state.table.project.id");
+        console.log('refreshTables - state.table.project.id')
       }
     },
     /**
@@ -260,11 +260,11 @@ export const projectTableStore = defineStore("projectTable", {
      *
      */
     async initAsync() {
-      const projects = await devToolApiClient.getAllProjects();
-      this.setProjects(projects);
+      const projects = await devToolApiClient.getAllProjects()
+      this.setProjects(projects)
 
-      const dataTypes = await devToolApiClient.loadDataTypes();
-      this.setDataTypes(dataTypes);
+      const dataTypes = await devToolApiClient.loadDataTypes()
+      this.setDataTypes(dataTypes)
     },
     /**
      * 切换项目
@@ -273,16 +273,14 @@ export const projectTableStore = defineStore("projectTable", {
      * @param projectId
      */
     async switchProjectAsync(projectId: number) {
-      this.emptyTable();
-      this.emptyCode();
-      const projectInfo = await devToolApiClient.getProjectInfo(
-        projectId
-      );
-      this.updateProject(projectInfo);
+      this.emptyTable()
+      this.emptyCode()
+      const projectInfo = await devToolApiClient.getProjectInfo(projectId)
+      this.updateProject(projectInfo)
       const allTables = await devToolApiClient.loadAllTables(
-        projectId.toString()
-      );
-      this.updateTables(allTables);
+        projectId.toString(),
+      )
+      this.updateTables(allTables)
     },
     /**
      * 切换表
@@ -301,12 +299,12 @@ export const projectTableStore = defineStore("projectTable", {
     //   // await this.triggerCodePreviewAsync('switchTableAsync');
     // },
     async switchTableAsyncV2(tableId: number) {
-      console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`);
-      this.emptyCode();
-      const table = await devToolApiClient.getTableInfo(tableId);
-      this.updateTable(table);
-      this.updatePersistTable(table);
-      this.addEmptyColumn();
+      console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`)
+      this.emptyCode()
+      const table = await devToolApiClient.getTableInfo(tableId)
+      this.updateTable(table)
+      this.updatePersistTable(table)
+      this.addEmptyColumn()
       // await this.triggerCodePreviewAsync('switchTableAsync');
     },
 
@@ -319,17 +317,17 @@ export const projectTableStore = defineStore("projectTable", {
     async deleteColumnAsync(column: Column) {
       if (column.id) {
         // 老字段(已经同步到数据库里的字段)
-        await devToolApiClient.deleteColumn(column.id);
-        const table = await devToolApiClient.getTableInfo(this.table.id);
-        this.updateTable(table);
-        this.updatePersistTable(table);
+        await devToolApiClient.deleteColumn(column.id)
+        const table = await devToolApiClient.getTableInfo(this.table.id)
+        this.updateTable(table)
+        this.updatePersistTable(table)
       } else {
         this.table.columns = this.table.columns
           .filter((_column) => _column.order !== column.order)
           .map((_column, idx) => {
-            _column.order = idx + 1;
-            return _column;
-          });
+            _column.order = idx + 1
+            return _column
+          })
       }
     },
 
@@ -344,8 +342,8 @@ export const projectTableStore = defineStore("projectTable", {
           this.addColumn(
             _.extend(_.clone(columnTemplate), {
               order: this.totalColumns + 1,
-            })
-          );
+            }),
+          )
         } else {
           if (
             this.table.columns[this.table.columns.length - 1].dataTypeId !==
@@ -355,19 +353,19 @@ export const projectTableStore = defineStore("projectTable", {
             this.addColumn(
               _.extend(_.clone(columnTemplate), {
                 order: this.totalColumns + 1,
-              })
-            );
+              }),
+            )
 
             for (const column of this.table.columns) {
               // TODO: FK 不一定是 int
-              if (!column.isFK && column?.dataType?.dataType === "int") {
-                column.refTableId = null;
-                column.relation = undefined;
-                column.relationColumnId = null;
+              if (!column.isFK && column?.dataType?.dataType === 'int') {
+                column.refTableId = null
+                column.relation = undefined
+                column.relationColumnId = null
               }
             }
           } else {
-            console.log(`addEmptyColumn - ignore`);
+            console.log(`addEmptyColumn - ignore`)
           }
         }
       }
@@ -381,20 +379,22 @@ export const projectTableStore = defineStore("projectTable", {
      */
     async triggerCodePreviewAsync(source: string, skipSaving = false) {
       try {
-        console.log(`triggerCodePreviewAsync - start - source: ${source} skipSaving: ${skipSaving}`)
+        console.log(
+          `triggerCodePreviewAsync - start - source: ${source} skipSaving: ${skipSaving}`,
+        )
         if (!this.isTableValid) {
-          console.log(`store - triggerCodePreview - not valid`);
-          this.status.tableSaving = false;
-          this.status.codePreviewing = false;
-          return;
+          console.log(`store - triggerCodePreview - not valid`)
+          this.status.tableSaving = false
+          this.status.codePreviewing = false
+          return
         }
 
         /**
          * 如果有延迟预览的倒计时，则本次预览会清空倒计时
          */
         if (this.status.previewTimer) {
-          clearTimeout(this.status.previewTimer);
-          this.status.previewTimer = undefined;
+          clearTimeout(this.status.previewTimer)
+          this.status.previewTimer = undefined
         }
 
         /**
@@ -402,52 +402,52 @@ export const projectTableStore = defineStore("projectTable", {
          */
         if (this.stringifiedTable !== this.stringifiedPersistTable) {
           console.log(
-            "--------stringifiedTable vs stringifiedPersistTable-----------"
-          );
-          console.log(this.stringifiedTable);
-          console.log(this.stringifiedPersistTable);
+            '--------stringifiedTable vs stringifiedPersistTable-----------',
+          )
+          console.log(this.stringifiedTable)
+          console.log(this.stringifiedPersistTable)
           console.log(
-            "----------stringifiedTable vs stringifiedPersistTable---------"
-          );
-          this.status.tableSaving = true;
-          const clonedTable = _.cloneDeep(this.table);
+            '----------stringifiedTable vs stringifiedPersistTable---------',
+          )
+          this.status.tableSaving = true
+          const clonedTable = _.cloneDeep(this.table)
 
           for (const i in clonedTable.columns) {
-            clonedTable.columns[i].order = parseInt(i) + 1;
+            clonedTable.columns[i].order = parseInt(i) + 1
           }
 
-          const savedTable = await devToolApiClient.saveEntity(this.table);
-          this.updateTable(savedTable);
-          this.updatePersistTable(savedTable);
+          const savedTable = await devToolApiClient.saveEntity(this.table)
+          this.updateTable(savedTable)
+          this.updatePersistTable(savedTable)
         }
 
         /**
          * 触发代码预览开始
          */
-        this.status.codePreviewing = true;
+        this.status.codePreviewing = true
         const response = await devToolApiClient.genPreviewCode(
           this.table.id,
           this.status.selectedCodeTypes,
-          this.gitInfo.sourceBranch
-        );
+          this.gitInfo.sourceBranch,
+        )
 
         this.gitInfo.codes = response.codes.map((code) => {
-          code.type = "code";
-          return code;
-        });
+          code.type = 'code'
+          return code
+        })
 
-        this.addEmptyColumn();
-        this.toPreviewMode();
-        console.log("debug...............");
-        this.status.tableSaving = false;
-        this.status.codePreviewing = false;
+        this.addEmptyColumn()
+        this.toPreviewMode()
+        console.log('debug...............')
+        this.status.tableSaving = false
+        this.status.codePreviewing = false
         /**
          * 触发代码预览开始
          */
       } catch (e: any) {
-        ElMessage.error(e.message);
-        this.status.tableSaving = false;
-        this.status.codePreviewing = false;
+        ElMessage.error(e.message)
+        this.status.tableSaving = false
+        this.status.codePreviewing = false
       }
     },
     /**
@@ -457,18 +457,18 @@ export const projectTableStore = defineStore("projectTable", {
      */
     async triggerCodePreviewThrottleAsync() {
       if (this.status.previewTimer) {
-        clearTimeout(this.status.previewTimer);
-        this.status.previewTimer = undefined;
+        clearTimeout(this.status.previewTimer)
+        this.status.previewTimer = undefined
       }
 
       this.status.previewTimer = setTimeout(async () => {
-        await this.triggerCodePreviewAsync('triggerCodePreviewThrottleAsync');
-        this.status.isTriggerCodePreviewThrottleCalling = false;
-        this.status.previewTimer = undefined;
-      }, 1 * 1000);
+        await this.triggerCodePreviewAsync('triggerCodePreviewThrottleAsync')
+        this.status.isTriggerCodePreviewThrottleCalling = false
+        this.status.previewTimer = undefined
+      }, 1 * 1000)
     },
   },
   persist: {
     enabled: true,
   },
-});
+})

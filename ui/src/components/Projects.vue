@@ -14,7 +14,11 @@
       <el-table-column label="操作" width="180">
         <template #default="scope">
           <!-- <el-button type="danger" :icon="Delete" size="small"/> -->
-          <el-button :icon="Edit" size="small" @click="openEditForm(scope.row.id)"/>
+          <el-button
+            :icon="Edit"
+            size="small"
+            @click="openEditForm(scope.row.id)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -53,21 +57,21 @@
 
 <script lang="ts">
 export default {
-  name: "Projects",
-};
+  name: 'Projects',
+}
 </script>
 
 <script lang="ts" setup>
-import { ref, watch, computed, shallowRef, reactive } from "vue";
-import { devToolApiClient } from "@/plugins";
-import _ from "lodash";
-import { Plus, Delete, Edit } from "@element-plus/icons-vue";
-import { Project } from "@/types";
+import { ref, watch, computed, shallowRef, reactive } from 'vue'
+import { devToolApiClient } from '@/plugins'
+import _ from 'lodash'
+import { Plus, Delete, Edit } from '@element-plus/icons-vue'
+import { Project } from '@/types'
 
-let table = reactive<Project[]>([]);
+let table = reactive<Project[]>([])
 
 async function refreshTable() {
-  table = await devToolApiClient.getAllProjects();
+  table = await devToolApiClient.getAllProjects()
 }
 
 const dialog = reactive({
@@ -76,44 +80,46 @@ const dialog = reactive({
   button: {
     loading: false,
   },
-});
+})
 
-const dialogTitle = computed(() => `${dialog.type === 'add' ? '新建':'修改'}项目`)
+const dialogTitle = computed(
+  () => `${dialog.type === 'add' ? '新建' : '修改'}项目`,
+)
 
 const postData = ref({
   repoId: 0,
-  repo: "",
-  name: "",
-  repoName: "",
-  projectName: "",
-  version: "2",
-});
+  repo: '',
+  name: '',
+  repoName: '',
+  projectName: '',
+  version: '2',
+})
 
 async function openSubmitForm() {
-  dialog.visible = true;
+  dialog.visible = true
   dialog.type = 'add'
 }
 
 async function submit() {
   try {
-    dialog.button.loading = true;
-    
+    dialog.button.loading = true
+
     // 从模板项目初始化
     const result = await devToolApiClient.initProject({
       projectName: postData.value.repoName,
-    });
+    })
 
     // 记录项目
-    postData.value.repo = result.ssh_url_to_repo;
-    postData.value.repoId = result.id;
-    await devToolApiClient.postProject(postData.value);
-    await refreshTable();
+    postData.value.repo = result.ssh_url_to_repo
+    postData.value.repoId = result.id
+    await devToolApiClient.postProject(postData.value)
+    await refreshTable()
 
-    dialog.visible = false;
-    dialog.button.loading = false;
+    dialog.visible = false
+    dialog.button.loading = false
   } catch (e) {
-    dialog.button.loading = false;
-    console.log(e);
+    dialog.button.loading = false
+    console.log(e)
   }
 }
 
@@ -128,7 +134,7 @@ async function openEditForm(projectId: number) {
   dialog.type = 'edit'
 }
 
-await refreshTable();
+await refreshTable()
 </script>
 
 <style lang="stylus" scoped>

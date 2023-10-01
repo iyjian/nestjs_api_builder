@@ -47,24 +47,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { devToolApiClient } from "@/plugins";
-import { Column } from "@/types";
-import _ from "lodash";
+import { defineComponent } from 'vue'
+import { devToolApiClient } from '@/plugins'
+import { Column } from '@/types'
+import _ from 'lodash'
 // import { useStore } from "@/store";
-import { projectTableStore } from "@/store/projectTable";
+import { projectTableStore } from '@/store/projectTable'
 
 export default defineComponent({
-  name: "ParseImg",
+  name: 'ParseImg',
   data() {
     return {
-      imgSrc: "",
+      imgSrc: '',
       recoData: [],
       store: projectTableStore(),
       dialog: {
         visible: false,
       },
-    } as any;
+    } as any
   },
   methods: {
     importColumns() {
@@ -75,29 +75,29 @@ export default defineComponent({
           dataTypeId: column.dataTypeId,
           allowNull: true,
           refTableId: undefined,
-          defaultValue: "",
-          enumKeys: "",
+          defaultValue: '',
+          enumKeys: '',
           isEnable: true,
           searchable: false,
           findable: true,
           createable: true,
           updateable: true,
           order: 0,
-          getCode: "",
-          setCode: "",
-          enumTypeCode: "",
-          remark: "",
+          getCode: '',
+          setCode: '',
+          enumTypeCode: '',
+          remark: '',
           sampleData: column.sampleData,
-        };
+        }
         // this.store.commit("addColumn", newColumn);
-        this.store.addColumn(newColumn);
+        this.store.addColumn(newColumn)
       }
-      this.closeDialog();
+      this.closeDialog()
     },
     closeDialog() {
-      this.dialog.visible = false;
-      this.imgSrc = "";
-      this.recoData = [];
+      this.dialog.visible = false
+      this.imgSrc = ''
+      this.recoData = []
     },
     onPaste(evt: any) {
       if (
@@ -105,25 +105,25 @@ export default defineComponent({
         evt.clipboardData.files &&
         evt.clipboardData.files.length > 0
       ) {
-        const reader = new FileReader();
-        reader.readAsDataURL(evt.clipboardData.files[0]);
+        const reader = new FileReader()
+        reader.readAsDataURL(evt.clipboardData.files[0])
         reader.onload = async () => {
           if (reader.result) {
-            this.imgSrc = reader.result.toString();
-            const tableName = this.store.table.name;
-            const base64Img = this.imgSrc.split("base64,")[1];
+            this.imgSrc = reader.result.toString()
+            const tableName = this.store.table.name
+            const base64Img = this.imgSrc.split('base64,')[1]
             const result = await devToolApiClient.parseTableImg(
               tableName,
-              base64Img
-            );
-            this.recoData = result;
+              base64Img,
+            )
+            this.recoData = result
           }
-        };
+        }
       }
     },
   },
   async mounted() {},
-});
+})
 </script>
 
 <style scoped lang="stylus">
