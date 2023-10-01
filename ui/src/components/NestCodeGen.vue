@@ -597,17 +597,17 @@ import { getCurrentInstance } from 'vue'
     1. 从getCurrentInstance 中获取
     2. template 中可直接通过$history 使用
 */
-onActivated(async () => {
+onMounted(async () => {
   const ins = getCurrentInstance()
   const routerHistory = ins?.proxy?.$history
-  console.log(111, routerHistory)
   if ((routerHistory?.stack?.length && routerHistory.stack.length === 1)) {
     /**
     * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
     */
+    console.log(`NestCodeGen - onActivated - routerHistory length: ${routerHistory.stack.length} routerHistory stack: ${JSON.stringify(routerHistory.stack)}`)
     if (table.value.id) {
-      console.log(`NestCodeGen - onActivated - refresh code preview`)
-      await store.switchTableAsync(table.value.id);
+      console.log(`NestCodeGen - onActivated - refresh code preview table.value.id: ${table.value.id}`)
+      await store.switchTableAsyncV2(table.value.id);
       await store.triggerCodePreviewAsync('switchTableAsync');
     }
 
@@ -629,7 +629,6 @@ const codeMirrorOption = {
 };
 
 const table = computed(() => {
-  console.log(store.table);
   return store.table;
 });
 
@@ -860,7 +859,7 @@ watch(
        * 切换表在TableList.vue里的emitShowEntity中处理，不需要在watch里处理
        * 调用了store中的**switchTable**方法
        */
-      console.log(`NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit)`);
+      console.log(`NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit) table.value.id: ${table.value.id}`);
       await store.switchTableAsyncV2(table.value.id);
       await store.triggerCodePreviewAsync('switchTableAsync');
       return;

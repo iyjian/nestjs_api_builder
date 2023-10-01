@@ -290,16 +290,16 @@ export const projectTableStore = defineStore("projectTable", {
      * @param param0
      * @param tableId
      */
-    async switchTableAsync(tableId: number) {
-      console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`);
-      this.emptyTable();
-      this.emptyCode();
-      const table = await devToolApiClient.getTableInfo(tableId);
-      this.updateTable(table);
-      this.updatePersistTable(table);
-      this.addEmptyColumn();
-      // await this.triggerCodePreviewAsync('switchTableAsync');
-    },
+    // async switchTableAsync(tableId: number) {
+    //   console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`);
+    //   this.emptyTable();
+    //   this.emptyCode();
+    //   const table = await devToolApiClient.getTableInfo(tableId);
+    //   this.updateTable(table);
+    //   this.updatePersistTable(table);
+    //   this.addEmptyColumn();
+    //   // await this.triggerCodePreviewAsync('switchTableAsync');
+    // },
     async switchTableAsyncV2(tableId: number) {
       console.log(`projectTableStore - switchTableAsync - tableId: ${tableId}`);
       this.emptyCode();
