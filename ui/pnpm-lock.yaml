@@ -59,7 +59,7 @@ dependencies:
     specifier: ^4.0.3
     version: 4.2.4(vue@3.3.4)
   vue3-history:
-    specifier: ^0.0.18
+    specifier: 0.0.18
     version: 0.0.18
   vuedraggable:
     specifier: ^4.1.0
