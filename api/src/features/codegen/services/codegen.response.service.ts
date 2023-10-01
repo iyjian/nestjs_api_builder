@@ -20,6 +20,7 @@ export class ResponseCodeGenService {
     const table = await this.tableService.findOneMetaTable(tableId)
 
     if (nodeId === '0-0') {
+      // TODO: relationNodes是findAll的关系配置 relationNodesForOne是findOne的关系配置 现在只有findOne的逻辑
       if (table.relationNodes && table.relationNodes.length > 0) {
         validNodeIds = _.keyBy(
           this.getCheckedNodesFlat(table.relationNodes[0]).map((o) => o.nodeId),
