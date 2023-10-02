@@ -27,6 +27,7 @@ export class ApiGuard implements CanActivate {
         token === this.configService.get('auth.superToken')
       ) {
         delete request['query']['token']
+        request['locals'] = {userId: 1}
         return true
       }
 
