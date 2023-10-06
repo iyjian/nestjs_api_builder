@@ -36,10 +36,12 @@ export class GitlabProjectService {
   public async createProject(
     projectName: string,
     templateProjectId: number = this.templateProjectId,
-    // private internal
     visibility: string = 'private',
     namespaceId: number = this.namespaceId,
+    cb?: (project: Types.ProjectExtendedSchema) => void
   ): Promise<Types.ProjectExtendedSchema> {
+    this.logger.debug(`createProject - projectName: ${projectName} templateProjectId: ${templateProjectId} visibility: ${visibility} namespaceId: ${namespaceId}`)
+    
     const project = await this.gitlabClient.Projects.create({
       name: projectName,
       visibility,
@@ -75,6 +77,10 @@ export class GitlabProjectService {
           })),
           'init',
         )
+
+        if (cb) {
+          cb(project)
+        }
       } catch (e) {
         await this.deleteProject(project.id)
         this.logger.debug(

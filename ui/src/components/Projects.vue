@@ -105,13 +105,13 @@ async function submit() {
     dialog.button.loading = true
 
     // 从模板项目初始化
-    const result = await devToolApiClient.initProject({
-      projectName: postData.value.repoName,
-    })
+    // const result = await devToolApiClient.initProject({
+    //   projectName: postData.value.repoName,
+    // })
 
     // 记录项目
-    postData.value.repo = result.ssh_url_to_repo
-    postData.value.repoId = result.id
+    // postData.value.repo = result.ssh_url_to_repo
+    // postData.value.repoId = result.id
     await devToolApiClient.postProject(postData.value)
     await refreshTable()
 
