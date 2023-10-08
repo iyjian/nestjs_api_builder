@@ -22,17 +22,17 @@
 
 <script lang="ts">
 /* eslint-disable */
-import { defineComponent } from "vue";
-import { devToolApiClient } from "@/plugins";
-import mermaid from "mermaid";
-import { nextTick } from "vue";
+import { defineComponent } from 'vue'
+import { devToolApiClient } from '@/plugins'
+import mermaid from 'mermaid'
+import { nextTick } from 'vue'
 export default defineComponent({
-  name: "ERPreviewer",
+  name: 'ERPreviewer',
   data() {
     return {
       dialogVisible: false,
-      diagram: "",
-    };
+      diagram: '',
+    }
   },
   props: {
     visible: Boolean,
@@ -41,22 +41,22 @@ export default defineComponent({
   methods: {
     openER() {
       if (this.tableId) {
-        this.getER(this.tableId.toString());
-        this.dialogVisible = true;
+        this.getER(this.tableId.toString())
+        this.dialogVisible = true
       }
     },
     async getER(tableId: string) {
-      this.diagram = await devToolApiClient.getERAll(tableId);
-      await nextTick();
+      this.diagram = await devToolApiClient.getERAll(tableId)
+      await nextTick()
       mermaid.initialize({
         startOnLoad: false,
-      });
+      })
       await mermaid.run({
-        querySelector: ".mermaid",
-      });
+        querySelector: '.mermaid',
+      })
     },
   },
-});
+})
 </script>
 
 <style lang="stylus" scoped>

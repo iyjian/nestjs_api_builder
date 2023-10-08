@@ -52,22 +52,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, shallowRef } from "vue";
-import { devToolApiClient } from "@/plugins";
-import { Plus, Delete } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
-const PlusShallow = shallowRef(Plus);
-const DeleteShallow = shallowRef(Delete);
+import { defineComponent, shallowRef } from 'vue'
+import { devToolApiClient } from '@/plugins'
+import { Plus, Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+const PlusShallow = shallowRef(Plus)
+const DeleteShallow = shallowRef(Delete)
 export default defineComponent({
-  name: "IndexManager",
+  name: 'IndexManager',
   data() {
     return {
       dialogVisible: false,
-      indexes: [{ fields: [], type: "btree" }],
+      indexes: [{ fields: [], type: 'btree' }],
       columns: [] as any,
       Plus: PlusShallow,
       Delete: DeleteShallow,
-    };
+    }
   },
   props: {
     tableId: Number,
@@ -75,23 +75,23 @@ export default defineComponent({
   methods: {
     async openIndexManager() {
       if (!this.tableId) {
-        return;
+        return
       }
-      const table = await devToolApiClient.getTableInfo(this.tableId);
-      this.columns = table.columns;
+      const table = await devToolApiClient.getTableInfo(this.tableId)
+      this.columns = table.columns
       if (table.indexes) {
-        this.indexes = table.indexes;
+        this.indexes = table.indexes
       } else {
-        this.indexes = [{ fields: [], type: "btree" }];
+        this.indexes = [{ fields: [], type: 'btree' }]
       }
-      console.log(table.indexes);
-      this.dialogVisible = true;
+      console.log(table.indexes)
+      this.dialogVisible = true
     },
     addIndex() {
-      this.indexes.push({ fields: [], type: "btree" });
+      this.indexes.push({ fields: [], type: 'btree' })
     },
     deleteIndex(idx: number) {
-      this.indexes.splice(idx, 1);
+      this.indexes.splice(idx, 1)
     },
     async saveIndex() {
       try {
@@ -99,32 +99,32 @@ export default defineComponent({
           for (const index of this.indexes) {
             if (!index.fields.length || !index.type) {
               ElMessage({
-                type: "error",
-                message: "索引字段和索引类型均不能为空",
-              });
-              return;
+                type: 'error',
+                message: '索引字段和索引类型均不能为空',
+              })
+              return
             }
           }
-          await devToolApiClient.updateTableIndex(this.tableId, this.indexes);
-          this.dialogVisible = false;
+          await devToolApiClient.updateTableIndex(this.tableId, this.indexes)
+          this.dialogVisible = false
         } else {
           ElMessage({
-            type: "error",
-            message: "系统错误",
-          });
+            type: 'error',
+            message: '系统错误',
+          })
         }
       } catch (e: any) {
         ElMessage({
-          type: "error",
+          type: 'error',
           message: e.message,
-        });
+        })
       }
     },
   },
   computed: {
     // delBtnShow() {},
   },
-});
+})
 </script>
 
 <style lang="stylus" scoped></style>

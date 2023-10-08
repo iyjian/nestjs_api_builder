@@ -220,9 +220,9 @@ export class CodegenControllerService {
     fileContent: string,
   ): Promise<string> {
     // 根据tableId生成schema
-    const schema: any = await this.responseCodeGenService.genResponseSchema(
-      table.id,
-    )
+    // const schema: any = await this.responseCodeGenService.genResponseSchema(
+    //   table.id,
+    // )
 
     // 将装饰器的import插入到Controller的代码中
     fileContent = this.codegenUtilService.ensureImports(fileContent, {
@@ -278,15 +278,20 @@ export class CodegenControllerService {
    */
   public async genSchemaCodeFromScratch(table: MetaTable): Promise<Code> {
     // 根据tableId生成schema
-    const schema: any = await this.responseCodeGenService.genResponseSchema(
+    const findOneResponseSchema: any = await this.responseCodeGenService.genResponseSchema(
       table.id,
+      'findOne'
     )
 
-    const code = `export const FindOneResponseSchema = ${JSON.stringify(schema)}
+    const findAllResponseSchema: any = await this.responseCodeGenService.genResponseSchema(
+      table.id,
+      'findAll'
+    )
+
+    const code = `export const FindOneResponseSchema = ${JSON.stringify(findOneResponseSchema)}
   
-                  export const FindAllResponseSchema = ${JSON.stringify(
-                    schema,
-                  )}\n`
+                  export const FindAllResponseSchema = ${JSON.stringify(findAllResponseSchema)}
+                 `
 
     return {
       label: 'schema',

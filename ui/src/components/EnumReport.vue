@@ -44,29 +44,23 @@
 
 <script lang="ts">
 // import { ElMessage, ElMessageBox } from "element-plus";
-import { defineComponent, shallowRef, PropType } from "vue";
-import { devToolApiClient } from "@/plugins";
-import {
-  Plus,
-  DeleteFilled,
-  Expand,
-  Fold,
-  Edit,
-} from "@element-plus/icons-vue";
-import { TableSimple, Project } from "@/types";
-import moment from "moment";
+import { defineComponent, shallowRef, PropType } from 'vue'
+import { devToolApiClient } from '@/plugins'
+import { Plus, DeleteFilled, Expand, Fold, Edit } from '@element-plus/icons-vue'
+import { TableSimple, Project } from '@/types'
+import moment from 'moment'
 // import { useStore } from "@/store";
-import { projectTableStore } from "@/store/projectTable";
+import { projectTableStore } from '@/store/projectTable'
 
-let store: ReturnType<typeof projectTableStore>;
+let store: ReturnType<typeof projectTableStore>
 
-const PlusIcon = shallowRef(Plus);
+const PlusIcon = shallowRef(Plus)
 
 export default defineComponent({
   setup() {
-    store = projectTableStore();
+    store = projectTableStore()
   },
-  name: "Entities",
+  name: 'Entities',
   components: {
     DeleteFilled,
     Edit,
@@ -77,14 +71,14 @@ export default defineComponent({
       // projectId: undefined,
       tables: [],
       missingEnumType: [],
-      search: "",
+      search: '',
       moment,
       tableLoading: false,
       postData: {
         projectId: -1,
-        name: "",
-        comment: "",
-        module: "",
+        name: '',
+        comment: '',
+        module: '',
       },
       dialog: {
         visible: false,
@@ -93,23 +87,23 @@ export default defineComponent({
         },
       },
       projectModules: [] as any,
-    };
+    }
   },
   computed: {
     projectId: {
       get() {
-        return store.currentProjectId;
+        return store.currentProjectId
       },
       set(projectId: number) {
         // store.commit("setCurrentProjectId", projectId);
-        store.setCurrentProjectId(projectId);
+        store.setCurrentProjectId(projectId)
       },
     },
     table() {
-      return store.table;
+      return store.table
     },
     projects() {
-      return store.projects;
+      return store.projects
     },
   },
   methods: {
@@ -117,11 +111,11 @@ export default defineComponent({
       if (this.projectId) {
         this.postData = {
           projectId: this.projectId,
-          name: "",
-          comment: "",
-          module: "",
-        };
-        this.dialog.visible = true;
+          name: '',
+          comment: '',
+          module: '',
+        }
+        this.dialog.visible = true
       }
     },
   },
@@ -130,22 +124,22 @@ export default defineComponent({
       async handler() {
         if (this.projectId) {
           try {
-            this.tableLoading = true;
-            const result = await devToolApiClient.getEnumReport(this.projectId);
-            this.tables = result.enumReport;
-            this.missingEnumType = result.missingEnumType;
-            this.tableLoading = false;
+            this.tableLoading = true
+            const result = await devToolApiClient.getEnumReport(this.projectId)
+            this.tables = result.enumReport
+            this.missingEnumType = result.missingEnumType
+            this.tableLoading = false
           } catch (e) {
-            this.tableLoading = false;
+            this.tableLoading = false
           }
         } else {
-          this.tables = [];
+          this.tables = []
         }
       },
       immediate: true,
     },
   },
-});
+})
 </script>
 
 <style lang="stylus" scoped>
