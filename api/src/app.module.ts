@@ -9,6 +9,7 @@ import { CodegenModule } from './features/codegen/codegen.module'
 import { CodingModule } from './features/coding/coding.module'
 import { ToolModule } from './features/tool/tool.module'
 import { ThirdModule } from './features/third/third.module'
+import { FrontcodegenModule } from './features/frontcodegen/frontcodegen.module'
 import fs from 'fs'
 
 @Module({
@@ -39,9 +40,11 @@ import fs from 'fs'
           idle: 10000,
         },
         timezone: '+08:00',
-        dialectOptions: configService.get('mysql.sslCert') ? {
-          ssl: fs.readFileSync(configService.get('mysql.sslCert'))
-        }: undefined
+        dialectOptions: configService.get('mysql.sslCert')
+          ? {
+              ssl: fs.readFileSync(configService.get('mysql.sslCert')),
+            }
+          : undefined,
       }),
       inject: [ConfigService],
     }),
@@ -64,6 +67,7 @@ import fs from 'fs'
     CodingModule,
     ToolModule,
     ThirdModule,
+    FrontcodegenModule,
   ],
 })
 export class AppModule {}

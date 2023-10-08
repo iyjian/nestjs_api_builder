@@ -41,7 +41,10 @@ export class MetaProjectController {
   }
 
   @Get('')
-  findAll(@RequestUserId() userId: string, @Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO) {
+  findAll(
+    @RequestUserId() userId: string,
+    @Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO,
+  ) {
     return this.metaProjectService.findAllMetaProject(findAllQueryMetaProject)
   }
 

@@ -54,8 +54,10 @@ export class GitlabService {
     // })
   }
 
-  async getGitlabClient (repoId: number): Promise<InstanceType<typeof Gitlab>> {
-    const project = await this.metaProjectService.findOneMetaProject2({repoId})
+  async getGitlabClient(repoId: number): Promise<InstanceType<typeof Gitlab>> {
+    const project = await this.metaProjectService.findOneMetaProject2({
+      repoId,
+    })
     if (project && project.gitlabHost && project.gitlabToken) {
       // project设置过token
       return new Gitlab({
@@ -227,7 +229,7 @@ export class GitlabService {
       directory,
       comment = `delete directory: ${directory}`,
     } = gitlabRemoveDirectoryRequest
-    
+
     const files = await this.getFiles(+repoId, branch, directory, true)
 
     const commitFiles = files
@@ -310,7 +312,7 @@ export class GitlabService {
     repoId: number,
     newBranch: string,
     sourceBranch: string,
-  )/* : Promise<BranchSchema | Camelize<BranchSchema>> */ {
+  ) /* : Promise<BranchSchema | Camelize<BranchSchema>> */ {
     const gitlabClient = await this.getGitlabClient(repoId)
     return gitlabClient.Branches.create(repoId, newBranch, sourceBranch)
   }

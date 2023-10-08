@@ -10,6 +10,6 @@ import { BaseModule } from '../base/base.module'
   providers: [GitlabService, GitlabProjectService, CodingService],
   controllers: [GitlabController, CodingController],
   exports: [GitlabService],
-  imports: [BaseModule]
+  imports: [BaseModule],
 })
 export class CodingModule {}

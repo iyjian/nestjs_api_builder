@@ -100,7 +100,9 @@ export class DBSyncService {
    * @returns
    */
   private async getProjectConnection(projectId: number): Promise<Sequelize> {
-    const project = await this.metaProjectService.findOneMetaProjectById(projectId)
+    const project = await this.metaProjectService.findOneMetaProjectById(
+      projectId,
+    )
     const config = this.targetDBConnections[projectId]?.config
 
     if (
@@ -120,7 +122,7 @@ export class DBSyncService {
         port: parseInt(project.dbPort),
         logging: false,
       })
-      
+
       // 如果没有初始化过数据库链接或者数据库链接的参数变了则初始化数据库链接
       this.targetDBConnections[projectId] = new Sequelize({
         host: project.dbHost,

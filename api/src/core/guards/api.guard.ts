@@ -49,7 +49,7 @@ export class ApiGuard implements CanActivate {
       const loginStatus = await this.authing.checkLoginStatus(token)
 
       if (loginStatus.status) {
-        request['locals'] = {userId: loginStatus.data.id}
+        request['locals'] = { userId: loginStatus.data.id }
         return true
       } else {
         this.logger.debug(`apiGuard - canActivate - token: ${token}`)
