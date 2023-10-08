@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { MetaColumn } from '../base/index.js'
 
 export class TemplateService {
@@ -130,17 +131,19 @@ export class TemplateService {
 
   public gen() {
     const crudCode = this.code.body[0]
-    // 过滤条件所需字段
-    crudCode.filter.body
+    // 过滤条件所需字段 crudCode.filter.body    
+    // TODO: 
 
     // 表格所需字段 crudCode.columns
-    for (const column of this.tableColumns) {
+    for (const column of _.sortBy(this.tableColumns, (a: MetaColumn) => a.order * -1)) {
       crudCode.columns.unshift({
         name: column.name,
         label: column.comment,
         type: 'text',
       })
     }
+
+    console.log(this.tableColumns)
 
     // 查看详情所需字段 crudCode.itemAction.dialog.body.body
     for (const column of this.tableColumns) {
