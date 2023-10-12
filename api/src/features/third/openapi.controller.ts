@@ -30,4 +30,12 @@ export class OpenAIController {
   ) {
     return this.openAPIService.chatCompletion(model, message)
   }
+
+  @Post('/spark/completion/chat')
+  chatCompletionSpark(
+    @Body('model') model: 'v1' | 'v2',
+    @Body('message') message: string,
+  ) {
+    return this.openAPIService.chatCompletionSpark(model, message)
+  }
 }

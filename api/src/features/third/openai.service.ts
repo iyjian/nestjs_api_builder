@@ -7,6 +7,7 @@ import {
   OpenAIApi,
 } from 'openai'
 import tunnel from 'tunnel'
+import { Spark } from 'iflytek-spark-nodejs'
 
 @Injectable()
 export class OpenAPIService {
@@ -123,5 +124,19 @@ export class OpenAPIService {
       { httpsAgent: this.agent },
     )
     return response.data
+  }
+
+  async chatCompletionSpark (model: 'v1' | 'v2' = 'v2', content: string) {
+    const spark = new Spark({
+      // 自行填入相关参数
+      secret: this.configService.get('iflyTechSpark.apiSecret'),
+      key: this.configService.get('iflyTechSpark.apiKey'),
+      appid: this.configService.get('iflyTechSpark.appId'),
+      version: model
+    });
+
+    return await spark.chat({
+      content
+    })
   }
 }
