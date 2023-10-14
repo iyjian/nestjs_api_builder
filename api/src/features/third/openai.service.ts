@@ -80,21 +80,27 @@ export class OpenAPIService {
     model: 'gpt-3.5-turbo-0301' | 'gpt-3.5-turbo',
     messages: any[],
   ) {
-    const result = await this.openai.createChatCompletion(
-      {
-        model,
-        // messages: [{ role: 'user', content }],
-        messages,
-        temperature: 0,
-        max_tokens: 2048,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-        stop: ['#', ';'],
-      },
-      { httpsAgent: this.agent },
-    )
-    return result.data
+    try {
+      const result = await this.openai.createChatCompletion(
+        {
+          model,
+          // messages: [{ role: 'user', content }],
+          messages,
+          temperature: 0,
+          max_tokens: 2048,
+          top_p: 1.0,
+          frequency_penalty: 0.0,
+          presence_penalty: 0.0,
+          stop: ['#', ';'],
+        },
+        { httpsAgent: this.agent },
+      )
+      return result.data      
+    } catch (e) {
+      console.log(e.message)
+      console.log(e.data)
+      throw e
+    }
   }
 
   async imageGen(prompt: string, size: string) {
