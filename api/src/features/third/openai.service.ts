@@ -77,14 +77,14 @@ export class OpenAPIService {
   }
 
   async chatCompletion(
-    model: 'gpt-3.5-turbo-0301' | 'gpt-3.5-turbo',
+    model: 'gpt-3.5-turbo-0301' | 'gpt-3.5-turbo' = 'gpt-3.5-turbo-0301',
     messages: any[],
   ) {
     try {
       const result = await this.openai.createChatCompletion(
         {
           model,
-          // messages: [{ role: 'user', content }],
+          // messages: [{ role: 'user', content: '你好呀' }],
           messages,
           temperature: 0,
           max_tokens: 2048,
@@ -98,7 +98,7 @@ export class OpenAPIService {
       return result.data      
     } catch (e) {
       console.log(e.message)
-      console.log(e.data)
+      console.log(e.response.data)
       throw e
     }
   }
