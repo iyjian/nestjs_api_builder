@@ -63,5 +63,9 @@ export default (): any => ({
     appId: process.env.IFLY_TECH_SPARK_APPID,
     apiKey: process.env.IFLY_TECH_SPARK_API_KEY,
     apiSecret: process.env.IFLY_TECH_SPARK_SECRET_KEY
+  },
+  qianfan: {
+    ak: process.env.QIANFAN_AK,
+    sk: process.env.QIANFAN_SK
   }
 })
