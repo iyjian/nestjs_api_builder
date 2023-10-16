@@ -26,9 +26,9 @@ export class OpenAIController {
   @Post('completion/chat')
   chatCompletion(
     @Body('model') model: 'gpt-3.5-turbo-0301' | 'gpt-3.5-turbo',
-    @Body('message') message: string,
+    @Body('messages') messages: any,
   ) {
-    return this.openAPIService.chatCompletion(model, message)
+    return this.openAPIService.chatCompletion(model, messages)
   }
 
   @Post('/spark/completion/chat')
