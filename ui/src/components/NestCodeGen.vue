@@ -840,6 +840,7 @@ watch(
     console.log(_newStringifiedTableDefinition)
     console.log(_oldStringifiedTableDefinition)
     console.log(`-------NestCodeGen-------`)
+
     if (_newStringifiedTableDefinition === _oldStringifiedTableDefinition) {
       console.log(
         `NestCodeGen - watch stringifiedTable - no change detected(exit)`,
@@ -861,10 +862,13 @@ watch(
     const oldTable: Table = JSON.parse(_oldStringifiedTableDefinition) as Table
     const newTable: Table = JSON.parse(_newStringifiedTableDefinition) as Table
 
-    if (!oldTable.id && newTable.id) {
-      console.log(`NestCodeGen - watch stringifiedTable - refreshTableList`)
-      await store.refreshTablesAsync()
-    }
+    // if (!oldTable.id && newTable.id) {
+    //   console.log(`NestCodeGen - watch stringifiedTable - refreshTableList`)
+    //   await store.refreshTablesAsync()
+    // }
+    // TODO: 这里要斟酌下，什么时候要刷新所有表的列表？
+    console.log(`NestCodeGen - watch stringifiedTable - oldTable.id: ${oldTable.id} && newTable.id: ${newTable.id}`)
+    await store.refreshTablesAsync()
 
     if (newTable.id !== oldTable.id) {
       /**
