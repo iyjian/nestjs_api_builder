@@ -113,6 +113,7 @@ export class CodegenUtilService {
   ) {
     let isOptional = '?'
     let code = ''
+
     if (!forceOptional) {
       /**
        * 如果字段允许为空或者字段有默认值则该值为可选
@@ -132,7 +133,7 @@ export class CodegenUtilService {
       @codeGen('${column.id}')
       @ApiProperty({
         description: '${column.fullComment.replace(/'/g, '"')}',
-        required: ${forceOptional || column.allowNull ? 'false' : 'true'}
+        required: ${isOptional === '?' ? 'false' : 'true'}
       })`
 
     if (!showInAPI) {
