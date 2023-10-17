@@ -7,6 +7,7 @@ import {
   OpenAIApi,
 } from 'openai'
 import tunnel from 'tunnel'
+import { Spark } from 'iflytek-spark-nodejs'
 
 @Injectable()
 export class OpenAPIService {
@@ -76,23 +77,30 @@ export class OpenAPIService {
   }
 
   async chatCompletion(
-    model: 'gpt-3.5-turbo-0301' | 'gpt-3.5-turbo',
-    content: string,
+    model: 'gpt-3.5-turbo-0301' | 'gpt-3.5-turbo' = 'gpt-3.5-turbo-0301',
+    messages: any[],
   ) {
-    const result = await this.openai.createChatCompletion(
-      {
-        model,
-        messages: [{ role: 'user', content }],
-        temperature: 0,
-        max_tokens: 2048,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-        stop: ['#', ';'],
-      },
-      { httpsAgent: this.agent },
-    )
-    return result.data
+    try {
+      const result = await this.openai.createChatCompletion(
+        {
+          model,
+          // messages: [{ role: 'user', content: '你好呀' }],
+          messages,
+          temperature: 0,
+          max_tokens: 2048,
+          top_p: 1.0,
+          frequency_penalty: 0.0,
+          presence_penalty: 0.0,
+          stop: ['#', ';'],
+        },
+        { httpsAgent: this.agent },
+      )
+      return result.data      
+    } catch (e) {
+      console.log(e.message)
+      console.log(e.response.data)
+      throw e
+    }
   }
 
   async imageGen(prompt: string, size: string) {
@@ -123,5 +131,19 @@ export class OpenAPIService {
       { httpsAgent: this.agent },
     )
     return response.data
+  }
+
+  async chatCompletionSpark (model: 'v1' | 'v2' = 'v2', content: string) {
+    const spark = new Spark({
+      // 自行填入相关参数
+      secret: this.configService.get('iflyTechSpark.apiSecret'),
+      key: this.configService.get('iflyTechSpark.apiKey'),
+      appid: this.configService.get('iflyTechSpark.appId'),
+      version: model
+    });
+
+    return await spark.chat({
+      content
+    })
   }
 }

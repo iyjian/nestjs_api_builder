@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { SequelizeModule } from '@nestjs/sequelize'
 
 import { MetaProjectController } from './controllers/meta.project.controller'
@@ -33,6 +33,7 @@ import { ProjectModuleController } from './controllers/project.module.controller
 import { ProjectModuleService } from './services/project.module.service'
 import { SwaggerController } from './controllers/swagger.controller'
 import { LogService, RouteService } from './services'
+import { CodingModule } from '../coding'
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { LogService, RouteService } from './services'
       Route,
       Log,
     ]),
+    forwardRef(()=>CodingModule)
   ],
   exports: [
     MetaTableService,

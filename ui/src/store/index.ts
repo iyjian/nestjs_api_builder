@@ -1,5 +1,5 @@
-import { InjectionKey } from "vue";
-import { createStore, useStore as baseUseStore, Store } from "vuex";
+import { InjectionKey } from 'vue'
+import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import {
   Column,
   Table,
@@ -8,12 +8,12 @@ import {
   NestCodeGenState,
   GitInfo,
   Project,
-} from "@/types";
-import _ from "lodash";
-import { devToolApiClient } from "@/plugins";
-import VuexPersistence from "vuex-persist";
-import { ElMessage } from "element-plus";
-import { getDiff } from "@/libs/CodeUtil";
+} from '@/types'
+import _ from 'lodash'
+import { devToolApiClient } from '@/plugins'
+import VuexPersistence from 'vuex-persist'
+import { ElMessage } from 'element-plus'
+import { getDiff } from '@/libs/CodeUtil'
 
 // const plugins = [new VuexPersistence().plugin];
 

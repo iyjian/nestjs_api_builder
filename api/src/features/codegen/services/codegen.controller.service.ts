@@ -220,9 +220,9 @@ export class CodegenControllerService {
     fileContent: string,
   ): Promise<string> {
     // 根据tableId生成schema
-    const schema: any = await this.responseCodeGenService.genResponseSchema(
-      table.id,
-    )
+    // const schema: any = await this.responseCodeGenService.genResponseSchema(
+    //   table.id,
+    // )
 
     // 将装饰器的import插入到Controller的代码中
     fileContent = this.codegenUtilService.ensureImports(fileContent, {
@@ -274,18 +274,24 @@ export class CodegenControllerService {
 
   /**
    * 根据schema生成 ${table.dotName}.response.schema.ts
+   * TODO: BUG 当table中有has many关系，且在findOne中定义了关系时并没有生成正确的responseSchema
    */
   public async genSchemaCodeFromScratch(table: MetaTable): Promise<Code> {
     // 根据tableId生成schema
-    const schema: any = await this.responseCodeGenService.genResponseSchema(
+    const findOneResponseSchema: any = await this.responseCodeGenService.genResponseSchema(
       table.id,
+      'findOne'
     )
 
-    const code = `export const FindOneResponseSchema = ${JSON.stringify(schema)}
+    const findAllResponseSchema: any = await this.responseCodeGenService.genResponseSchema(
+      table.id,
+      'findAll'
+    )
+
+    const code = `export const FindOneResponseSchema = ${JSON.stringify(findOneResponseSchema)}
   
-                  export const FindAllResponseSchema = ${JSON.stringify(
-                    schema,
-                  )}\n`
+                  export const FindAllResponseSchema = ${JSON.stringify(findAllResponseSchema)}
+                 `
 
     return {
       label: 'schema',
@@ -306,16 +312,10 @@ export class CodegenControllerService {
     if (contentResult.err === 500) {
       throw new HttpException(contentResult.errMsg, HttpStatus.BAD_GATEWAY)
     } else if (contentResult.err === 0) {
-      // 如果存在schema的代码，则不做修改，直接返回
-      // return {
-      //   content: contentResult.content,
-      //   originContent: contentResult.content,
-      //   path: table.schemaFilePath,
-      //   isExist: true,
-      //   label: 'schema',
-      // }
+      // 如果存在schema的代码
       const schemaCode = await this.genSchemaCodeFromScratch(table)
       schemaCode.isExist = true
+      schemaCode.originContent = contentResult.content
       return schemaCode
     } else if (contentResult.err === 404) {
       const schemaCode = await this.genSchemaCodeFromScratch(table)

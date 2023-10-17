@@ -1,6 +1,6 @@
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { BaseModule } from './../features/base/base.module'
-import {RouteService} from './../features/base/services/route.service'
+import { RouteService } from './../features/base/services/route.service'
 
 export default (app: NestExpressApplication) => {
   const server = app.getHttpServer()

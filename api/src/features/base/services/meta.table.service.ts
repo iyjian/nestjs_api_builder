@@ -43,24 +43,37 @@ export class MetaTableService extends BaseService {
   }
 
   async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableRequestDTO) {
-    const { page, pageSize, skipPaging, simplify, ...payload } = findAllQueryMetaTable
+    const { page, pageSize, skipPaging, simplify, ...payload } =
+      findAllQueryMetaTable
 
     const metaTables = await this.metaTableModel.findAndCountAll({
       distinct: true,
       where: { ...payload },
-      attributes: simplify?['id', 'module', 'name', 'comment', 'selectDisplayColumns', 'createdAt', 'updatedAt']: undefined,
+      attributes: simplify
+        ? [
+            'id',
+            'module',
+            'name',
+            'comment',
+            'selectDisplayColumns',
+            'createdAt',
+            'updatedAt',
+          ]
+        : undefined,
       offset: skipPaging ? undefined : (page - 1) * pageSize,
       limit: skipPaging ? undefined : pageSize,
-      include: simplify? undefined:[
-        {
-          model: MetaProject,
-        },
-        {
-          model: MetaColumn,
-          as: 'columns',
-          separate: true,
-        },
-      ],
+      include: simplify
+        ? undefined
+        : [
+            {
+              model: MetaProject,
+            },
+            {
+              model: MetaColumn,
+              as: 'columns',
+              separate: true,
+            },
+          ],
       order: [
         ['module', 'asc'],
         ['name', 'asc'],
@@ -190,9 +203,9 @@ export class MetaTableService extends BaseService {
               include: [
                 {
                   model: MetaProject,
-                  attributes: ['baseDirectory']
-                }
-              ]
+                  attributes: ['baseDirectory'],
+                },
+              ],
             },
             {
               model: MetaTable,

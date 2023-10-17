@@ -122,6 +122,9 @@ export class CreateMetaProjectRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isPublic?: boolean
+
+  @codeGen('9154')
+  status?: number
 }
 
 export class UpdateMetaProjectRequestDTO {
@@ -241,6 +244,9 @@ export class UpdateMetaProjectRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isPublic?: boolean
+
+  @codeGen('9154')
+  status?: number
 }
 
 export class FindOneMetaProjectRequestDTO {
@@ -360,6 +366,14 @@ export class FindOneMetaProjectRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isPublic?: boolean
+
+  @codeGen('9154')
+  @ApiProperty({
+    description: '创建状态',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  status?: number
 }
 
 export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
@@ -479,4 +493,12 @@ export class FindAllMetaProjectRequestDTO extends PagingRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isPublic?: boolean
+
+  @codeGen('9154')
+  @ApiProperty({
+    description: '创建状态',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  status?: number
 }

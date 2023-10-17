@@ -27,6 +27,7 @@ export class ApiGuard implements CanActivate {
         token === this.configService.get('auth.superToken')
       ) {
         delete request['query']['token']
+        request['locals'] = {userId: 1}
         return true
       }
 
@@ -49,7 +50,7 @@ export class ApiGuard implements CanActivate {
       const loginStatus = await this.authing.checkLoginStatus(token)
 
       if (loginStatus.status) {
-        request['locals'] = {userId: loginStatus.data.id}
+        request['locals'] = { userId: loginStatus.data.id }
         return true
       } else {
         this.logger.debug(`apiGuard - canActivate - token: ${token}`)

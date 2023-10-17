@@ -100,7 +100,9 @@ export class DBSyncService {
    * @returns
    */
   private async getProjectConnection(projectId: number): Promise<Sequelize> {
-    const project = await this.metaProjectService.findOneMetaProjectById(projectId)
+    const project = await this.metaProjectService.findOneMetaProjectById(
+      projectId,
+    )
     const config = this.targetDBConnections[projectId]?.config
 
     if (
@@ -108,20 +110,31 @@ export class DBSyncService {
       config.database !== project.dbName ||
       config.username !== project.dbUser ||
       config.password !== project.dbPassword ||
-      config.host !== project.dbHost
+      config.host !== project.dbHost ||
+      config.port !== project.dbPort
     ) {
-      // 如果projectId不在targetDBConnections中，或者projectId已经在targetDBConnections中且数据库的连接配置参数变更了
+      console.log({
+        host: project.dbHost,
+        dialect: 'mysql',
+        database: project.dbName,
+        username: project.dbUser,
+        password: project.dbPassword,
+        port: parseInt(project.dbPort),
+        logging: false,
+      })
 
+      // 如果没有初始化过数据库链接或者数据库链接的参数变了则初始化数据库链接
       this.targetDBConnections[projectId] = new Sequelize({
         host: project.dbHost,
         dialect: 'mysql',
         database: project.dbName,
         username: project.dbUser,
         password: project.dbPassword,
+        port: parseInt(project.dbPort),
         logging: false,
       })
 
-      // 检测修改后的连接池是否能连接上
+      // 数据库链接检测
       try {
         await this.targetDBConnections[projectId].authenticate()
       } catch (err) {
