@@ -65,7 +65,7 @@ export class CodegenEntityService {
         ['BelongsTo', 'HasMany', 'BelongsToMany', 'HasOne'].includes(
           column.relation,
         ) &&
-        column.tableId !== table.id
+        column.refTableId !== table.id
       ) {
         const importSpecifier = this.codegenUtilService.getImportSpecifier(
           table.entityFilePath,
