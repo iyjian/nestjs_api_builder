@@ -1,8 +1,6 @@
 <template>
   <div class="toolbar">
-    <el-button type="primary" :icon="Plus" @click="openSubmitForm"
-      >新建项目</el-button
-    >
+    <el-button type="primary" :icon="Plus" @click="openSubmitForm">新建项目</el-button>
   </div>
 
   <div class="tableView">
@@ -14,23 +12,16 @@
       <el-table-column label="操作" width="180">
         <template #default="scope">
           <!-- <el-button type="danger" :icon="Delete" size="small"/> -->
-          <el-button
-            :icon="Edit"
-            size="small"
-            @click="openEditForm(scope.row.id)"
-          />
+          <el-button :icon="Edit" size="small" @click="openEditForm(scope.row.id)" />
         </template>
       </el-table-column>
     </el-table>
   </div>
 
-  <el-dialog v-model="dialog.visible" :show-close="false" :title="dialogTitle">
+  <el-dialog v-model="dialog.visible" :show-close="false" :title="dialogTitle" @close="resetPostData">
     <el-form :model="postData" label-width="120px">
       <el-form-item label="仓库项目名称">
-        <el-input
-          v-model="postData.repoName"
-          placeholder="仅支持英文、数字、_、-"
-        />
+        <el-input v-model="postData.repoName" placeholder="仅支持英文、数字、_、-" />
       </el-form-item>
       <el-form-item label="项目名称">
         <el-input v-model="postData.name" />
@@ -38,16 +29,8 @@
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button
-          @click="dialog.visible = false"
-          :loading="dialog.button.loading"
-          >取消</el-button
-        >
-        <el-button
-          type="primary"
-          @click="submit"
-          :loading="dialog.button.loading"
-        >
+        <el-button @click="dialog.visible = false" :loading="dialog.button.loading">取消</el-button>
+        <el-button type="primary" @click="submit" :loading="dialog.button.loading">
           确认
         </el-button>
       </span>
@@ -86,14 +69,21 @@ const dialogTitle = computed(
   () => `${dialog.type === 'add' ? '新建' : '修改'}项目`,
 )
 
-const postData = ref({
+const DEFAULT_POST_DATA = {
   repoId: 0,
   repo: '',
   name: '',
   repoName: '',
   projectName: '',
   version: '2',
-})
+}
+
+const postData = ref(_.cloneDeep(DEFAULT_POST_DATA))
+
+
+function resetPostData() {
+  postData.value = _.cloneDeep(DEFAULT_POST_DATA)
+}
 
 async function openSubmitForm() {
   dialog.visible = true
@@ -112,14 +102,18 @@ async function submit() {
     // 记录项目
     // postData.value.repo = result.ssh_url_to_repo
     // postData.value.repoId = result.id
-    await devToolApiClient.postProject(postData.value)
-    await refreshTable()
 
+    if (dialog.type === 'add') {
+      await devToolApiClient.postProject(postData.value)
+    } else {
+      await devToolApiClient.updateProject(postData.value)
+    }
+    await refreshTable()
     dialog.visible = false
-    dialog.button.loading = false
   } catch (e) {
-    dialog.button.loading = false
     console.log(e)
+  } finally {
+    dialog.button.loading = false
   }
 }
 
@@ -128,10 +122,9 @@ async function edit(projectId: number) {
 }
 
 async function openEditForm(projectId: number) {
-  const project = await devToolApiClient.getProjectInfo(projectId)
-  postData.value = project
-  dialog.visible = true
+  postData.value = await devToolApiClient.getProjectInfo(projectId)
   dialog.type = 'edit'
+  dialog.visible = true
 }
 
 await refreshTable()
