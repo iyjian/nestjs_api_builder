@@ -131,11 +131,14 @@ export class TemplateService {
 
   public gen() {
     const crudCode = this.code.body[0]
-    // 过滤条件所需字段 crudCode.filter.body    
-    // TODO: 
+    // 过滤条件所需字段 crudCode.filter.body
+    // TODO:
 
     // 表格所需字段 crudCode.columns
-    for (const column of _.sortBy(this.tableColumns, (a: MetaColumn) => a.order * -1)) {
+    for (const column of _.sortBy(
+      this.tableColumns,
+      (a: MetaColumn) => a.order * -1,
+    )) {
       crudCode.columns.unshift({
         name: column.name,
         label: column.comment,

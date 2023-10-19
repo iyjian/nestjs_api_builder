@@ -47,7 +47,7 @@ import { CodingModule } from '../coding'
       Route,
       Log,
     ]),
-    forwardRef(()=>CodingModule)
+    forwardRef(() => CodingModule),
   ],
   exports: [
     MetaTableService,

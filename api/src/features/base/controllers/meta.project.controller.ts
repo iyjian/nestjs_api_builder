@@ -35,19 +35,31 @@ export class MetaProjectController {
 
   @Post('')
   async create(@Body() createMetaProject: CreateMetaProjectRequestDTO) {
-    const metaProject = await this.metaProjectService.createMetaProject(createMetaProject)
+    const metaProject = await this.metaProjectService.createMetaProject(
+      createMetaProject,
+    )
 
-    this.gitlabProjectService.createProject(createMetaProject.name, undefined, undefined, undefined, async (project) => {
-      this.logger.debug(`create - updateMetaProject - projectId: ${metaProject.id} repoId: ${project.id} repo: ${project.ssh_url_to_repo}`)
-      await this.metaProjectService.updateMetaProject(metaProject.id, {
-        status: 1,
-        repo: project.ssh_url_to_repo,
-        repoId: project.id
+    this.gitlabProjectService
+      .createProject(
+        createMetaProject.name,
+        undefined,
+        undefined,
+        undefined,
+        async (project) => {
+          this.logger.debug(
+            `create - updateMetaProject - projectId: ${metaProject.id} repoId: ${project.id} repo: ${project.ssh_url_to_repo}`,
+          )
+          await this.metaProjectService.updateMetaProject(metaProject.id, {
+            status: 1,
+            repo: project.ssh_url_to_repo,
+            repoId: project.id,
+          })
+        },
+      )
+      .catch((error) => {
+        this.logger.error(error)
+        console.log(error)
       })
-    }).catch(error => {
-      this.logger.error(error)
-      console.log(error)
-    })
 
     return metaProject
   }

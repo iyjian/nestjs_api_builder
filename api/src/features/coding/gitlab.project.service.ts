@@ -38,10 +38,12 @@ export class GitlabProjectService {
     templateProjectId: number = this.templateProjectId,
     visibility: string = 'private',
     namespaceId: number = this.namespaceId,
-    cb?: (project: Types.ProjectExtendedSchema) => void
+    cb?: (project: Types.ProjectExtendedSchema) => void,
   ): Promise<Types.ProjectExtendedSchema> {
-    this.logger.debug(`createProject - projectName: ${projectName} templateProjectId: ${templateProjectId} visibility: ${visibility} namespaceId: ${namespaceId}`)
-    
+    this.logger.debug(
+      `createProject - projectName: ${projectName} templateProjectId: ${templateProjectId} visibility: ${visibility} namespaceId: ${namespaceId}`,
+    )
+
     const project = await this.gitlabClient.Projects.create({
       name: projectName,
       visibility,

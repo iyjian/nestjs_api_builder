@@ -278,19 +278,19 @@ export class CodegenControllerService {
    */
   public async genSchemaCodeFromScratch(table: MetaTable): Promise<Code> {
     // 根据tableId生成schema
-    const findOneResponseSchema: any = await this.responseCodeGenService.genResponseSchema(
-      table.id,
-      'findOne'
-    )
+    const findOneResponseSchema: any =
+      await this.responseCodeGenService.genResponseSchema(table.id, 'findOne')
 
-    const findAllResponseSchema: any = await this.responseCodeGenService.genResponseSchema(
-      table.id,
-      'findAll'
-    )
+    const findAllResponseSchema: any =
+      await this.responseCodeGenService.genResponseSchema(table.id, 'findAll')
 
-    const code = `export const FindOneResponseSchema = ${JSON.stringify(findOneResponseSchema)}
+    const code = `export const FindOneResponseSchema = ${JSON.stringify(
+      findOneResponseSchema,
+    )}
   
-                  export const FindAllResponseSchema = ${JSON.stringify(findAllResponseSchema)}
+                  export const FindAllResponseSchema = ${JSON.stringify(
+                    findAllResponseSchema,
+                  )}
                  `
 
     return {
