@@ -45,12 +45,12 @@
     />
     <el-table-column label="创建时间">
       <template #default="scope">
-        {{ moment(scope.row.createdAt).format('YYYY-MM-DD HH:mm') }}
+        {{ moment(scope.row.createdAt).format("YYYY-MM-DD HH:mm") }}
       </template>
     </el-table-column>
     <el-table-column label="修改时间">
       <template #default="scope">
-        {{ moment(scope.row.updatedAt).format('YYYY-MM-DD HH:mm') }}
+        {{ moment(scope.row.updatedAt).format("YYYY-MM-DD HH:mm") }}
       </template>
     </el-table-column>
     <el-table-column>
@@ -115,23 +115,29 @@
 </template>
 
 <script lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { defineComponent, shallowRef, PropType } from 'vue'
-import { devToolApiClient } from '@/plugins'
-import { Plus, DeleteFilled, Expand, Fold, Edit } from '@element-plus/icons-vue'
-import { TableSimple, Project } from '@/types'
-import moment from 'moment'
-import { projectTableStore } from '@/store/projectTable'
+import { ElMessage, ElMessageBox } from "element-plus";
+import { defineComponent, shallowRef, PropType } from "vue";
+import { devToolApiClient } from "@/plugins";
+import {
+  Plus,
+  DeleteFilled,
+  Expand,
+  Fold,
+  Edit,
+} from "@element-plus/icons-vue";
+import { TableSimple, Project } from "@/types";
+import moment from "moment";
+import { projectTableStore } from "@/store/projectTable";
 
-let store: ReturnType<typeof projectTableStore>
+let store: ReturnType<typeof projectTableStore>;
 
-const PlusIcon = shallowRef(Plus)
+const PlusIcon = shallowRef(Plus);
 
 export default defineComponent({
   setup() {
-    store = projectTableStore()
+    store = projectTableStore();
   },
-  name: 'Entities',
+  name: "Entities",
   components: {
     DeleteFilled,
     Edit,
@@ -141,14 +147,14 @@ export default defineComponent({
       PlusIcon,
       // projectId: undefined,
       tables: [],
-      search: '',
+      search: "",
       moment,
       tableLoading: false,
       postData: {
         projectId: -1,
-        name: '',
-        comment: '',
-        module: '',
+        name: "",
+        comment: "",
+        module: "",
       },
       dialog: {
         visible: false,
@@ -157,22 +163,22 @@ export default defineComponent({
         },
       },
       projectModules: [] as any,
-    }
+    };
   },
   computed: {
     projectId: {
       get() {
-        return store.currentProjectId
+        return store.currentProjectId;
       },
       set(projectId: number) {
-        store.setCurrentProjectId(projectId)
+        store.setCurrentProjectId(projectId);
       },
     },
     table() {
-      return store.table
+      return store.table;
     },
     projects() {
-      return store.projects
+      return store.projects;
     },
     tabelsFiltered(): TableSimple[] {
       return this.tables.filter(
@@ -180,83 +186,83 @@ export default defineComponent({
           new RegExp(this.search).test(table.name) ||
           new RegExp(this.search).test(table.module) ||
           new RegExp(this.search).test(table.id.toString()) ||
-          new RegExp(this.search).test(table.comment),
-      )
+          new RegExp(this.search).test(table.comment)
+      );
     },
   },
   methods: {
     async submit() {
       try {
-        this.dialog.button.loading = true
-        const table = await devToolApiClient.saveEntity(this.postData)
+        this.dialog.button.loading = true;
+        const table = await devToolApiClient.saveEntity(this.postData);
         // store.commit("emptyTable");
         // store.commit("updateTable", table);
-        store.emptyTable()
-        store.updateTable(table)
-        this.dialog.button.loading = false
-        this.dialog.visible = false
-        this.$router.push('/nestCodeGen')
+        store.emptyTable();
+        store.updateTable(table);
+        this.dialog.button.loading = false;
+        this.dialog.visible = false;
+        this.$router.push("/nestCodeGen");
       } catch (e: any) {
-        this.dialog.button.loading = false
+        this.dialog.button.loading = false;
         ElMessage({
-          type: 'error',
+          type: "error",
           message: e.message,
-        })
+        });
       }
     },
     async deleteTable(table: TableSimple) {
       ElMessageBox.confirm(
         `删除${table.module}: ${table.name}的定义`,
-        '是否确认删除',
+        "是否确认删除",
         {
           distinguishCancelAndClose: true,
-          confirmButtonText: '确认删除',
-          cancelButtonText: '取消',
-        },
+          confirmButtonText: "确认删除",
+          cancelButtonText: "取消",
+        }
       ).then(async () => {
         if (table.id && this.projectId) {
           try {
-            await devToolApiClient.deleteTable(table.id)
+            await devToolApiClient.deleteTable(table.id);
 
             this.tables = await devToolApiClient.loadAllTables(
               this.projectId.toString(),
-              true,
-            )
+              true
+            );
 
             ElMessage({
-              type: 'info',
-              message: '已删除',
-            })
+              type: "info",
+              message: "已删除",
+            });
           } catch (e: any) {
             ElMessage({
-              type: 'error',
+              type: "error",
               message: e.message,
-            })
+            });
           }
         }
-      })
+      });
     },
     async openDialog() {
       if (this.projectId) {
         this.postData = {
           projectId: this.projectId,
-          name: '',
-          comment: '',
-          module: '',
-        }
-        this.dialog.visible = true
+          name: "",
+          comment: "",
+          module: "",
+        };
+        this.dialog.visible = true;
       }
     },
     async configEntity(table: TableSimple) {
       try {
-        this.tableLoading = true
-        console.log(`Entities - configEntity - tableId: ${table.id}`)
-        await store.switchTableAsyncV2(table.id)
-        await store.triggerCodePreviewAsync('switchTableAsync')
-        this.$router.push('/nestCodeGen')
-        this.tableLoading = false
+        this.tableLoading = true;
+        console.log(`Entities - configEntity - tableId: ${table.id}`);
+        await store.switchTableAsyncV2(table.id);
+        await store.triggerCodePreviewAsync("switchTableAsync");
+        this.$router.push("/nestCodeGen");
+        this.tableLoading = false;
       } catch (e) {
-        this.tableLoading = false
+        this.tableLoading = false;
       }
     },
   },
@@ -265,26 +271,26 @@ export default defineComponent({
       async handler() {
         if (this.projectId) {
           try {
-            this.tableLoading = true
+            this.tableLoading = true;
             this.projectModules = await devToolApiClient.getProjectModules(
-              this.projectId,
-            )
+              this.projectId
+            );
             this.tables = await devToolApiClient.loadAllTables(
-              this.projectId.toString(),
-            )
-            this.tableLoading = false
+              this.projectId.toString()
+            );
+            this.tableLoading = false;
           } catch (e) {
-            this.tableLoading = false
+            this.tableLoading = false;
           }
         } else {
-          this.tables = []
-          this.projectModules = []
+          this.tables = [];
+          this.projectModules = [];
         }
       },
       immediate: true,
     },
   },
-})
+});
 </script>
 
 <style lang="stylus" scoped>

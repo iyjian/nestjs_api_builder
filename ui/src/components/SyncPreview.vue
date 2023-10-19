@@ -15,7 +15,7 @@
       <tr v-for="columnDiff in columnDiffs">
         <td>{{ columnDiff.code }}</td>
         <td>{{ columnDiff.sql }}</td>
-        <td>{{ columnDiff.error.join(',') }}</td>
+        <td>{{ columnDiff.error.join(",") }}</td>
         <td>
           <el-button
             :disabled="!!columnDiff.error.length"
@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { devToolApiClient } from '@/plugins'
+import { defineComponent } from "vue";
+import { devToolApiClient } from "@/plugins";
 
 export enum SYNC_REASON {
   SYNC_CONSTRAINT_NEW,
@@ -51,7 +51,7 @@ export enum ERROR_REASON {
 }
 
 export default defineComponent({
-  name: 'SyncPreview',
+  name: "SyncPreview",
   props: {
     tableId: Number,
   },
@@ -64,81 +64,81 @@ export default defineComponent({
         execLoading: false,
       },
       toBeSyncCount: undefined,
-    } as any
+    } as any;
   },
   watch: {
     async tableId(newTableId) {
       if (newTableId) {
         const results = await devToolApiClient.getDBSyncColumnDiffs(
-          this.tableId,
-        )
-        this.toBeSyncCount = results.length
+          this.tableId
+        );
+        this.toBeSyncCount = results.length;
       }
     },
   },
   methods: {
     async refreshSyncResult() {
-      const results = await devToolApiClient.getDBSyncColumnDiffs(this.tableId)
-      this.toBeSyncCount = results.length
+      const results = await devToolApiClient.getDBSyncColumnDiffs(this.tableId);
+      this.toBeSyncCount = results.length;
       for (const result of results) {
         result.error = result.error.map((o: ERROR_REASON) => {
           switch (o) {
             case ERROR_REASON.ERROR_CONSTRAINT_NEW:
-              return '数据依赖错误'
+              return "数据依赖错误";
           }
-        })
+        });
         result.code = result.code.map((o: SYNC_REASON) => {
           switch (o) {
             case SYNC_REASON.SYNC_CONSTRAINT_NEW:
-              return '新约束'
+              return "新约束";
             case SYNC_REASON.SYNC_CONSTRAINT_DROP:
-              return 'error'
+              return "error";
             case SYNC_REASON.SYNC_CONSTRAINT_MODIFY:
-              return '改约束'
+              return "改约束";
             case SYNC_REASON.SYNC_ALLOWNULL_MODIFY:
-              return '改null'
+              return "改null";
             case SYNC_REASON.SYNC_DEFAULTVALUE_MODIFY:
-              return '改默认值'
+              return "改默认值";
             case SYNC_REASON.SYNC_COMMENT_MODIFY:
-              return '改注释'
+              return "改注释";
             case SYNC_REASON.SYNC_DTATTYPE_MODIFY:
-              return '改数据类型'
+              return "改数据类型";
             case SYNC_REASON.SYNC_FEILD_NEW:
-              return '加列'
+              return "加列";
             case SYNC_REASON.SYNC_FEILD_DELETE:
-              return '删列'
+              return "删列";
             default:
-              return o
+              return o;
           }
-        })
+        });
       }
-      this.columnDiffs = results
+      this.columnDiffs = results;
     },
     async execSyncSql(sql: string) {
       try {
-        this.button.execLoading = true
-        await devToolApiClient.executeSyncDB(this.tableId, sql)
-        await this.refreshSyncResult()
-        this.button.execLoading = false
+        this.button.execLoading = true;
+        await devToolApiClient.executeSyncDB(this.tableId, sql);
+        await this.refreshSyncResult();
+        this.button.execLoading = false;
       } catch (e) {
-        this.button.execLoading = false
+        this.button.execLoading = false;
       }
     },
     async open() {
       if (this.tableId) {
         try {
-          this.button.openDialogLoading = true
-          await this.refreshSyncResult()
-          this.dialogVisible = true
-          this.button.openDialogLoading = false
+          this.button.openDialogLoading = true;
+          await this.refreshSyncResult();
+          this.dialogVisible = true;
+          this.button.openDialogLoading = false;
         } catch (e) {
-          this.button.openDialogLoading = false
+          this.button.openDialogLoading = false;
         }
       }
     },
     close() {
-      this.dialogVisible = false
+      this.dialogVisible = false;
     },
   },
-})
+});
 </script>

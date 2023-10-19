@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useToolsStore = defineStore('tools', {
+export const useToolsStore = defineStore("tools", {
   state: () => ({
     crypto: {
-      key: '5cmcAjSuaipIJk7I',
-      iv: 'uKlQnWkB2WbpmHVZ',
+      key: "5cmcAjSuaipIJk7I",
+      iv: "uKlQnWkB2WbpmHVZ",
     },
     // options1Key: "",
     // option1Val: "5cmcAjSuaipIJk7I",
@@ -13,14 +13,14 @@ export const useToolsStore = defineStore('tools', {
   }),
   actions: {
     setDecryptKey(val: string) {
-      this.crypto.key = val
+      this.crypto.key = val;
     },
     setDecryptIV(val: string) {
-      this.crypto.iv = val
+      this.crypto.iv = val;
     },
   },
   persist: {
     enabled: true,
-    strategies: [{ storage: localStorage, paths: ['tools'] }],
+    strategies: [{ storage: localStorage, paths: ["tools"] }],
   },
-})
+});

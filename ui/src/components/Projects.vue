@@ -57,52 +57,52 @@
 
 <script lang="ts">
 export default {
-  name: 'Projects',
-}
+  name: "Projects",
+};
 </script>
 
 <script lang="ts" setup>
-import { ref, watch, computed, shallowRef, reactive } from 'vue'
-import { devToolApiClient } from '@/plugins'
-import _ from 'lodash'
-import { Plus, Delete, Edit } from '@element-plus/icons-vue'
-import { Project } from '@/types'
+import { ref, watch, computed, shallowRef, reactive } from "vue";
+import { devToolApiClient } from "@/plugins";
+import _ from "lodash";
+import { Plus, Delete, Edit } from "@element-plus/icons-vue";
+import { Project } from "@/types";
 
-let table = reactive<Project[]>([])
+let table = reactive<Project[]>([]);
 
 async function refreshTable() {
-  table = await devToolApiClient.getAllProjects()
+  table = await devToolApiClient.getAllProjects();
 }
 
 const dialog = reactive({
   visible: false,
-  type: 'add',
+  type: "add",
   button: {
     loading: false,
   },
-})
+});
 
 const dialogTitle = computed(
-  () => `${dialog.type === 'add' ? '新建' : '修改'}项目`,
-)
+  () => `${dialog.type === "add" ? "新建" : "修改"}项目`
+);
 
 const postData = ref({
   repoId: 0,
-  repo: '',
-  name: '',
-  repoName: '',
-  projectName: '',
-  version: '2',
-})
+  repo: "",
+  name: "",
+  repoName: "",
+  projectName: "",
+  version: "2",
+});
 
 async function openSubmitForm() {
-  dialog.visible = true
-  dialog.type = 'add'
+  dialog.visible = true;
+  dialog.type = "add";
 }
 
 async function submit() {
   try {
-    dialog.button.loading = true
+    dialog.button.loading = true;
 
     // 从模板项目初始化
     // const result = await devToolApiClient.initProject({
@@ -112,14 +112,14 @@ async function submit() {
     // 记录项目
     // postData.value.repo = result.ssh_url_to_repo
     // postData.value.repoId = result.id
-    await devToolApiClient.postProject(postData.value)
-    await refreshTable()
+    await devToolApiClient.postProject(postData.value);
+    await refreshTable();
 
-    dialog.visible = false
-    dialog.button.loading = false
+    dialog.visible = false;
+    dialog.button.loading = false;
   } catch (e) {
-    dialog.button.loading = false
-    console.log(e)
+    dialog.button.loading = false;
+    console.log(e);
   }
 }
 
@@ -128,13 +128,13 @@ async function edit(projectId: number) {
 }
 
 async function openEditForm(projectId: number) {
-  const project = await devToolApiClient.getProjectInfo(projectId)
-  postData.value = project
-  dialog.visible = true
-  dialog.type = 'edit'
+  const project = await devToolApiClient.getProjectInfo(projectId);
+  postData.value = project;
+  dialog.visible = true;
+  dialog.type = "edit";
 }
 
-await refreshTable()
+await refreshTable();
 </script>
 
 <style lang="stylus" scoped>

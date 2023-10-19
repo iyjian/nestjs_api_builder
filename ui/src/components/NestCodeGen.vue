@@ -406,10 +406,10 @@
           <template
             v-if="
               allTables.filter(
-                (table) => table.id === editingColumn?.refTableId,
+                (table) => table.id === editingColumn?.refTableId
               ).length > 0 &&
               allTables.filter(
-                (table) => table.id === editingColumn?.refTableId,
+                (table) => table.id === editingColumn?.refTableId
               )[0]['name'] === 't_enum'
             "
           >
@@ -569,12 +569,12 @@
 
 <script lang="ts">
 export default {
-  name: 'NestCodeGen',
-}
+  name: "NestCodeGen",
+};
 </script>
 
 <script lang="ts" setup>
-import { projectTableStore } from '@/store/projectTable'
+import { projectTableStore } from "@/store/projectTable";
 import {
   ref,
   watch,
@@ -583,31 +583,31 @@ import {
   reactive,
   onMounted,
   onActivated,
-} from 'vue'
-import CodePreivew from './CodePreview.vue'
-import ERPreviewer from './ERPreviewer.vue'
-import { devToolApiClient } from '@/plugins'
-import ColumnSummary from './ColumnSummary.vue'
-import _ from 'lodash'
-import draggable from 'vuedraggable'
-import { Column, Table } from '@/types'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete, Rank, Setting, Back } from '@element-plus/icons-vue'
-import Codemirror from 'codemirror-editor-vue3'
-import ParseImg from './ParseImg.vue'
-import IndexManager from './IndexManager.vue'
-import 'codemirror/mode/javascript/javascript.js'
-import 'codemirror/theme/dracula.css'
-import SyncPreview from '@/components/SyncPreview.vue'
+} from "vue";
+import CodePreivew from "./CodePreview.vue";
+import ERPreviewer from "./ERPreviewer.vue";
+import { devToolApiClient } from "@/plugins";
+import ColumnSummary from "./ColumnSummary.vue";
+import _ from "lodash";
+import draggable from "vuedraggable";
+import { Column, Table } from "@/types";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Delete, Rank, Setting, Back } from "@element-plus/icons-vue";
+import Codemirror from "codemirror-editor-vue3";
+import ParseImg from "./ParseImg.vue";
+import IndexManager from "./IndexManager.vue";
+import "codemirror/mode/javascript/javascript.js";
+import "codemirror/theme/dracula.css";
+import SyncPreview from "@/components/SyncPreview.vue";
 
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance } from "vue";
 /** 两种用法
     1. 从getCurrentInstance 中获取
     2. template 中可直接通过$history 使用
 */
 onMounted(async () => {
-  const ins = getCurrentInstance()
-  const routerHistory = ins?.proxy?.$history
+  const ins = getCurrentInstance();
+  const routerHistory = ins?.proxy?.$history;
   if (routerHistory?.stack?.length && routerHistory.stack.length === 1) {
     /**
      * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
@@ -615,82 +615,82 @@ onMounted(async () => {
     console.log(
       `NestCodeGen - onActivated - routerHistory length: ${
         routerHistory.stack.length
-      } routerHistory stack: ${JSON.stringify(routerHistory.stack)}`,
-    )
+      } routerHistory stack: ${JSON.stringify(routerHistory.stack)}`
+    );
     if (table.value.id) {
       console.log(
-        `NestCodeGen - onActivated - refresh code preview table.value.id: ${table.value.id}`,
-      )
-      await store.switchTableAsyncV2(table.value.id)
-      await store.triggerCodePreviewAsync('switchTableAsync')
+        `NestCodeGen - onActivated - refresh code preview table.value.id: ${table.value.id}`
+      );
+      await store.switchTableAsyncV2(table.value.id);
+      await store.triggerCodePreviewAsync("switchTableAsync");
     }
   }
-})
+});
 
-const store = projectTableStore()
+const store = projectTableStore();
 
 const codeMirrorOption = {
-  mode: 'text/javascript',
+  mode: "text/javascript",
   tabSize: 2,
   lineNumbers: false,
   readOnly: false,
   showCursorWhenSelecting: true,
   singleCursorHeightPerLine: false,
   styleActiveLine: true,
-  theme: 'dracula',
+  theme: "dracula",
   foldGutter: true,
-}
+};
 
 const table = computed(() => {
-  return store.table
-})
+  return store.table;
+});
 
 // const table = store.table
 
-const allTables = computed(() => store.tables)
+const allTables = computed(() => store.tables);
 const groupedDataTypes = computed<{ [key: string]: any[] }>(() => {
-  return _.groupBy(store.dataTypes, (o: any) => o.category)
-})
+  return _.groupBy(store.dataTypes, (o: any) => o.category);
+});
 
 const dataTypeByDataTypeId = computed<{ [key: string]: any }>(() => {
-  return _.keyBy(store.dataTypes, (o: any) => o.id)
-})
+  return _.keyBy(store.dataTypes, (o: any) => o.id);
+});
 
-const computedReadyColumns = computed(() => store.readyColumns)
-const stringifiedTable = computed(() => store.stringifiedTable)
-const state = computed(() => store.status)
-const gitInfo = computed(() => store.gitInfo)
+const computedReadyColumns = computed(() => store.readyColumns);
+const stringifiedTable = computed(() => store.stringifiedTable);
+const state = computed(() => store.status);
+const gitInfo = computed(() => store.gitInfo);
 
 const sourceBranch = computed({
   get: () => store.gitInfo.sourceBranch,
   set: (val) => {
     // store.commit("setGitInfoSourceBranch", val);
-    store.setGitInfoSourceBranch(val)
+    store.setGitInfoSourceBranch(val);
   },
-})
+});
 
 const gitCommitComment = computed({
   get: () => store.gitInfo.comment,
   set: (val) => {
     // store.commit("setGitInfoComment", val);
-    store.setGitInfoComment(val)
+    store.setGitInfoComment(val);
   },
-})
+});
 
 const previewButton = computed(() =>
-  store.status.currentPreviewMode === 'preview' ? '查看diff' : '查看生成代码',
-)
+  store.status.currentPreviewMode === "preview" ? "查看diff" : "查看生成代码"
+);
 
 const dragOptions = computed(() => ({
   animation: 200,
-  group: 'description',
+  group: "description",
   disabled: false,
-  ghostClass: 'ghost',
-}))
+  ghostClass: "ghost",
+}));
 
 const checkMove = (evt: any) => {
-  return !!evt.draggedContext.element.name && !!evt.relatedContext.element.name
-}
+  return !!evt.draggedContext.element.name && !!evt.relatedContext.element.name;
+};
 
 /**
  * 关联表的选中与取消选中
@@ -700,13 +700,13 @@ const checkMove = (evt: any) => {
  */
 function changeRefTable(column?: Column, refTableId?: number) {
   if (!column) {
-    return
+    return;
   }
   if (refTableId) {
-    column.relation = 'BelongsTo'
+    column.relation = "BelongsTo";
   } else {
-    column.refTableId = null
-    column.relation = null
+    column.refTableId = null;
+    column.relation = null;
   }
 }
 
@@ -715,34 +715,34 @@ function changeRefTable(column?: Column, refTableId?: number) {
  * TODO: 经调查后端并没有save，这里需要改名字
  *
  */
-async function saveAndSubmitPR(type: 'commit' | 'pr') {
+async function saveAndSubmitPR(type: "commit" | "pr") {
   try {
     // store.commit("startSaving");
-    store.startSaving()
+    store.startSaving();
     if (table.value.id) {
       const mergeRequestResult = await devToolApiClient.saveAndSubmitPR(
         table.value.id,
-        gitInfo.value.codes.filter((code: any) => code.type === 'code'),
+        gitInfo.value.codes.filter((code: any) => code.type === "code"),
         gitInfo.value.sourceBranch,
-        type === 'commit' ? gitInfo.value.sourceBranch : '',
-        gitInfo.value.comment,
-      )
+        type === "commit" ? gitInfo.value.sourceBranch : "",
+        gitInfo.value.comment
+      );
       // store.commit("stopSaving");
-      store.stopSaving()
-      if (type === 'commit') {
-        ElMessage.success('代码已提交')
-        gitInfo.value.mergeRequestUrl = ''
-        gitInfo.value.comment = ''
+      store.stopSaving();
+      if (type === "commit") {
+        ElMessage.success("代码已提交");
+        gitInfo.value.mergeRequestUrl = "";
+        gitInfo.value.comment = "";
       } else {
-        ElMessage.success('已发起PR')
+        ElMessage.success("已发起PR");
         gitInfo.value.mergeRequestUrl =
-          mergeRequestResult.MergeInfo.MergeRequestUrl
+          mergeRequestResult.MergeInfo.MergeRequestUrl;
       }
     }
   } catch (e: any) {
-    ElMessage.warning(e.message)
+    ElMessage.warning(e.message);
     // store.commit("stopSaving");
-    store.stopSaving()
+    store.stopSaving();
   }
 }
 
@@ -755,17 +755,17 @@ async function deleteColumn(columnToBeDeleted: Column) {
   try {
     await ElMessageBox.confirm(
       `删除列${columnToBeDeleted.name}`,
-      '是否确认删除',
+      "是否确认删除",
       {
         distinguishCancelAndClose: true,
-        confirmButtonText: '确认删除',
-        cancelButtonText: '取消',
-      },
-    )
+        confirmButtonText: "确认删除",
+        cancelButtonText: "取消",
+      }
+    );
     // store.dispatch("deleteColumn", columnToBeDeleted);
-    await store.deleteColumnAsync(columnToBeDeleted)
+    await store.deleteColumnAsync(columnToBeDeleted);
   } catch (e) {
-    console.log(e)
+    console.log(e);
   }
 }
 
@@ -775,50 +775,50 @@ async function deleteColumn(columnToBeDeleted: Column) {
  * @param column
  */
 // const editingColumn = ref<Partial<Column>>({});
-const editingColumn = ref<Column>()
+const editingColumn = ref<Column>();
 
 async function openSetting(column: Column) {
-  console.log('column:::::::::::::::::', column)
-  editingColumn.value = column
+  console.log("column:::::::::::::::::", column);
+  editingColumn.value = column;
   if (
     column.relationColumnId &&
     table.value.columns.filter(
-      (column_) => column_.id === column.relationColumnId,
+      (column_) => column_.id === column.relationColumnId
     ).length
   ) {
     editingColumn.value.relationColumn = table.value.columns.filter(
-      (column_) => column_.id === column.relationColumnId,
-    )[0]
+      (column_) => column_.id === column.relationColumnId
+    )[0];
   }
-  state.value.columnSettingDialogVisible = true
+  state.value.columnSettingDialogVisible = true;
 }
 /**
  * 字段 settings 弹出框
  */
 
 function toggerViewMode() {
-  if (store.status.currentPreviewMode === 'preview') {
-    store.toDiffMode()
+  if (store.status.currentPreviewMode === "preview") {
+    store.toDiffMode();
   } else {
-    store.toPreviewMode()
+    store.toPreviewMode();
   }
 }
 
 function setCodeTypes(shortcut: string) {
-  if (shortcut === 'entity') {
-    store.setSelectedCodeTypes(['enty'])
-  } else if (shortcut === 'all') {
+  if (shortcut === "entity") {
+    store.setSelectedCodeTypes(["enty"]);
+  } else if (shortcut === "all") {
     if (table.value.project.version === 1) {
-      store.setSelectedCodeTypes(['enty', 'dto/req', 'ctl', 'serv', 'mdu'])
+      store.setSelectedCodeTypes(["enty", "dto/req", "ctl", "serv", "mdu"]);
     } else {
       store.setSelectedCodeTypes([
-        'enty',
-        'dto/req',
-        'ctl',
-        'serv',
-        'mdu',
-        'schema',
-      ])
+        "enty",
+        "dto/req",
+        "ctl",
+        "serv",
+        "mdu",
+        "schema",
+      ]);
     }
   }
 }
@@ -829,46 +829,48 @@ function setCodeTypes(shortcut: string) {
 watch(
   () => store.status.selectedCodeTypes,
   async () => {
-    await store.triggerCodePreviewAsync('selectedCodeTypesChanged')
-  },
-)
+    await store.triggerCodePreviewAsync("selectedCodeTypesChanged");
+  }
+);
 
 watch(
   stringifiedTable,
   async (_newStringifiedTableDefinition, _oldStringifiedTableDefinition) => {
-    console.log(`-------NestCodeGen-------`)
-    console.log(_newStringifiedTableDefinition)
-    console.log(_oldStringifiedTableDefinition)
-    console.log(`-------NestCodeGen-------`)
+    console.log(`-------NestCodeGen-------`);
+    console.log(_newStringifiedTableDefinition);
+    console.log(_oldStringifiedTableDefinition);
+    console.log(`-------NestCodeGen-------`);
 
     if (_newStringifiedTableDefinition === _oldStringifiedTableDefinition) {
       console.log(
-        `NestCodeGen - watch stringifiedTable - no change detected(exit)`,
-      )
-      return
+        `NestCodeGen - watch stringifiedTable - no change detected(exit)`
+      );
+      return;
     }
 
     if (!_oldStringifiedTableDefinition) {
       // 首次加载则触发代码预览
-      console.log(`NestCodeGen - watch stringifiedTable - new table(exit)`)
-      await store.switchTableAsyncV2(table.value.id)
-      await store.triggerCodePreviewAsync('switchTableAsync')
-      return
+      console.log(`NestCodeGen - watch stringifiedTable - new table(exit)`);
+      await store.switchTableAsyncV2(table.value.id);
+      await store.triggerCodePreviewAsync("switchTableAsync");
+      return;
     }
 
     // 检查是否需要增加下一列
-    store.addEmptyColumn()
+    store.addEmptyColumn();
 
-    const oldTable: Table = JSON.parse(_oldStringifiedTableDefinition) as Table
-    const newTable: Table = JSON.parse(_newStringifiedTableDefinition) as Table
+    const oldTable: Table = JSON.parse(_oldStringifiedTableDefinition) as Table;
+    const newTable: Table = JSON.parse(_newStringifiedTableDefinition) as Table;
 
     // if (!oldTable.id && newTable.id) {
     //   console.log(`NestCodeGen - watch stringifiedTable - refreshTableList`)
     //   await store.refreshTablesAsync()
     // }
     // TODO: 这里要斟酌下，什么时候要刷新所有表的列表？
-    console.log(`NestCodeGen - watch stringifiedTable - oldTable.id: ${oldTable.id} && newTable.id: ${newTable.id}`)
-    await store.refreshTablesAsync()
+    console.log(
+      `NestCodeGen - watch stringifiedTable - oldTable.id: ${oldTable.id} && newTable.id: ${newTable.id}`
+    );
+    await store.refreshTablesAsync();
 
     if (newTable.id !== oldTable.id) {
       /**
@@ -876,17 +878,19 @@ watch(
        * 调用了store中的**switchTable**方法
        */
       console.log(
-        `NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit) table.value.id: ${table.value.id}`,
-      )
-      await store.switchTableAsyncV2(table.value.id)
-      await store.triggerCodePreviewAsync('switchTableAsync')
-      return
+        `NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit) table.value.id: ${table.value.id}`
+      );
+      await store.switchTableAsyncV2(table.value.id);
+      await store.triggerCodePreviewAsync("switchTableAsync");
+      return;
     }
 
-    console.log(`NestCodeGen - watch stringifiedTable - column change detected`)
+    console.log(
+      `NestCodeGen - watch stringifiedTable - column change detected`
+    );
   },
-  { immediate: true },
-)
+  { immediate: true }
+);
 </script>
 
 <style lang="stylus" scoped>
