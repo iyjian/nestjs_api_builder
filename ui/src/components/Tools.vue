@@ -38,64 +38,64 @@
 
 <script lang="ts">
 export default {
-  name: 'Tools',
-}
+  name: "Tools",
+};
 </script>
 
 <script lang="ts" setup>
-import { reactive, computed, ref, watch } from 'vue'
-import { toolsClient } from '@/plugins'
+import { reactive, computed, ref, watch } from "vue";
+import { toolsClient } from "@/plugins";
 // @ts-ignore
-import JsonViewer from 'vue-json-viewer'
-import { TransformerOptions } from './Tools/types'
+import JsonViewer from "vue-json-viewer";
+import { TransformerOptions } from "./Tools/types";
 
-const input = ref('')
+const input = ref("");
 
 const result = ref({
-  content: '',
-  dataType: '',
-})
+  content: "",
+  dataType: "",
+});
 
 const transformerOptions = reactive<TransformerOptions>({
-  name: '',
-  func: '',
-  content: '',
-  signature: '',
+  name: "",
+  func: "",
+  content: "",
+  signature: "",
   manual: true,
   params: {},
-})
+});
 
-const transformers = await toolsClient.getTransformers()
+const transformers = await toolsClient.getTransformers();
 
 const getDataType = async (content: string) => {
-  const dataType = await toolsClient.getDateTypeSignature(content)
-  transformerOptions.signature = dataType.signature
+  const dataType = await toolsClient.getDateTypeSignature(content);
+  transformerOptions.signature = dataType.signature;
   if (dataType.possibleFunc.highestScoreFunc) {
     // 如果有高分数的转化函数，则直接调用
-    console.log(dataType)
-    doTransform(transformers[dataType.possibleFunc.highestScoreFunc], false)
+    console.log(dataType);
+    doTransform(transformers[dataType.possibleFunc.highestScoreFunc], false);
   }
-}
+};
 
 async function doTransform(transform: any, manual = true) {
   if (!input.value) {
-    return
+    return;
   }
 
-  transformerOptions.func = transform.func
-  transformerOptions.content = input.value
-  transformerOptions.manual = manual
-  console.log(transformerOptions)
-  result.value = await toolsClient.doTransform(transformerOptions)
+  transformerOptions.func = transform.func;
+  transformerOptions.content = input.value;
+  transformerOptions.manual = manual;
+  console.log(transformerOptions);
+  result.value = await toolsClient.doTransform(transformerOptions);
 }
 
 watch(input, async (newInputVal: string) => {
   result.value = {
-    content: '',
-    dataType: '',
-  }
-  await getDataType(newInputVal)
-})
+    content: "",
+    dataType: "",
+  };
+  await getDataType(newInputVal);
+});
 </script>
 
 <style scoped lang="stylus">

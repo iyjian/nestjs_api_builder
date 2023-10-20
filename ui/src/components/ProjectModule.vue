@@ -32,7 +32,7 @@
     <el-table-column prop="remark" label="说明" />
     <el-table-column label="创建时间">
       <template #default="scope">
-        {{ moment(scope.row.createdAt).format('YYYY-MM-DD HH:mm') }}
+        {{ moment(scope.row.createdAt).format("YYYY-MM-DD HH:mm") }}
       </template>
     </el-table-column>
     <el-table-column>
@@ -104,23 +104,29 @@
 </template>
 
 <script lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { defineComponent, shallowRef, PropType } from 'vue'
-import { devToolApiClient } from '@/plugins'
-import { Plus, DeleteFilled, Expand, Fold, Edit } from '@element-plus/icons-vue'
-import moment from 'moment'
+import { ElMessage, ElMessageBox } from "element-plus";
+import { defineComponent, shallowRef, PropType } from "vue";
+import { devToolApiClient } from "@/plugins";
+import {
+  Plus,
+  DeleteFilled,
+  Expand,
+  Fold,
+  Edit,
+} from "@element-plus/icons-vue";
+import moment from "moment";
 // import { useStore } from "@/store";
-import { projectTableStore } from '@/store/projectTable'
+import { projectTableStore } from "@/store/projectTable";
 
-let store: ReturnType<typeof projectTableStore>
+let store: ReturnType<typeof projectTableStore>;
 
-const PlusIcon = shallowRef(Plus)
+const PlusIcon = shallowRef(Plus);
 
 export default defineComponent({
   setup() {
-    store = projectTableStore()
+    store = projectTableStore();
   },
-  name: 'ProjectModule',
+  name: "ProjectModule",
   components: {
     DeleteFilled,
     Edit,
@@ -128,19 +134,19 @@ export default defineComponent({
   data() {
     return {
       PlusIcon,
-      search: '',
+      search: "",
       moment,
       // projectId: undefined,
       postData: {
         id: undefined,
         projectId: -1,
-        code: '',
-        name: '',
-        remark: '',
+        code: "",
+        name: "",
+        remark: "",
       },
       dialog: {
-        title: '',
-        openType: '',
+        title: "",
+        openType: "",
         visible: false,
         button: {
           loading: false,
@@ -152,99 +158,99 @@ export default defineComponent({
         },
       },
       projectModules: [],
-    }
+    };
   },
   mounted() {
-    this.refreshProjectModules()
+    this.refreshProjectModules();
   },
   watch: {
     projectId() {
-      this.refreshProjectModules()
+      this.refreshProjectModules();
     },
   },
   computed: {
     projectId: {
       get() {
-        return store.currentProjectId
+        return store.currentProjectId;
       },
       set(projectId: number) {
         // store.commit("setCurrentProjectId", projectId);
-        store.setCurrentProjectId(projectId)
+        store.setCurrentProjectId(projectId);
       },
     },
     projects() {
-      return store.projects
+      return store.projects;
     },
   },
   methods: {
     async refreshProjectModules() {
       if (this.projectId) {
         this.projectModules = await devToolApiClient.getProjectModules(
-          this.projectId,
-        )
+          this.projectId
+        );
       }
     },
     async submit() {
       try {
-        this.dialog.button.loading = true
-        if (this.dialog.openType === 'create') {
-          await devToolApiClient.createProjectModule(this.postData)
+        this.dialog.button.loading = true;
+        if (this.dialog.openType === "create") {
+          await devToolApiClient.createProjectModule(this.postData);
         } else {
           if (this.postData && this.postData.id) {
             await devToolApiClient.patchProjectModule(
               this.postData.id,
-              this.postData,
-            )
+              this.postData
+            );
           }
         }
-        this.dialog.button.loading = false
-        this.dialog.visible = false
-        this.refreshProjectModules()
+        this.dialog.button.loading = false;
+        this.dialog.visible = false;
+        this.refreshProjectModules();
       } catch (e: any) {
-        this.dialog.button.loading = false
+        this.dialog.button.loading = false;
         ElMessage({
-          type: 'error',
+          type: "error",
           message: e.message,
-        })
+        });
       }
     },
     async openDialog(openType: string, payload?: any) {
       if (!this.projectId) {
-        return
+        return;
       }
-      if (openType === 'create') {
-        this.dialog.openType = openType
-        this.dialog.title = '新建模块定义信息'
-        this.dialog.visible = true
+      if (openType === "create") {
+        this.dialog.openType = openType;
+        this.dialog.title = "新建模块定义信息";
+        this.dialog.visible = true;
         this.dialog.disabledKeys = {
           code: false,
           name: false,
           remark: false,
-        }
+        };
         this.postData = {
           id: undefined,
           projectId: this.projectId,
-          code: '',
-          name: '',
-          remark: '',
-        }
+          code: "",
+          name: "",
+          remark: "",
+        };
       } else {
-        this.dialog.openType = openType
-        this.dialog.title = '修改模块定义信息'
-        this.dialog.visible = true
-        this.postData = payload
-        this.dialog.disabledKeys = { code: true, name: false, remark: false }
+        this.dialog.openType = openType;
+        this.dialog.title = "修改模块定义信息";
+        this.dialog.visible = true;
+        this.postData = payload;
+        this.dialog.disabledKeys = { code: true, name: false, remark: false };
       }
     },
     async modify(payload: { id: number; name: string; remark: string }) {
-      this.dialog.visible = true
+      this.dialog.visible = true;
       await devToolApiClient.patchProjectModule(payload.id, {
         name: payload.name,
         remark: payload.remark,
-      })
+      });
     },
   },
-})
+});
 </script>
 
 <style lang="stylus" scoped>

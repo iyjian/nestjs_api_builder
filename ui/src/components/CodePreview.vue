@@ -10,7 +10,7 @@
         <template v-if="label !== 'relation' && codesByLabel[label]">
           <div>
             {{
-              codesByLabel[label].isExist ? '修改' : '新增'
+              codesByLabel[label].isExist ? "修改" : "新增"
             }}&nbsp;&nbsp;代码路径:{{ codesByLabel[label].path }}
           </div>
           <Codemirror
@@ -50,63 +50,63 @@
 
 <script lang="ts">
 export default {
-  name: 'CodePreview',
-}
+  name: "CodePreview",
+};
 </script>
 
 <script lang="ts" setup>
-import { ref, watch, computed, nextTick, Ref } from 'vue'
-import Codemirror from 'codemirror-editor-vue3'
-import { Editor } from 'codemirror'
-import 'codemirror/mode/javascript/javascript.js'
-import 'codemirror/theme/dracula.css'
-import _ from 'lodash'
-import { CodeType, Code, RelationNode } from '@/types'
-import { devToolApiClient } from '@/plugins'
+import { ref, watch, computed, nextTick, Ref } from "vue";
+import Codemirror from "codemirror-editor-vue3";
+import { Editor } from "codemirror";
+import "codemirror/mode/javascript/javascript.js";
+import "codemirror/theme/dracula.css";
+import _ from "lodash";
+import { CodeType, Code, RelationNode } from "@/types";
+import { devToolApiClient } from "@/plugins";
 // import { useStore } from "@/store";
-import { projectTableStore } from '@/store/projectTable'
-import RelationTree from './RelationTree.vue'
+import { projectTableStore } from "@/store/projectTable";
+import RelationTree from "./RelationTree.vue";
 
-const store = projectTableStore()
+const store = projectTableStore();
 
-const table = computed(() => store.table)
+const table = computed(() => store.table);
 
-const cminstance = ref<{ [label in CodeType]?: Editor }>({})
+const cminstance = ref<{ [label in CodeType]?: Editor }>({});
 
 const props = defineProps<{
-  tableId: number
-  codes: Code[]
-  highlightClassPropName?: string
-}>()
+  tableId: number;
+  codes: Code[];
+  highlightClassPropName?: string;
+}>();
 
-const activeCodeTab = ref('enty')
+const activeCodeTab = ref("enty");
 
-const relations: Ref<RelationNode | undefined> = ref()
-const relationsOne: Ref<RelationNode | undefined> = ref()
+const relations: Ref<RelationNode | undefined> = ref();
+const relationsOne: Ref<RelationNode | undefined> = ref();
 
 const labels = computed<string[]>(() => {
-  const results = []
+  const results = [];
   if (props.codes && props.codes.length > 0) {
     for (const code of props.codes) {
-      results.push(code.label)
+      results.push(code.label);
     }
   }
-  return results
-})
+  return results;
+});
 
 const codesByLabel = computed(() => {
-  return _.keyBy(props.codes, 'label')
-})
+  return _.keyBy(props.codes, "label");
+});
 
 function onCodeMirrorReady(cm: Editor, label: CodeType) {
-  console.log(`CodePreview - onCodeMirrorReady - label: ${label}`)
-  cminstance.value[label] = cm
+  console.log(`CodePreview - onCodeMirrorReady - label: ${label}`);
+  cminstance.value[label] = cm;
 }
 
 function switchCodeTab(tab: { props: { name: CodeType } }) {
   setTimeout(() => {
-    cminstance.value[tab.props.name]?.refresh()
-  }, 200)
+    cminstance.value[tab.props.name]?.refresh();
+  }, 200);
 }
 
 /**
@@ -119,8 +119,8 @@ async function loadRelation(node: RelationNode, force = false) {
   const children = await devToolApiClient.getRelations(
     node.tableId,
     node.level,
-    node.nodeId,
-  )
+    node.nodeId
+  );
   if (
     (!node.include || node.include.length === 0 || force) &&
     children &&
@@ -130,14 +130,14 @@ async function loadRelation(node: RelationNode, force = false) {
      * 节点无展开的下级节点时才返回下级节点数据
      */
     console.log(
-      `CodePreview - loadRelation - nodeId: ${node.nodeId} load children`,
-    )
-    return children
+      `CodePreview - loadRelation - nodeId: ${node.nodeId} load children`
+    );
+    return children;
   } else {
     /**
      * 节点已有展开的下级节点时不返回下级节点数据
      */
-    return
+    return;
   }
 }
 
@@ -147,66 +147,66 @@ async function loadRelation(node: RelationNode, force = false) {
  */
 async function RelationTreeUpdated(payload: any) {
   if (!props.tableId) {
-    return
+    return;
   }
-  const { checkedKeys, relationTree } = payload
+  const { checkedKeys, relationTree } = payload;
 
   console.log(
-    `CodePreview - RelationTreeUpdated - tableId: ${props.tableId} saved checkedNodes:`,
-  )
+    `CodePreview - RelationTreeUpdated - tableId: ${props.tableId} saved checkedNodes:`
+  );
 
-  console.log(`>>`, checkedKeys)
+  console.log(`>>`, checkedKeys);
 
-  await devToolApiClient.updateRelation(props.tableId, checkedKeys)
+  await devToolApiClient.updateRelation(props.tableId, checkedKeys);
 
   if (!relationsOne.value || relationsOne.value.include.length === 0) {
-    relationsOne.value = checkedKeys[0]
+    relationsOne.value = checkedKeys[0];
   }
 }
 
 async function RelationTreeUpdatedOne(payload: any) {
   if (!props.tableId) {
-    return
+    return;
   }
-  const { checkedKeys, relationTree } = payload
+  const { checkedKeys, relationTree } = payload;
 
   console.log(
-    `CodePreview - RelationTreeUpdated - tableId: ${props.tableId} saved checkedNodes:`,
-  )
+    `CodePreview - RelationTreeUpdated - tableId: ${props.tableId} saved checkedNodes:`
+  );
 
-  console.log(`>>`, checkedKeys)
+  console.log(`>>`, checkedKeys);
 
-  await devToolApiClient.updateRelationForOne(props.tableId, checkedKeys)
+  await devToolApiClient.updateRelationForOne(props.tableId, checkedKeys);
 }
 
 watch(
   () => props.codes,
   (codes) => {
     if (codes && codes.length > 0) {
-      activeCodeTab.value = codes[0].label
+      activeCodeTab.value = codes[0].label;
     }
-  },
-)
+  }
+);
 
 function getRelation(relationNodes?: any[]) {
   if (relationNodes && relationNodes.length > 0) {
-    return relationNodes[0]
+    return relationNodes[0];
   } else if (props.tableId) {
     /**
      * 根节点
      */
     return {
-      label: 'root',
+      label: "root",
       tableId: props.tableId,
       include: [],
       level: 0,
-      parentNodeId: '',
+      parentNodeId: "",
       leaf: false,
-      nodeId: '0-0',
+      nodeId: "0-0",
       isChecked: false,
-    }
+    };
   }
-  return
+  return;
 }
 
 watch(
@@ -214,25 +214,25 @@ watch(
   (tableId, oldTableId) => {
     if (tableId !== oldTableId) {
       console.log(
-        `CodePreview - watch: props.tableId (changed) - tableId: ${tableId} oldTableId: ${oldTableId}`,
-      )
+        `CodePreview - watch: props.tableId (changed) - tableId: ${tableId} oldTableId: ${oldTableId}`
+      );
       console.log(
-        'CodePreview - watch - table.value.relationNodes',
+        "CodePreview - watch - table.value.relationNodes",
         table.value.relationNodes,
-        typeof table.value.relationNodes,
-      )
-      relations.value = getRelation(table.value.relationNodes)
-      relationsOne.value = getRelation(table.value.relationNodesForOne)
+        typeof table.value.relationNodes
+      );
+      relations.value = getRelation(table.value.relationNodes);
+      relationsOne.value = getRelation(table.value.relationNodesForOne);
     } else {
       console.log(
-        `CodePreview - watch: props.tableId (unchanged) - tableId: ${tableId} oldTableId: ${oldTableId}`,
-      )
+        `CodePreview - watch: props.tableId (unchanged) - tableId: ${tableId} oldTableId: ${oldTableId}`
+      );
     }
   },
   {
     immediate: true,
-  },
-)
+  }
+);
 </script>
 
 <style lang="stylus" scoped>

@@ -10,6 +10,6 @@ import { BaseModule } from '../base/base.module'
   providers: [GitlabService, GitlabProjectService, CodingService],
   controllers: [GitlabController, CodingController],
   exports: [GitlabService, GitlabProjectService],
-  imports: [forwardRef(()=>BaseModule)]
+  imports: [forwardRef(() => BaseModule)],
 })
 export class CodingModule {}

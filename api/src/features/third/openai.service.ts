@@ -95,7 +95,7 @@ export class OpenAPIService {
         },
         { httpsAgent: this.agent },
       )
-      return result.data      
+      return result.data
     } catch (e) {
       console.log(e.message)
       console.log(e.response.data)
@@ -133,17 +133,17 @@ export class OpenAPIService {
     return response.data
   }
 
-  async chatCompletionSpark (model: 'v1' | 'v2' = 'v2', content: string) {
+  async chatCompletionSpark(model: 'v1' | 'v2' = 'v2', content: string) {
     const spark = new Spark({
       // 自行填入相关参数
       secret: this.configService.get('iflyTechSpark.apiSecret'),
       key: this.configService.get('iflyTechSpark.apiKey'),
       appid: this.configService.get('iflyTechSpark.appId'),
-      version: model
-    });
+      version: model,
+    })
 
     return await spark.chat({
-      content
+      content,
     })
   }
 }

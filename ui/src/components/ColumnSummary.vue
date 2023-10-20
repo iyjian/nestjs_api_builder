@@ -74,47 +74,47 @@
 
 <script lang="ts">
 export default {
-  name: 'ColumnSummary',
-}
+  name: "ColumnSummary",
+};
 </script>
 
 <script lang="ts" setup>
-import { ref, watch, computed } from 'vue'
-import useClipboard from 'vue-clipboard3'
-import { Column, Table } from '@/types'
-import _ from 'lodash'
+import { ref, watch, computed } from "vue";
+import useClipboard from "vue-clipboard3";
+import { Column, Table } from "@/types";
+import _ from "lodash";
 
-const dialogVisible = ref(false)
+const dialogVisible = ref(false);
 
 const props = defineProps<{
-  columns: Column[]
-}>()
+  columns: Column[];
+}>();
 
-const { toClipboard } = useClipboard()
+const { toClipboard } = useClipboard();
 
 const relationColumnHash = computed(() => {
   return _.groupBy(
     props.columns.filter((column) => column.relationColumnId),
-    'relationColumnId',
-  )
-})
+    "relationColumnId"
+  );
+});
 
 const closeDialog = () => {
-  dialogVisible.value = false
-}
+  dialogVisible.value = false;
+};
 
 const copyCommaSpeperate = async () => {
   try {
     await toClipboard(
       props.columns
-        .filter((column) => column.dataType?.dataType !== 'vrelation')
+        .filter((column) => column.dataType?.dataType !== "vrelation")
         .map((column) => column.name)
-        .join(','),
-    )
+        .join(",")
+    );
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
-}
+};
 
 // watch(
 //   (visiable: boolean) => {

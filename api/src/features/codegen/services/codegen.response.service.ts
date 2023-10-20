@@ -22,14 +22,24 @@ export class ResponseCodeGenService {
     if (nodeId === '0-0') {
       const table = await this.tableService.findOneMetaTable(tableId)
       // TODO: relationNodes是findAll的关系配置 relationNodesForOne是findOne的关系配置 现在只有findOne的逻辑
-      if (type === 'findAll' && table.relationNodes && table.relationNodes.length > 0) {
+      if (
+        type === 'findAll' &&
+        table.relationNodes &&
+        table.relationNodes.length > 0
+      ) {
         validNodeIds = _.keyBy(
           this.getCheckedNodesFlat(table.relationNodes[0]).map((o) => o.nodeId),
           (o) => o,
         )
-      } else if (type === 'findOne' && table.relationNodesForOne && table.relationNodesForOne.length > 0) {
+      } else if (
+        type === 'findOne' &&
+        table.relationNodesForOne &&
+        table.relationNodesForOne.length > 0
+      ) {
         validNodeIds = _.keyBy(
-          this.getCheckedNodesFlat(table.relationNodesForOne[0]).map((o) => o.nodeId),
+          this.getCheckedNodesFlat(table.relationNodesForOne[0]).map(
+            (o) => o.nodeId,
+          ),
           (o) => o,
         )
       }

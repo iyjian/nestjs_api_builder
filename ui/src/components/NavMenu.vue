@@ -14,31 +14,31 @@
   </el-menu>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { AuthenticationClient } from 'authing-js-sdk'
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { AuthenticationClient } from "authing-js-sdk";
 
 const authClient = new AuthenticationClient({
-  appId: '62315258ab0a42505a0d6bb8',
-})
+  appId: "62315258ab0a42505a0d6bb8",
+});
 
-const route = useRoute()
-const router = useRouter()
-const isCollapse = ref(false)
+const route = useRoute();
+const router = useRouter();
+const isCollapse = ref(false);
 const active = computed(() => {
-  return route.path
-})
+  return route.path;
+});
 const routes = computed(() => {
-  return router.getRoutes().filter((route) => !route.meta.menuIgnore)
-})
+  return router.getRoutes().filter((route) => !route.meta.menuIgnore);
+});
 
 async function logout() {
   try {
-    await authClient.logout()
+    await authClient.logout();
   } catch (e) {
     //
   }
-  router.push('/login')
+  router.push("/login");
 }
 </script>
 <style lang="stylus">
