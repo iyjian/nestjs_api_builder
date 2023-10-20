@@ -24,7 +24,12 @@
     </el-table>
   </div>
 
-  <el-dialog v-model="dialog.visible" :show-close="false" :title="dialogTitle">
+  <el-dialog
+    v-model="dialog.visible"
+    :show-close="false"
+    :title="dialogTitle"
+    @close="resetPostData"
+  >
     <el-form :model="postData" label-width="120px">
       <el-form-item label="仓库项目名称">
         <el-input
@@ -86,14 +91,20 @@ const dialogTitle = computed(
   () => `${dialog.type === "add" ? "新建" : "修改"}项目`
 );
 
-const postData = ref({
+const DEFAULT_POST_DATA = {
   repoId: 0,
   repo: "",
   name: "",
   repoName: "",
   projectName: "",
   version: "2",
-});
+};
+
+const postData = ref(_.cloneDeep(DEFAULT_POST_DATA));
+
+function resetPostData() {
+  postData.value = _.cloneDeep(DEFAULT_POST_DATA);
+}
 
 async function openSubmitForm() {
   dialog.visible = true;
@@ -112,14 +123,18 @@ async function submit() {
     // 记录项目
     // postData.value.repo = result.ssh_url_to_repo
     // postData.value.repoId = result.id
-    await devToolApiClient.postProject(postData.value);
-    await refreshTable();
 
+    if (dialog.type === "add") {
+      await devToolApiClient.postProject(postData.value);
+    } else {
+      await devToolApiClient.updateProject(postData.value);
+    }
+    await refreshTable();
     dialog.visible = false;
-    dialog.button.loading = false;
   } catch (e) {
-    dialog.button.loading = false;
     console.log(e);
+  } finally {
+    dialog.button.loading = false;
   }
 }
 
@@ -128,10 +143,9 @@ async function edit(projectId: number) {
 }
 
 async function openEditForm(projectId: number) {
-  const project = await devToolApiClient.getProjectInfo(projectId);
-  postData.value = project;
-  dialog.visible = true;
+  postData.value = await devToolApiClient.getProjectInfo(projectId);
   dialog.type = "edit";
+  dialog.visible = true;
 }
 
 await refreshTable();
