@@ -8,6 +8,6 @@ export class FrontcodegenController {
 
   @Get('crud/:tableId')
   public genCRUDCode(@Param('tableId') tableId: number) {
-    return this.frontcodegenService.genCRUDCode(tableId)
+    return this.frontcodegenService.genVueCRUDCode(tableId)
   }
 }
