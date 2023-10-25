@@ -36,6 +36,8 @@
           v-model="postData.repoName"
           placeholder="仅支持英文、数字、_、-"
         />
+        <!-- TODO:锁住仓库名称修改 -->
+        <!-- <el-input v-model="postData.repoName" placeholder="仅支持英文、数字、_、-" :disabled="dialog.type === 'edit'"  /> -->
       </el-form-item>
       <el-form-item label="项目名称">
         <el-input v-model="postData.name" />
@@ -144,6 +146,12 @@ async function edit(projectId: number) {
 
 async function openEditForm(projectId: number) {
   postData.value = await devToolApiClient.getProjectInfo(projectId);
+  // TODO: 固定仓库名称
+  // const projectInfo = await devToolApiClient.getProjectInfo(projectId);
+  // postData.value = {
+  //   ...projectInfo,
+  //   repoName: projectInfo.repoName
+  // }
   dialog.type = "edit";
   dialog.visible = true;
 }
