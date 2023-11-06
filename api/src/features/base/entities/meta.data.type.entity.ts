@@ -4,6 +4,7 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  Scopes,
 } from 'sequelize-typescript'
 import { BaseModel, codeGen } from './../../../core'
 
@@ -11,6 +12,15 @@ import { BaseModel, codeGen } from './../../../core'
   tableName: 't_meta_data_type',
   timestamps: true,
 })
+@codeGen('scopesGen')
+@Scopes(() => ({
+  findAll: {
+    include: [],
+  },
+  findOne: {
+    include: [],
+  },
+}))
 export class MetaDataType extends BaseModel<MetaDataType> {
   @Column({
     type: DataType.INTEGER,
@@ -53,7 +63,7 @@ export class MetaDataType extends BaseModel<MetaDataType> {
     comment: '数据类型分类',
   })
   @codeGen('6403')
-  category: string
+  category?: string
 
   @Column({
     allowNull: true,
@@ -62,4 +72,12 @@ export class MetaDataType extends BaseModel<MetaDataType> {
   })
   @codeGen('6444')
   transformer?: string
+
+  @Column({
+    allowNull: true,
+    type: DataType.STRING(255),
+    comment: 'swagger数据类型',
+  })
+  @codeGen('9307')
+  swaggerDataType?: string
 }

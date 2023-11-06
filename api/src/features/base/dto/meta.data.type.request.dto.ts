@@ -46,6 +46,13 @@ export class CreateMetaDataTypeRequestDTO {
     required: false,
   })
   transformer?: string
+
+  @codeGen('9307')
+  @ApiProperty({
+    description: 'swagger数据类型',
+    required: false,
+  })
+  swaggerDataType?: string
 }
 
 export class UpdateMetaDataTypeRequestDTO {
@@ -90,6 +97,13 @@ export class UpdateMetaDataTypeRequestDTO {
     required: false,
   })
   transformer?: string
+
+  @codeGen('9307')
+  @ApiProperty({
+    description: 'swagger数据类型',
+    required: false,
+  })
+  swaggerDataType?: string
 }
 
 export class FindAllMetaDataTypeRequestDTO extends PagingRequestDTO {
@@ -134,4 +148,11 @@ export class FindAllMetaDataTypeRequestDTO extends PagingRequestDTO {
     required: false,
   })
   transformer?: string
+
+  @codeGen('9307')
+  @ApiProperty({
+    description: 'swagger数据类型',
+    required: false,
+  })
+  swaggerDataType?: string
 }
