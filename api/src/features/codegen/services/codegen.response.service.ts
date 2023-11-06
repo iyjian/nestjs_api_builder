@@ -59,6 +59,9 @@ export class ResponseCodeGenService {
             nodeId in validNodeIds
           }`,
         )
+
+        // TODO: 不能用mappingDataType 需要用swagger的dataType
+        // https://swagger.io/docs/specification/data-models/data-types/
         properties[column.name] = {
           type: column.dataType.mappingDataType,
           example: column.sampleData || '',
