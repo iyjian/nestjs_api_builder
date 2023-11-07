@@ -81,6 +81,7 @@ export class OpenAPIService {
     messages: any[],
   ) {
     try {
+      this.logger.debug(`chatCompletion - begin - model: ${model}`)
       const result = await this.openai.createChatCompletion(
         {
           model,
