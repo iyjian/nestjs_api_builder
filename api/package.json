@@ -56,7 +56,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
     "nanoid": "3.3.4",
-    "openai": "^3.2.1",
+    "openai": "^4.16.1",
     "pluralize": "^8.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
