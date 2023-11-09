@@ -1,7 +1,41 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
+import prettier from 'prettier'
+
 @Injectable()
 export class FrontcodegenService {
+
+  private readonly logger = new Logger(FrontcodegenService.name)
+
   constructor() {}
+
+    /**
+   * 使用prettier格式化代码
+   *
+   * @param code - 原始代码
+   * @returns
+   */
+    public codeFormat(code: string): string {
+      try {
+        const formattedCode = prettier.format(code, {
+          singleQuote: true,
+          trailingComma: 'all',
+          semi: false,
+          endOfLine: 'auto',
+          parser: 'vue',
+          filepath: '/dummy/file.ts',
+        })
+        return formattedCode
+      } catch (e) {
+        const { message, loc } = e
+        if (loc) {
+          console.error(`Error in line ${loc.start.line}: ${message}`)
+        } else {
+          console.error(`Error formatting code: ${message}`)
+        }
+        this.logger.error('原始代码: ', code)
+        throw new Error('代码格式化出错')
+      }
+    }
 
 
   getTableColumnCode(columnConfig: any) {
@@ -163,7 +197,7 @@ export class FrontcodegenService {
       }
     }
 
-    return this.renderTemplate(
+    const code = this.renderTemplate(
       columnsCode,
       dialogFieldsCode,
       interfacesCode,
@@ -171,6 +205,8 @@ export class FrontcodegenService {
       filtersCode,
       tableConfig.className
     );
+
+    return this.codeFormat(code)
   }
 
   renderTemplate(
