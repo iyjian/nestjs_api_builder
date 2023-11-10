@@ -173,7 +173,10 @@ export class FrontcodegenService {
       if (!column.isEnable || column.relation == "HasMany") {
         continue;
       }
-      columnsCode += this.getTableColumnCode(column);
+      
+      if(column.showable){
+        columnsCode += this.getTableColumnCode(column);
+      }
 
       if (column.createable || column.updateable) {
         dialogFieldsCode += this.getFieldCode(
