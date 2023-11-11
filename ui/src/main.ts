@@ -9,17 +9,13 @@ import piniaPersist from "pinia-plugin-persist";
 import "./style.styl";
 import { createHistory } from "vue3-history";
 
-
 const pinia = createPinia();
 pinia.use(piniaPersist);
-
 
 const Vue3History = createHistory({
   router,
   debug: false,
-})
-
-
+});
 
 const app = createApp(App);
 // .use(store, key)

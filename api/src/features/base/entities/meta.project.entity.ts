@@ -152,4 +152,13 @@ export class MetaProject extends BaseModel<MetaProject> {
   })
   @codeGen('9147')
   isPublic?: boolean
+
+  @Column({
+    allowNull: true,
+    type: DataType.INTEGER,
+    defaultValue: 0,
+    comment: '创建状态',
+  })
+  @codeGen('9154')
+  status?: number
 }

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "startall": "concurrently \"cd api && yarn start:dev\" \"cd front && yarn dev\""
+    "startall": "concurrently \"cd api && yarn start:dev\" \"cd front && yarn dev\"",
+    "dev:api": "cd api && pnpm i && pnpm run start:dev",
+    "dev:ui": "cd ui && pnpm i && pnpm run dev"
   },
   "repository": {
     "type": "git",

@@ -13,16 +13,33 @@ export class ResponseCodeGenService {
 
   public async genResponseSchema(
     tableId: number,
+    type: 'findOne' | 'findAll',
     validNodeIds: {} = {},
-    properties: {} = {},
     nodeId: string = '0-0',
   ): Promise<object> {
-    const table = await this.tableService.findOneMetaTable(tableId)
+    const properties = {}
 
     if (nodeId === '0-0') {
-      if (table.relationNodes && table.relationNodes.length > 0) {
+      const table = await this.tableService.findOneMetaTable(tableId)
+      // TODO: relationNodes是findAll的关系配置 relationNodesForOne是findOne的关系配置 现在只有findOne的逻辑
+      if (
+        type === 'findAll' &&
+        table.relationNodes &&
+        table.relationNodes.length > 0
+      ) {
         validNodeIds = _.keyBy(
           this.getCheckedNodesFlat(table.relationNodes[0]).map((o) => o.nodeId),
+          (o) => o,
+        )
+      } else if (
+        type === 'findOne' &&
+        table.relationNodesForOne &&
+        table.relationNodesForOne.length > 0
+      ) {
+        validNodeIds = _.keyBy(
+          this.getCheckedNodesFlat(table.relationNodesForOne[0]).map(
+            (o) => o.nodeId,
+          ),
           (o) => o,
         )
       }
@@ -36,12 +53,15 @@ export class ResponseCodeGenService {
     for (const column of columns.rows) {
       if (column.dataType.dataType !== 'vrelation') {
         this.logger.debug(
-          `generate property1 definition table: ${table.name} column: ${
+          `generate property1 definition table: ${tableId} column: ${
             column.name
           } nodeId: ${nodeId} valideNodeIds: ${JSON.stringify(validNodeIds)} ${
             nodeId in validNodeIds
           }`,
         )
+
+        // TODO: 不能用mappingDataType 需要用swagger的dataType
+        // https://swagger.io/docs/specification/data-models/data-types/
         properties[column.name] = {
           type: column.dataType.mappingDataType,
           example: column.sampleData || '',
@@ -52,7 +72,7 @@ export class ResponseCodeGenService {
         `${nodeId}-${column.id}` in validNodeIds
       ) {
         this.logger.debug(
-          `generate property2 definition table: ${table.name} column: ${
+          `generate property2 definition table: ${tableId} column: ${
             column.name
           } nodeId: ${nodeId} valideNodeIds: ${JSON.stringify(validNodeIds)} ${
             nodeId in validNodeIds
@@ -62,14 +82,15 @@ export class ResponseCodeGenService {
           type: 'object',
           properties: await this.genResponseSchema(
             column.refTableId,
+            type,
             validNodeIds,
-            {},
+            // {},
             `${nodeId}-${column.id}`,
           ),
         }
       } else if (`${nodeId}-${column.id}` in validNodeIds) {
         this.logger.debug(
-          `generate property3 definition table: ${table.name} column: ${
+          `generate property3 definition table: ${tableId} column: ${
             column.name
           } nodeId: ${nodeId} valideNodeIds: ${validNodeIds} ${
             nodeId in validNodeIds
@@ -81,8 +102,9 @@ export class ResponseCodeGenService {
             type: 'object',
             properties: await this.genResponseSchema(
               column.refTableId,
+              type,
               validNodeIds,
-              {},
+              // {},
               `${nodeId}-${column.id}`,
             ),
           },

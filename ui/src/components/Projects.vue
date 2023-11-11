@@ -14,19 +14,30 @@
       <el-table-column label="操作" width="180">
         <template #default="scope">
           <!-- <el-button type="danger" :icon="Delete" size="small"/> -->
-          <el-button :icon="Edit" size="small" @click="openEditForm(scope.row.id)"/>
+          <el-button
+            :icon="Edit"
+            size="small"
+            @click="openEditForm(scope.row.id)"
+          />
         </template>
       </el-table-column>
     </el-table>
   </div>
 
-  <el-dialog v-model="dialog.visible" :show-close="false" :title="dialogTitle">
+  <el-dialog
+    v-model="dialog.visible"
+    :show-close="false"
+    :title="dialogTitle"
+    @close="resetPostData"
+  >
     <el-form :model="postData" label-width="120px">
       <el-form-item label="仓库项目名称">
         <el-input
           v-model="postData.repoName"
           placeholder="仅支持英文、数字、_、-"
         />
+        <!-- TODO:锁住仓库名称修改 -->
+        <!-- <el-input v-model="postData.repoName" placeholder="仅支持英文、数字、_、-" :disabled="dialog.type === 'edit'"  /> -->
       </el-form-item>
       <el-form-item label="项目名称">
         <el-input v-model="postData.name" />
@@ -72,48 +83,60 @@ async function refreshTable() {
 
 const dialog = reactive({
   visible: false,
-  type: 'add',
+  type: "add",
   button: {
     loading: false,
   },
 });
 
-const dialogTitle = computed(() => `${dialog.type === 'add' ? '新建':'修改'}项目`)
+const dialogTitle = computed(
+  () => `${dialog.type === "add" ? "新建" : "修改"}项目`
+);
 
-const postData = ref({
+const DEFAULT_POST_DATA = {
   repoId: 0,
   repo: "",
   name: "",
   repoName: "",
   projectName: "",
   version: "2",
-});
+};
+
+const postData = ref(_.cloneDeep(DEFAULT_POST_DATA));
+
+function resetPostData() {
+  postData.value = _.cloneDeep(DEFAULT_POST_DATA);
+}
 
 async function openSubmitForm() {
   dialog.visible = true;
-  dialog.type = 'add'
+  dialog.type = "add";
 }
 
 async function submit() {
   try {
     dialog.button.loading = true;
-    
+
     // 从模板项目初始化
-    const result = await devToolApiClient.initProject({
-      projectName: postData.value.repoName,
-    });
+    // const result = await devToolApiClient.initProject({
+    //   projectName: postData.value.repoName,
+    // })
 
     // 记录项目
-    postData.value.repo = result.ssh_url_to_repo;
-    postData.value.repoId = result.id;
-    await devToolApiClient.postProject(postData.value);
-    await refreshTable();
+    // postData.value.repo = result.ssh_url_to_repo
+    // postData.value.repoId = result.id
 
+    if (dialog.type === "add") {
+      await devToolApiClient.postProject(postData.value);
+    } else {
+      await devToolApiClient.updateProject(postData.value);
+    }
+    await refreshTable();
     dialog.visible = false;
-    dialog.button.loading = false;
   } catch (e) {
-    dialog.button.loading = false;
     console.log(e);
+  } finally {
+    dialog.button.loading = false;
   }
 }
 
@@ -122,10 +145,15 @@ async function edit(projectId: number) {
 }
 
 async function openEditForm(projectId: number) {
-  const project = await devToolApiClient.getProjectInfo(projectId)
-  postData.value = project
-  dialog.visible = true
-  dialog.type = 'edit'
+  postData.value = await devToolApiClient.getProjectInfo(projectId);
+  // TODO: 固定仓库名称
+  // const projectInfo = await devToolApiClient.getProjectInfo(projectId);
+  // postData.value = {
+  //   ...projectInfo,
+  //   repoName: projectInfo.repoName
+  // }
+  dialog.type = "edit";
+  dialog.visible = true;
 }
 
 await refreshTable();

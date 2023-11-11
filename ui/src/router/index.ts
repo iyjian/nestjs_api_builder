@@ -107,27 +107,34 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  console.log(`router/index - beforeEach - from: ${from?.path} to.path: ${to?.path}`);
-  if (to.path !== "/login" && to.path !== "/") {
+  console.log(
+    `router/index - beforeEach - from: ${from?.path} to.path: ${to?.path}`
+  );
+  if (to.path !== "/login") {
+    // 只有登录页不校验身份
     const user = await authClient.getCurrentUser();
     if (user?.token) {
       const { status } = await authClient.checkLoginStatus(user.token);
       if (status) {
         const store = projectTableStore();
-        await store.initAsync();
-        // next({
-        //   path: to.path,
-        //   replace: true
-        // });
-        next()
+        store.initAsync();
+        next();
+        return;
       } else {
+        console.log(`router/index - token expires - goto login`);
         router.push("/login");
+        next();
+        return;
       }
     } else {
+      console.log(`router/index - not login - goto login`);
       router.push("/login");
+      next();
+      return;
     }
   } else {
     next();
+    return;
   }
 });
 

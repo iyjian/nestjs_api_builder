@@ -2,7 +2,8 @@ version: "3.5"
 
 services:
   api:
-    image: iyjian/nestjs-builder-api  
+    # image: iyjian/nestjs-builder-api  
+    image: iyjian-docker.pkg.coding.net/jcjy/docker/nestjs-builder-api:dev
     # image: iyjian/api
     # build:
     #   context: ./api    
@@ -12,7 +13,8 @@ services:
     env_file:
       - ./api/.env
   ui:
-    image: iyjian/nestjs-builder-ui
+    # image: iyjian/nestjs-builder-ui
+    image: iyjian-docker.pkg.coding.net/jcjy/docker/nestjs-builder-ui:dev
     # image: iyjian/devfront
     # build:
     #   context: ./ui

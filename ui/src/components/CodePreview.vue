@@ -225,8 +225,8 @@ watch(
       relationsOne.value = getRelation(table.value.relationNodesForOne);
     } else {
       console.log(
-      `CodePreview - watch: props.tableId (unchanged) - tableId: ${tableId} oldTableId: ${oldTableId}`
-    );
+        `CodePreview - watch: props.tableId (unchanged) - tableId: ${tableId} oldTableId: ${oldTableId}`
+      );
     }
   },
   {

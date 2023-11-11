@@ -225,7 +225,8 @@ export default defineComponent({
             await devToolApiClient.deleteTable(table.id);
 
             this.tables = await devToolApiClient.loadAllTables(
-              this.projectId.toString(), true
+              this.projectId.toString(),
+              true
             );
 
             ElMessage({
@@ -254,13 +255,14 @@ export default defineComponent({
     },
     async configEntity(table: TableSimple) {
       try {
-        this.tableLoading = true
+        this.tableLoading = true;
         console.log(`Entities - configEntity - tableId: ${table.id}`);
-        await store.switchTableAsync(table.id);
-        this.tableLoading = false
+        await store.switchTableAsyncV2(table.id);
+        await store.triggerCodePreviewAsync("switchTableAsync");
         this.$router.push("/nestCodeGen");
+        this.tableLoading = false;
       } catch (e) {
-        this.tableLoading = false
+        this.tableLoading = false;
       }
     },
   },

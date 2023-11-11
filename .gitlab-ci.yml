@@ -1,0 +1,28 @@
+variables:
+  PROJECT_NAME: "nestjs-builder-api"
+  PROJECT_NAME2: "nestjs-builder-ui"
+  DOCKER_REPO: "iyjian-docker.pkg.coding.net/jcjy/docker"
+
+# stages:
+#   - build-api
+#   - build-ui
+
+build-api:
+  stage: build
+  tags:
+    - jcjy
+  script:
+    - docker build -t dummy1/${PROJECT_NAME}:$CI_COMMIT_REF_NAME ./api
+    - docker tag dummy1/${PROJECT_NAME}:$CI_COMMIT_REF_NAME ${DOCKER_REPO}/${PROJECT_NAME}:$CI_COMMIT_REF_NAME
+    - docker push ${DOCKER_REPO}/${PROJECT_NAME}:$CI_COMMIT_REF_NAME
+    # - curl --data-urlencode "content=${PROJECT_NAME} build done" https://h.tltr.top/g/Tdi7Fjg
+
+build-ui:
+  stage: build
+  tags:
+    - jcjy
+  script:
+    - docker build -t dummy/${PROJECT_NAME2}:$CI_COMMIT_REF_NAME ./ui
+    - docker tag dummy/${PROJECT_NAME2}:$CI_COMMIT_REF_NAME ${DOCKER_REPO}/${PROJECT_NAME2}:$CI_COMMIT_REF_NAME
+    - docker push ${DOCKER_REPO}/${PROJECT_NAME2}:$CI_COMMIT_REF_NAME
+    - curl --data-urlencode "content=${PROJECT_NAME2} build done" https://h.tltr.top/g/Tdi7Fjg

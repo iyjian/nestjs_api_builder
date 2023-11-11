@@ -93,12 +93,12 @@
       <div class="info-left">
         <div style="margin-right: 10px">tableId: {{ table.id }}</div>
         <el-space>
-        <ERPreviewer :tableId="table.id"> </ERPreviewer>
-        <ColumnSummary :columns="computedReadyColumns"></ColumnSummary>
-        <ParseImg />
-        <IndexManager :tableId="store.table.id" />
-        <SyncPreview :tableId="store.table.id" />
-      </el-space>
+          <ERPreviewer :tableId="table.id"> </ERPreviewer>
+          <ColumnSummary :columns="computedReadyColumns"></ColumnSummary>
+          <ParseImg />
+          <IndexManager :tableId="store.table.id" />
+          <SyncPreview :tableId="store.table.id" />
+        </el-space>
         <!-- <div
           id="srcImg"
           style="width: 400px; height: 40px; border: 1px solid gray"
@@ -575,7 +575,15 @@ export default {
 
 <script lang="ts" setup>
 import { projectTableStore } from "@/store/projectTable";
-import { ref, watch, computed, shallowRef, reactive, onMounted, onActivated } from "vue";
+import {
+  ref,
+  watch,
+  computed,
+  shallowRef,
+  reactive,
+  onMounted,
+  onActivated,
+} from "vue";
 import CodePreivew from "./CodePreview.vue";
 import ERPreviewer from "./ERPreviewer.vue";
 import { devToolApiClient } from "@/plugins";
@@ -592,27 +600,32 @@ import "codemirror/mode/javascript/javascript.js";
 import "codemirror/theme/dracula.css";
 import SyncPreview from "@/components/SyncPreview.vue";
 
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance } from "vue";
 /** 两种用法
     1. 从getCurrentInstance 中获取
     2. template 中可直接通过$history 使用
 */
-onActivated(async () => {
-  const ins = getCurrentInstance()
-  const routerHistory = ins?.proxy?.$history
-  console.log(111, routerHistory)
-  if ((routerHistory?.stack?.length && routerHistory.stack.length === 1)) {
+onMounted(async () => {
+  const ins = getCurrentInstance();
+  const routerHistory = ins?.proxy?.$history;
+  if (routerHistory?.stack?.length && routerHistory.stack.length === 1) {
     /**
-    * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
-    */
+     * 如果在当前页面刷新页面，则需要强制更新代码预览，因为后端的代码可能已经变了
+     */
+    console.log(
+      `NestCodeGen - onActivated - routerHistory length: ${
+        routerHistory.stack.length
+      } routerHistory stack: ${JSON.stringify(routerHistory.stack)}`
+    );
     if (table.value.id) {
-      console.log(`NestCodeGen - onActivated - refresh code preview`)
-      await store.switchTableAsync(table.value.id);
-      await store.triggerCodePreviewAsync('switchTableAsync');
+      console.log(
+        `NestCodeGen - onActivated - refresh code preview table.value.id: ${table.value.id}`
+      );
+      await store.switchTableAsyncV2(table.value.id);
+      await store.triggerCodePreviewAsync("switchTableAsync");
     }
-
   }
-})
+});
 
 const store = projectTableStore();
 
@@ -629,7 +642,6 @@ const codeMirrorOption = {
 };
 
 const table = computed(() => {
-  console.log(store.table);
   return store.table;
 });
 
@@ -679,7 +691,6 @@ const dragOptions = computed(() => ({
 const checkMove = (evt: any) => {
   return !!evt.draggedContext.element.name && !!evt.relatedContext.element.name;
 };
-
 
 /**
  * 关联表的选中与取消选中
@@ -798,13 +809,7 @@ function setCodeTypes(shortcut: string) {
     store.setSelectedCodeTypes(["enty"]);
   } else if (shortcut === "all") {
     if (table.value.project.version === 1) {
-      store.setSelectedCodeTypes([
-        "enty",
-        "dto/req",
-        "ctl",
-        "serv",
-        "mdu",
-      ]);
+      store.setSelectedCodeTypes(["enty", "dto/req", "ctl", "serv", "mdu"]);
     } else {
       store.setSelectedCodeTypes([
         "enty",
@@ -824,23 +829,30 @@ function setCodeTypes(shortcut: string) {
 watch(
   () => store.status.selectedCodeTypes,
   async () => {
-    await store.triggerCodePreviewAsync('selectedCodeTypesChanged');
+    await store.triggerCodePreviewAsync("selectedCodeTypesChanged");
   }
 );
 
 watch(
   stringifiedTable,
   async (_newStringifiedTableDefinition, _oldStringifiedTableDefinition) => {
+    console.log(`-------NestCodeGen-------`);
+    console.log(_newStringifiedTableDefinition);
+    console.log(_oldStringifiedTableDefinition);
+    console.log(`-------NestCodeGen-------`);
+
     if (_newStringifiedTableDefinition === _oldStringifiedTableDefinition) {
-      console.log(`NestCodeGen - watch stringifiedTable - no change detected(exit)`);
+      console.log(
+        `NestCodeGen - watch stringifiedTable - no change detected(exit)`
+      );
       return;
     }
 
     if (!_oldStringifiedTableDefinition) {
       // 首次加载则触发代码预览
-      console.log(`NestCodeGen - watch stringifiedTable - new table(exit)`);      
+      console.log(`NestCodeGen - watch stringifiedTable - new table(exit)`);
       await store.switchTableAsyncV2(table.value.id);
-      await store.triggerCodePreviewAsync('switchTableAsync');
+      await store.triggerCodePreviewAsync("switchTableAsync");
       return;
     }
 
@@ -850,19 +862,26 @@ watch(
     const oldTable: Table = JSON.parse(_oldStringifiedTableDefinition) as Table;
     const newTable: Table = JSON.parse(_newStringifiedTableDefinition) as Table;
 
-    if (!oldTable.id && newTable.id) {
-      console.log(`NestCodeGen - watch stringifiedTable - refreshTableList`);
-      await store.refreshTablesAsync();
-    }
+    // if (!oldTable.id && newTable.id) {
+    //   console.log(`NestCodeGen - watch stringifiedTable - refreshTableList`)
+    //   await store.refreshTablesAsync()
+    // }
+    // TODO: 这里要斟酌下，什么时候要刷新所有表的列表？
+    console.log(
+      `NestCodeGen - watch stringifiedTable - oldTable.id: ${oldTable.id} && newTable.id: ${newTable.id}`
+    );
+    await store.refreshTablesAsync();
 
     if (newTable.id !== oldTable.id) {
       /**
        * 切换表在TableList.vue里的emitShowEntity中处理，不需要在watch里处理
        * 调用了store中的**switchTable**方法
        */
-      console.log(`NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit)`);
+      console.log(
+        `NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit) table.value.id: ${table.value.id}`
+      );
       await store.switchTableAsyncV2(table.value.id);
-      await store.triggerCodePreviewAsync('switchTableAsync');
+      await store.triggerCodePreviewAsync("switchTableAsync");
       return;
     }
 
@@ -882,14 +901,14 @@ watch(
 
 .toolbar
   height 50px
-  padding 0px 20px
+  padding 0px 10px
   display flex
   align-items center
   *
     margin-right 5px
 .info
   height 50px
-  padding 3px 20px
+  padding 3px 10px
   font-size: 18px
   display flex
   flex-direction row
@@ -907,7 +926,7 @@ watch(
   flex-direction row
   overflow hidden
   .table-wrapper
-    padding 10px 10px
+    padding 10px 0px
     width 59%
     height  100%
     overflow scroll

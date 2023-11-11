@@ -64,14 +64,22 @@ export class CodegenEntityService {
       if (
         ['BelongsTo', 'HasMany', 'BelongsToMany', 'HasOne'].includes(
           column.relation,
-        )
+        ) &&
+        column.refTableId !== table.id
       ) {
-        const importSpecifier = this.codegenUtilService.getImportSpecifier(table.entityFilePath, column.refTable.entityFilePath)
+        const importSpecifier = this.codegenUtilService.getImportSpecifier(
+          table.entityFilePath,
+          column.refTable.entityFilePath,
+        )
 
         if (importSpecifier in importsStruncture) {
-          importsStruncture[importSpecifier].identifiers.push(column.refTable.className)
+          importsStruncture[importSpecifier].identifiers.push(
+            column.refTable.className,
+          )
         } else {
-          importsStruncture[importSpecifier] = {identifiers: [column.refTable.className]}
+          importsStruncture[importSpecifier] = {
+            identifiers: [column.refTable.className],
+          }
         }
 
         importsStruncture['sequelize-typescript'].identifiers.push(

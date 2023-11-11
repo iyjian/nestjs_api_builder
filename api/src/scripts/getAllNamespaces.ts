@@ -1,7 +1,9 @@
 import { Gitlab } from '@gitbeaker/node'
 import 'dotenv/config'
 
-console.log(`GITLAB_HOST: ${process.env.GITLAB_HOST} GITLAB_TOKEN: ${process.env.GITLAB_TOKEN}`)
+console.log(
+  `GITLAB_HOST: ${process.env.GITLAB_HOST} GITLAB_TOKEN: ${process.env.GITLAB_TOKEN}`,
+)
 
 const api = new Gitlab({
   host: process.env.GITLAB_HOST,

@@ -136,6 +136,12 @@ export class DEVToolApiClient extends RequestBase {
     return response.data.data;
   }
 
+  async updateProject(data: any) {
+    const { id, ...value } = data;
+    const response = await this.request.patch(`/metaProject/${id}`, value);
+    return response.data.data;
+  }
+
   async initProject(project: any): Promise<any> {
     const response = await this.request.post("/gitlab/project", project);
     return response.data.data;

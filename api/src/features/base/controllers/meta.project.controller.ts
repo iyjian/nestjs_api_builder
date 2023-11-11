@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Logger,
 } from '@nestjs/common'
 import { MetaProjectService } from '../services/meta.project.service'
 import {
@@ -22,14 +23,45 @@ import {
   codeGen,
   RequestUserId,
 } from './../../../core'
+import { GitlabProjectService } from './../../coding/gitlab.project.service'
 
 @Controller('metaProject')
 export class MetaProjectController {
-  constructor(private readonly metaProjectService: MetaProjectService) {}
+  private readonly logger = new Logger(MetaProjectController.name)
+  constructor(
+    private readonly metaProjectService: MetaProjectService,
+    private readonly gitlabProjectService: GitlabProjectService,
+  ) {}
 
   @Post('')
-  create(@Body() createMetaProject: CreateMetaProjectRequestDTO) {
-    return this.metaProjectService.createMetaProject(createMetaProject)
+  async create(@Body() createMetaProject: CreateMetaProjectRequestDTO) {
+    const metaProject = await this.metaProjectService.createMetaProject(
+      createMetaProject,
+    )
+
+    this.gitlabProjectService
+      .createProject(
+        createMetaProject.name,
+        undefined,
+        undefined,
+        undefined,
+        async (project) => {
+          this.logger.debug(
+            `create - updateMetaProject - projectId: ${metaProject.id} repoId: ${project.id} repo: ${project.ssh_url_to_repo}`,
+          )
+          await this.metaProjectService.updateMetaProject(metaProject.id, {
+            status: 1,
+            repo: project.ssh_url_to_repo,
+            repoId: project.id,
+          })
+        },
+      )
+      .catch((error) => {
+        this.logger.error(error)
+        console.log(error)
+      })
+
+    return metaProject
   }
 
   @Patch(':id')
@@ -41,7 +73,10 @@ export class MetaProjectController {
   }
 
   @Get('')
-  findAll(@RequestUserId() userId: string, @Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO) {
+  findAll(
+    @RequestUserId() userId: string,
+    @Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO,
+  ) {
     return this.metaProjectService.findAllMetaProject(findAllQueryMetaProject)
   }
 
