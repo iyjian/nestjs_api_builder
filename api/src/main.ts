@@ -14,11 +14,13 @@ import * as Sentry from '@sentry/node'
 import logRoutes from './scripts/logRoutes'
 import setupSwagger from './scripts/setupSwagger'
 import { LogService } from './features/base/services/log.service'
+import { UserService } from './features/base/services/user.service'
 // import { run } from './scripts/seed'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   const configService = app.get(ConfigService)
+  const userService = app.get(UserService)
 
   if (configService.get('app.sentryDSN')) {
     Sentry.init({
@@ -39,7 +41,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionFilter())
   app.useGlobalInterceptors(new TransformInterceptor())
   app.useGlobalInterceptors(new LoggingInterceptor(app.get(LogService)))
-  app.useGlobalGuards(new ApiGuard(configService))
+  app.useGlobalGuards(new ApiGuard(configService, userService))
 
   /**
    * nest swagger config(enabled on development env)

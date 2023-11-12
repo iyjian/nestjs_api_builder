@@ -4,9 +4,11 @@ import {
   Injectable,
   HttpException,
   Logger,
+  HttpStatus,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AuthenticationClient } from 'authing-js-sdk'
+import { UserService } from './../../features/base/services/user.service'
 
 @Injectable()
 export class ApiGuard implements CanActivate {
@@ -16,7 +18,7 @@ export class ApiGuard implements CanActivate {
     appHost: this.configService.get('auth.authingAppHost'),
   })
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService, private readonly userService: UserService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
@@ -50,7 +52,16 @@ export class ApiGuard implements CanActivate {
       const loginStatus = await this.authing.checkLoginStatus(token)
 
       if (loginStatus.status) {
+        const user = await this.userService.findOne({
+          accountId: loginStatus.data.id,
+        })
+  
+        if (!user || !user.isEnable) {
+          throw new HttpException('无权限', HttpStatus.UNAUTHORIZED)
+        }
+        
         request['locals'] = { userId: loginStatus.data.id }
+        
         return true
       } else {
         this.logger.debug(`apiGuard - canActivate - token: ${token}`)
