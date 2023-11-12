@@ -150,7 +150,7 @@ export class ProjectModuleService extends BaseService {
       }
 
       await this.projectModuleModel.update(
-        { deleted: null },
+        { isActive: null },
         {
           where: {
             id,

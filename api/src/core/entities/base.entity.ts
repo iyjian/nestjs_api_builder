@@ -14,10 +14,10 @@ import { QueryTypes } from 'sequelize'
 
 @DefaultScope(() => ({
   where: {
-    deleted: false,
+    isActive: true,
   },
   attributes: {
-    exclude: ['deleted', 'syncKey'],
+    exclude: ['isActive', 'syncKey'],
   },
 }))
 export class BaseModel<T> extends Model<T> {
@@ -28,14 +28,14 @@ export class BaseModel<T> extends Model<T> {
   // @Column(DataType.STRING(32))
   // syncKey: string
 
-  @Comment('删除标记')
+  @Comment('是否有效')
   @AllowNull(true)
-  @Default(false)
+  @Default(true)
   @Column
-  deleted?: boolean
+  isActive?: boolean
 
   /**
-    attributes: { deleted: false, updatedAt: 2022-11-18T09:35:57.322Z },
+    attributes: { isActive: true, updatedAt: 2022-11-18T09:35:57.322Z },
     validate: true,
     hooks: true,
     individualHooks: false,
@@ -43,7 +43,7 @@ export class BaseModel<T> extends Model<T> {
     force: false,
     sideEffects: true,
     type: 'BULKUPDATE',
-    fields: [ 'deleted', 'updatedAt' ],
+    fields: [ 'isActive', 'updatedAt' ],
     model: EquipmentCategory,
     skip: undefined
    */
@@ -52,22 +52,22 @@ export class BaseModel<T> extends Model<T> {
     if (
       !instance ||
       !instance.where ||
-      !('deleted' in instance.where) ||
+      !('isActive' in instance.where) ||
       !instance.where.id ||
       !instance.attributes ||
-      instance.attributes.deleted !== null
+      instance.attributes.isActive !== null
     ) {
       return
     }
 
     const sql = `
-          select table_name   as tableName,
-                 column_name  as columnName
-          from information_schema.KEY_COLUMN_USAGE
-          where referenced_table_name is not null
-                and table_schema = '${process.env.MYSQL_DB}'
-                and referenced_table_name = '${instance.model.tableName}';
-        `
+        select table_name   as tableName,
+               column_name  as columnName
+        from information_schema.KEY_COLUMN_USAGE
+        where referenced_table_name is not null
+              and table_schema = '${process.env.MYSQL_DB}'
+              and referenced_table_name = '${instance.model.tableName}';
+      `
     /**
      * 找到和软删除数据有关联的表以及有关联的字段
      */
@@ -82,15 +82,13 @@ export class BaseModel<T> extends Model<T> {
          * 逐个查询这些关联表中的数据是否出于活跃状态
          */
         sqls.push(
-          `select 1 from ${row.tableName} where ${row.columnName} = ${instance.where.id} and deleted = 0`,
+          `select 1 from ${row.tableName} where ${row.columnName} = ${instance.where.id} and isActive = 1`,
         )
       }
 
       const finalSql = `select count(*) as cnt from (${sqls.join(
         ' union all ',
       )}) t`
-
-      console.log(finalSql)
 
       const result = await instance.transaction.sequelize.query(finalSql, {
         type: QueryTypes.SELECT,

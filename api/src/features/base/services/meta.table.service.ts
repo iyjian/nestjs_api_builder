@@ -258,7 +258,7 @@ export class MetaTableService extends BaseService {
       }
 
       await this.metaTableModel.update(
-        { deleted: null },
+        { isActive: null },
         {
           where: {
             id,

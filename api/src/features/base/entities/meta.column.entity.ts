@@ -13,7 +13,7 @@ import { codeGen } from './../../../core'
 @Table({
   tableName: 't_meta_column',
   timestamps: true,
-  indexes: [{ fields: ['tableId', 'name', 'deleted'], unique: true }],
+  indexes: [{ fields: ['tableId', 'name', 'isActive'], unique: true }],
 })
 @codeGen('scopesGen')
 @Scopes(() => ({

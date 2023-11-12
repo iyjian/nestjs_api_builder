@@ -142,7 +142,7 @@ export class RouteService extends BaseService {
       }
 
       await this.routeModel.update(
-        { deleted: null },
+        { isActive: null },
         {
           where: {
             id,

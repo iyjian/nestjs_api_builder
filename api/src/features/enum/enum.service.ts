@@ -80,7 +80,7 @@ export class EnumService {
 
   async remove(id: number) {
     await this.enumModel.update(
-      { deleted: true },
+      { isActive: null },
       {
         where: {
           id,

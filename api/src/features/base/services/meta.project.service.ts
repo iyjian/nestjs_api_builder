@@ -86,7 +86,7 @@ export class MetaProjectService extends BaseService {
 
   async removeMetaProject(id: number) {
     await this.metaProjectModel.update(
-      { deleted: true },
+      { isActive: true },
       {
         where: {
           id,

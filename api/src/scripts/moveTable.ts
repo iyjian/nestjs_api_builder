@@ -102,7 +102,7 @@ async function moveTable(
     let srcColumns = await MetaColumn.findAll({
       where: {
         tableId: srcTableId,
-        deleted: false,
+        isActive: null,
       },
       include: [
         {

@@ -138,7 +138,7 @@ export class FrontProjectService extends BaseService {
       }
 
       await this.frontProjectModel.update(
-        { deleted: null },
+        { isActive: null },
         {
           where: {
             id,

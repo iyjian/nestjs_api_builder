@@ -79,7 +79,7 @@ export class MetaDataTypeService extends BaseService {
 
   async removeMetaDataType(id: number) {
     await this.metaDataTypeModel.update(
-      { deleted: true },
+      { isActive: true },
       {
         where: {
           id,
