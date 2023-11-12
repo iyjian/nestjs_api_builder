@@ -37,6 +37,9 @@ import { CodingModule } from '../coding'
 import { UserController } from './controllers/user.controller'
 import { UserService } from './services/user.service'
 import { User } from './entities/user.entity'
+import { DbMigrateLogController } from './controllers/db.migrate.log.controller'
+import { DbMigrateLogService } from './services/db.migrate.log.service'
+import { DbMigrateLog } from './entities/db.migrate.log.entity'
 
 @Module({
   imports: [
@@ -50,6 +53,7 @@ import { User } from './entities/user.entity'
       Route,
       Log,
       User,
+      DbMigrateLog,
     ]),
     forwardRef(() => CodingModule),
   ],
@@ -60,6 +64,7 @@ import { User } from './entities/user.entity'
     FrontProjectService,
     ProjectModuleService,
     UserService,
+    DbMigrateLogService,
   ],
   controllers: [
     MetaProjectController,
@@ -70,6 +75,7 @@ import { User } from './entities/user.entity'
     ProjectModuleController,
     SwaggerController,
     UserController,
+    DbMigrateLogController,
   ],
   providers: [
     MetaProjectService,
@@ -81,6 +87,7 @@ import { User } from './entities/user.entity'
     RouteService,
     LogService,
     UserService,
+    DbMigrateLogService,
   ],
 })
 export class BaseModule {}
