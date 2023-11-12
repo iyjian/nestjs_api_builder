@@ -49,6 +49,7 @@ export class DbMigrateLog extends BaseModel<DbMigrateLog> {
   @Column({
     allowNull: true,
     type: DataType.BOOLEAN,
+    defaultValue: false,
     comment: '是否在生产环境执行过',
   })
   @codeGen('9326')
