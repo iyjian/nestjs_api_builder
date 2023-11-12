@@ -3,49 +3,47 @@ import prettier from 'prettier'
 
 @Injectable()
 export class FrontcodegenService {
-
   private readonly logger = new Logger(FrontcodegenService.name)
 
   constructor() {}
 
-    /**
+  /**
    * 使用prettier格式化代码
    *
    * @param code - 原始代码
    * @returns
    */
-    public codeFormat(code: string): string {
-      try {
-        const formattedCode = prettier.format(code, {
-          singleQuote: true,
-          trailingComma: 'all',
-          semi: false,
-          endOfLine: 'auto',
-          parser: 'vue',
-          filepath: '/dummy/file.ts',
-        })
-        return formattedCode
-      } catch (e) {
-        const { message, loc } = e
-        if (loc) {
-          console.error(`Error in line ${loc.start.line}: ${message}`)
-        } else {
-          console.error(`Error formatting code: ${message}`)
-        }
-        this.logger.error('原始代码: ', code)
-        throw new Error('代码格式化出错')
+  public codeFormat(code: string): string {
+    try {
+      const formattedCode = prettier.format(code, {
+        singleQuote: true,
+        trailingComma: 'all',
+        semi: false,
+        endOfLine: 'auto',
+        parser: 'vue',
+        filepath: '/dummy/file.ts',
+      })
+      return formattedCode
+    } catch (e) {
+      const { message, loc } = e
+      if (loc) {
+        console.error(`Error in line ${loc.start.line}: ${message}`)
+      } else {
+        console.error(`Error formatting code: ${message}`)
       }
+      this.logger.error('原始代码: ', code)
+      throw new Error('代码格式化出错')
     }
-
+  }
 
   getTableColumnCode(columnConfig: any) {
-    if (columnConfig.dataType.dataType === "datetime") {
+    if (columnConfig.dataType.dataType === 'datetime') {
       return `
         <el-table-column  label="${columnConfig.comment}" >
           <template #default="scope">
             {{ moment(scope.row.${columnConfig.name}).format("YYYY-MM-DD HH:mm") }}
           </template>
-        </el-table-column>`;
+        </el-table-column>`
     } else if (columnConfig.refTable) {
       return `
         <el-table-column  label="${columnConfig.comment}"   >
@@ -54,18 +52,18 @@ export class FrontcodegenService {
               <el-tag  v-if="scope.row.${columnConfig.name} === item.id" type="" >{{item.name}}</el-tag>
             </div>
           </template>
-        </el-table-column>`;
-    } else if (columnConfig.dataType.dataType === "boolean") {
+        </el-table-column>`
+    } else if (columnConfig.dataType.dataType === 'boolean') {
       return `
         <el-table-column  label="${columnConfig.comment}"   >
           <template #default="scope">
             <el-tag v-if="scope.row.${columnConfig.name} === true">是</el-tag>
             <el-tag v-else>否</el-tag>
           </template>
-        </el-table-column>`;
+        </el-table-column>`
     } else {
       return `
-        <el-table-column prop="${columnConfig.name}" label="${columnConfig.comment}"/>`;
+        <el-table-column prop="${columnConfig.name}" label="${columnConfig.comment}"/>`
     }
   }
 
@@ -73,51 +71,51 @@ export class FrontcodegenService {
     columnConfig: any,
     type: string,
     createable?: boolean,
-    updateable?: boolean
+    updateable?: boolean,
   ) {
-    let formItemCode = ``; //表单项代码
-    let disabledCode = ``; //表单项是否启用判断代码
-    let objectName = ``; //表单项内容存储对象名称
+    let formItemCode = `` //表单项代码
+    let disabledCode = `` //表单项是否启用判断代码
+    let objectName = `` //表单项内容存储对象名称
 
-    if (type == "dialog") {
+    if (type == 'dialog') {
       if (!updateable && createable) {
-        disabledCode = `:disabled="dialog.type === 'edit' ? true : false"`;
+        disabledCode = `:disabled="dialog.type === 'edit' ? true : false"`
       } else if (updateable && !createable) {
-        disabledCode = `:disabled="dialog.type === 'add' ? true : false"`;
+        disabledCode = `:disabled="dialog.type === 'add' ? true : false"`
       }
-      objectName = `dialogData`;
-    } else if (type == "filter") {
-      objectName = `params`;
+      objectName = `dialogData`
+    } else if (type == 'filter') {
+      objectName = `params`
     }
 
     formItemCode = this.getFormItemCode(
       columnConfig,
       disabledCode,
       objectName,
-      type
-    );
+      type,
+    )
 
     if (formItemCode) {
       return `
         <el-form-item label="${columnConfig.comment}">
           ${formItemCode}
-        </el-form-item>\n`;
+        </el-form-item>\n`
     }
 
-    return ``;
+    return ``
   }
 
   getFormItemCode(
     columnConfig: any,
     disabledCode: string,
     objectName: string,
-    type: string
+    type: string,
   ) {
-    if (columnConfig.dataType.dataType === "datetime") {
+    if (columnConfig.dataType.dataType === 'datetime') {
       return `<el-date-picker
                 v-model="${objectName}.${columnConfig.name}"
                 type="datetime"
-                ${disabledCode}/>`;
+                ${disabledCode}/>`
     } else if (columnConfig.refTable) {
       return `<el-select v-model="${objectName}.${columnConfig.name}" class="m-2" placeholder="Select" size="large" ${disabledCode}>
                 <el-option
@@ -125,33 +123,33 @@ export class FrontcodegenService {
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"/>
-              </el-select>`;
-    } else if (columnConfig.dataType.dataType === "boolean") {
+              </el-select>`
+    } else if (columnConfig.dataType.dataType === 'boolean') {
       return `<el-switch
                 v-model="${objectName}.${columnConfig.name}"
                 inline-prompt
                 style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                 active-text="是"
                 inactive-text="否"
-                ${disabledCode}/>`;
+                ${disabledCode}/>`
     } else if (
-      ["int", "varchar(40)"].includes(columnConfig.dataType.dataType) &&
-      type === "dialog"
+      ['int', 'varchar(40)'].includes(columnConfig.dataType.dataType) &&
+      type === 'dialog'
     ) {
-      return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`;
+      return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
-      ["varchar(255)", "text", "json(array)"].includes(
-        columnConfig.dataType.dataType
+      ['varchar(255)', 'text', 'json(array)'].includes(
+        columnConfig.dataType.dataType,
       ) &&
-      type === "dialog"
+      type === 'dialog'
     ) {
       return `<el-input
                 type="textarea"
                 :autosize="{ minRows: 2, maxRows: 8 }"
                 v-model="${objectName}.${columnConfig.name}"
-                ${disabledCode} />`;
+                ${disabledCode} />`
     }
-    return ``;
+    return ``
   }
 
   getRefCode(columnConfig: any) {
@@ -159,44 +157,44 @@ export class FrontcodegenService {
       const ${columnConfig.refTable.className}List = ref<any>([]);
       ${columnConfig.refTable.className}List.value = (
         await devToolApiClient.getAll${columnConfig.refTable.className}({ skipPaging: true })
-      ).rows;\n`;
+      ).rows;\n`
   }
 
   generate(tableConfig: any) {
-    let dialogFieldsCode = ``; //弹窗内表单项代码
-    let interfacesCode = ``; //获取下拉列表项接口代码
-    let paramsCode = ``; //存取输入框内容变量名代码
-    let filtersCode = ``; //筛选条件项代码
-    let columnsCode = ``; //表格列代码
+    let dialogFieldsCode = `` //弹窗内表单项代码
+    let interfacesCode = `` //获取下拉列表项接口代码
+    let paramsCode = `` //存取输入框内容变量名代码
+    let filtersCode = `` //筛选条件项代码
+    let columnsCode = `` //表格列代码
 
     for (const column of tableConfig.columns) {
-      if (!column.isEnable || column.relation == "HasMany") {
-        continue;
+      if (!column.isEnable || column.relation == 'HasMany') {
+        continue
       }
-      
-      if(column.showable){
-        columnsCode += this.getTableColumnCode(column);
+
+      if (column.showable) {
+        columnsCode += this.getTableColumnCode(column)
       }
 
       if (column.createable || column.updateable) {
         dialogFieldsCode += this.getFieldCode(
           column,
-          "dialog",
+          'dialog',
           column.createable,
-          column.updateable
-        );
+          column.updateable,
+        )
       }
 
       if (column.findable) {
-        filtersCode += this.getFieldCode(column, "filter");
-        paramsCode += `${column.name}: undefined,\n`;
+        filtersCode += this.getFieldCode(column, 'filter')
+        paramsCode += `${column.name}: undefined,\n`
       }
 
       if (
         column.refTable &&
-        interfacesCode.indexOf(column.refTable.className + "List") == -1
+        interfacesCode.indexOf(column.refTable.className + 'List') == -1
       ) {
-        interfacesCode += this.getRefCode(column);
+        interfacesCode += this.getRefCode(column)
       }
     }
 
@@ -206,8 +204,8 @@ export class FrontcodegenService {
       interfacesCode,
       paramsCode,
       filtersCode,
-      tableConfig.className
-    );
+      tableConfig.className,
+    )
 
     return this.codeFormat(code)
   }
@@ -218,7 +216,7 @@ export class FrontcodegenService {
     interfacesCode: string,
     paramsCode: string,
     filtersCode: string,
-    className: string
+    className: string,
   ) {
     return `
       <template>
@@ -453,6 +451,6 @@ export class FrontcodegenService {
         margin-left 20px
   
       </style>
-    `;
+    `
   }
 }

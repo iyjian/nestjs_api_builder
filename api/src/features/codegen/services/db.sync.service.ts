@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { QueryTypes } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import { MetaTableService } from '../../base/services/meta.table.service'
 import { MetaColumnService } from '../../base/services/meta.column.service'
 import { MetaProjectService } from '../../base/services/meta.project.service'
 import _ from 'lodash'
+import { DbMigrateLogService } from './../../base/services/db.migrate.log.service'
 
 export type SYNC_RESULT = {
   id?: number
@@ -55,10 +56,12 @@ export enum ERROR_REASON {
 export class DBSyncService {
   private readonly targetDBConnections: { [projectId: string]: Sequelize } = {}
   private readonly mysqlDefinitionSQL: string
+  private readonly logger = new Logger(DBSyncService.name)
   constructor(
     private readonly metaTableService: MetaTableService,
     private readonly metaColumnService: MetaColumnService,
     private readonly metaProjectService: MetaProjectService,
+    private readonly dbMigrateLogService: DbMigrateLogService,
     private readonly mysql: Sequelize,
   ) {
     this.mysqlDefinitionSQL = `with relationColumn as (
@@ -592,15 +595,13 @@ export class DBSyncService {
 
     const projectConnection = await this.getProjectConnection(table.projectId)
 
-    const result = await projectConnection
-      .query(sql, {
-        type: QueryTypes.RAW,
-      })
-      .catch((err) => {
-        throw new Error(err)
-      })
+    const result = await projectConnection.query(sql, {
+      type: QueryTypes.RAW,
+    })
 
-    console.log(result)
+    this.logger.debug(`executionSql - result: ${result}`)
+
+    await this.dbMigrateLogService.create({sql, tableId})
 
     return true
   }
