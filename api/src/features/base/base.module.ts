@@ -34,6 +34,9 @@ import { ProjectModuleService } from './services/project.module.service'
 import { SwaggerController } from './controllers/swagger.controller'
 import { LogService, RouteService } from './services'
 import { CodingModule } from '../coding'
+import { UserController } from './controllers/user.controller'
+import { UserService } from './services/user.service'
+import { User } from './entities/user.entity'
 
 @Module({
   imports: [
@@ -46,6 +49,7 @@ import { CodingModule } from '../coding'
       ProjectModule,
       Route,
       Log,
+      User,
     ]),
     forwardRef(() => CodingModule),
   ],
@@ -55,6 +59,7 @@ import { CodingModule } from '../coding'
     MetaProjectService,
     FrontProjectService,
     ProjectModuleService,
+    UserService,
   ],
   controllers: [
     MetaProjectController,
@@ -64,6 +69,7 @@ import { CodingModule } from '../coding'
     FrontProjectController,
     ProjectModuleController,
     SwaggerController,
+    UserController,
   ],
   providers: [
     MetaProjectService,
@@ -74,6 +80,7 @@ import { CodingModule } from '../coding'
     ProjectModuleService,
     RouteService,
     LogService,
+    UserService,
   ],
 })
 export class BaseModule {}
