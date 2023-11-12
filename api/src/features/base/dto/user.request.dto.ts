@@ -16,8 +16,7 @@ export class CreateUserRequestDTO {
     description: '账户id',
     required: false,
   })
-  @Transform(getTransformer('numberTransformer'))
-  accountId?: number
+  accountId?: string
 
   @codeGen('9320')
   @ApiProperty({
@@ -49,8 +48,7 @@ export class UpdateUserRequestDTO {
     description: '账户id',
     required: false,
   })
-  @Transform(getTransformer('numberTransformer'))
-  accountId?: number
+  accountId?: string
 
   @codeGen('9320')
   @ApiProperty({
@@ -82,8 +80,7 @@ export class FindOneUserRequestDTO {
     description: '账户id',
     required: false,
   })
-  @Transform(getTransformer('numberTransformer'))
-  accountId?: number
+  accountId?: string
 
   @codeGen('9320')
   @ApiProperty({
@@ -115,8 +112,7 @@ export class FindAllUserRequestDTO extends PagingRequestDTO {
     description: '账户id',
     required: false,
   })
-  @Transform(getTransformer('numberTransformer'))
-  accountId?: number
+  accountId?: string
 
   @codeGen('9320')
   @ApiProperty({

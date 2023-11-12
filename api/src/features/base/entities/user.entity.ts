@@ -25,11 +25,11 @@ export class User extends BaseModel<User> {
 
   @Column({
     allowNull: true,
-    type: DataType.INTEGER,
+    type: DataType.STRING(40),
     comment: '账户id',
   })
   @codeGen('9319')
-  accountId?: number
+  accountId?: string
 
   @Column({
     allowNull: true,
