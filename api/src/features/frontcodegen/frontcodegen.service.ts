@@ -205,6 +205,7 @@ export class FrontcodegenService {
     let filtersCode = `` //筛选条件项代码
     let columnsCode = `` //表格列代码
     let apiFilesCode = `` //引用链接表API文件路径
+    let dialogDataParamsCode = `` //存取弹窗内容变量名代码
 
     for (const columnConfig of tableConfig.table.filterItems) {
       if (columnConfig.findable) {
@@ -240,6 +241,9 @@ export class FrontcodegenService {
           columnConfig,
           'createDialog',
         )
+        if (columnConfig.dataType.dataType === 'boolean') {
+          dialogDataParamsCode += `${columnConfig.name}: false,\n`
+        }
       }
     }
 
@@ -264,6 +268,7 @@ export class FrontcodegenService {
       viewDialogItemsCode,
       tableConfig.instanceName,
       apiFilesCode,
+      dialogDataParamsCode,
     )
 
     return this.codeFormat(code)
@@ -280,6 +285,7 @@ export class FrontcodegenService {
     viewDialogItemsCode: string,
     instanceName: string,
     apiFilesCode: string,
+    dialogDataParamsCode: string,
   ) {
     return `
       <template>
@@ -468,7 +474,7 @@ export class FrontcodegenService {
             const ${instanceName} = await ${instanceName}Api.get${className}ById(row.id);
             dialogData.value = _.cloneDeep(${instanceName});
           } else if (dialog.type === "add") {
-            dialogData.value = ref<any>({});
+            dialogData.value = {${dialogDataParamsCode}}
             ${createDialogFieldsCode ? '' : 'return'}
           }
           else if(dialog.type === "view"){
