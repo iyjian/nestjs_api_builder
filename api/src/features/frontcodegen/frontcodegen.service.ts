@@ -482,7 +482,7 @@ export class FrontcodegenService {
           if (column.label != "操作") {
             openForm('view', row)
           }
-          }
+        }
 
           async function deleteData(row: any) {
             try {
