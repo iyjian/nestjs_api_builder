@@ -396,11 +396,8 @@ export class FrontcodegenService {
         async function openForm(openType: String, row?: any) {
           dialog.type = openType;
           if (dialog.type === "edit") {
-            const teachingModule = await devToolApiClient.get${className}ById(row.id);
-            teachingModule.tags = teachingModule.teachingModuleTags.map(
-              (teachingModuleTag: any) => teachingModuleTag.tag,
-            );
-            dialogData.value = _.cloneDeep(teachingModule);
+            const ${className} = await devToolApiClient.get${className}ById(row.id);
+            dialogData.value = _.cloneDeep(${className});
           } else if (dialog.type === "add") {
             dialogData.value = ref<any>({});
           }
