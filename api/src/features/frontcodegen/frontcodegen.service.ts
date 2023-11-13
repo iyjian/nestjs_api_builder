@@ -69,25 +69,21 @@ export class FrontcodegenService {
 
   getFieldCode(
     columnConfig: any,
-    type: string,
-    createable?: boolean,
-    updateable?: boolean,
+    type: 'createDialog' | 'updateDialog' | 'filter',
   ) {
     let formItemCode = `` //表单项代码
     let disabledCode = `` //表单项是否启用判断代码
     let objectName = `` //表单项内容存储对象名称
 
-    if (type == 'dialog') {
-      if (!updateable && createable) {
-        disabledCode = `:disabled="dialog.type === 'edit' ? true : false"`
-      } else if (updateable && !createable) {
-        disabledCode = `:disabled="dialog.type === 'add' ? true : false"`
-      }
+    if (['createDialog', 'updateDialog'].includes(type)) {
       objectName = `dialogData`
-    } else if (type == 'filter') {
+    } else if (type === 'filter') {
       objectName = `params`
     }
 
+    if (type === 'updateDialog' && !columnConfig.updateable) {
+      disabledCode = 'disabled'
+    }
     formItemCode = this.getFormItemCode(
       columnConfig,
       disabledCode,
@@ -134,14 +130,14 @@ export class FrontcodegenService {
                 ${disabledCode}/>`
     } else if (
       ['int', 'varchar(40)'].includes(columnConfig.dataType.dataType) &&
-      type === 'dialog'
+      ['createDialog', 'updateDialog'].includes(type)
     ) {
       return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
       ['varchar(255)', 'text', 'json(array)'].includes(
         columnConfig.dataType.dataType,
       ) &&
-      type === 'dialog'
+      ['createDialog', 'updateDialog'].includes(type)
     ) {
       return `<el-input
                 type="textarea"
@@ -160,51 +156,55 @@ export class FrontcodegenService {
       ).rows;\n`
   }
 
-  generate(tableConfig: any) {
-    let dialogFieldsCode = `` //弹窗内表单项代码
+  generator(tableConfig: any) {
+    let createDialogFieldsCode = `` //新增弹窗内表单项代码
+    let updateDialogFieldsCode = `` //修改弹窗内表单项代码
     let interfacesCode = `` //获取下拉列表项接口代码
     let paramsCode = `` //存取输入框内容变量名代码
     let filtersCode = `` //筛选条件项代码
     let columnsCode = `` //表格列代码
 
-    for (const column of tableConfig.columns) {
-      if (!column.isEnable || column.relation == 'HasMany') {
-        continue
-      }
-
-      if (column.showable) {
-        columnsCode += this.getTableColumnCode(column)
-      }
-
-      if (column.createable || column.updateable) {
-        dialogFieldsCode += this.getFieldCode(
-          column,
-          'dialog',
-          column.createable,
-          column.updateable,
-        )
-      }
-
-      if (column.findable) {
-        filtersCode += this.getFieldCode(column, 'filter')
-        paramsCode += `${column.name}: undefined,\n`
+    for (const columnConfig of tableConfig.table.filterItems) {
+      if (columnConfig.findable) {
+        filtersCode += this.getFieldCode(columnConfig, 'filter')
+        paramsCode += `${columnConfig.name}: undefined,\n`
       }
 
       if (
-        column.refTable &&
-        interfacesCode.indexOf(column.refTable.className + 'List') == -1
+        columnConfig.refTable &&
+        interfacesCode.indexOf(columnConfig.refTable.className + 'List') === -1
       ) {
-        interfacesCode += this.getRefCode(column)
+        interfacesCode += this.getRefCode(columnConfig)
       }
+    }
+
+    for (const columnConfig of tableConfig.table.tableColumns) {
+      if (columnConfig.showable) {
+        columnsCode += this.getTableColumnCode(columnConfig)
+      }
+    }
+
+    for (const columnConfig of tableConfig.table.createDialogFieldItems) {
+      if (columnConfig.createable) {
+        createDialogFieldsCode += this.getFieldCode(
+          columnConfig,
+          'createDialog',
+        )
+      }
+    }
+
+    for (const columnConfig of tableConfig.table.updateDialogFieldItems) {
+      updateDialogFieldsCode += this.getFieldCode(columnConfig, 'updateDialog')
     }
 
     const code = this.renderTemplate(
       columnsCode,
-      dialogFieldsCode,
       interfacesCode,
       paramsCode,
       filtersCode,
       tableConfig.className,
+      createDialogFieldsCode,
+      updateDialogFieldsCode,
     )
 
     return this.codeFormat(code)
@@ -212,11 +212,12 @@ export class FrontcodegenService {
 
   renderTemplate(
     columnsCode: string,
-    dialogFieldsCode: string,
     interfacesCode: string,
     paramsCode: string,
     filtersCode: string,
     className: string,
+    createDialogFieldsCode: string,
+    updateDialogFieldsCode: string,
   ) {
     return `
       <template>
@@ -275,7 +276,12 @@ export class FrontcodegenService {
         </div>
         <el-dialog v-model="dialog.visible" :show-close="false" :title="dialog.type">
           <el-form label-width="120px">
-            ${dialogFieldsCode}
+            <div v-if="dialog.type === 'add'">
+              ${createDialogFieldsCode}
+            </div>
+            <div v-else-if="dialog.type === 'edit'">
+              ${updateDialogFieldsCode}
+            </div>
           </el-form>
           <template #header>
             <span class="dialog-footer">
