@@ -216,8 +216,7 @@ export class FrontcodegenService {
         continue
       }
       if (
-        interfacesCode.indexOf(columnConfig.refTable.instanceName + 'List') ===
-        -1
+        interfacesCode.indexOf(columnConfig.refTable.instanceName + 'List') === -1
       ) {
         interfacesCode += this.getRefCode(columnConfig)
       }
