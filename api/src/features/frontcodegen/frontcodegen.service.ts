@@ -222,7 +222,7 @@ export class FrontcodegenService {
         interfacesCode += this.getRefCode(columnConfig)
       }
       if (
-        apiFilesCode.indexOf(columnConfig.refTable.instanceName + 'APi') === -1
+        apiFilesCode.indexOf(columnConfig.refTable.instanceName + 'Api') === -1
       ) {
         apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service.ts'\n`
       }
@@ -309,7 +309,7 @@ export class FrontcodegenService {
           class="table-body"
           @sort-change="onColumnSort"
           :row-class-name="tableRowClassName"
-          @row-click="handle">
+          @row-click="onRowClick">
             ${columnsCode}
             <el-table-column label="操作" width="150">
               <template #default="scope">
@@ -479,7 +479,7 @@ export class FrontcodegenService {
           dialog.visible = true;
         }
 
-        function handle(row: any , column: any){
+        function onRowClick(row: any , column: any){
           if (column.label != "操作") {
             openForm('view', row)
           }
