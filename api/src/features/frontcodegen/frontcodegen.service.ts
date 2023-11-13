@@ -484,18 +484,18 @@ export class FrontcodegenService {
           }
         }
 
-          async function deleteData(row: any) {
-            try {
-              await ElMessageBox.confirm("您确定要删除此条数据吗？", "提示", {
-                confirmButtonText: "确认",
-                cancelButtonText: "取消",
-              });
-              const result = await ${instanceName}Api.delete${className}(row.id);
-              lazyRefreshTable();
-            } catch (e) {
-              ElMessage({ message: '数据删除失败', type: 'warning', })
-            }
-          }
+        async function deleteData(row: any) {
+           try {
+             await ElMessageBox.confirm("您确定要删除此条数据吗？", "提示", {
+               confirmButtonText: "确认",
+               cancelButtonText: "取消",
+             });
+             const result = await ${instanceName}Api.delete${className}(row.id);
+             lazyRefreshTable();
+           } catch (e) {
+             ElMessage({ message: '数据删除失败', type: 'warning', })
+           }
+         }
         
         await lazyRefreshTable();
       </script>
