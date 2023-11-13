@@ -48,9 +48,7 @@ export class FrontcodegenService {
       return `
         <el-table-column  label="${this.getLabel(columnConfig)}" >
           <template #default="scope">
-            {{ moment(scope.row.${
-              columnConfig.name
-            }).format("YYYY-MM-DD HH:mm") }}
+            {{ moment(scope.row.${columnConfig.name}).format("YYYY-MM-DD HH:mm") }}
           </template>
         </el-table-column>`
     } else if (columnConfig.refTable) {
