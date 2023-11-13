@@ -205,6 +205,7 @@ export class FrontcodegenService {
       tableConfig.className,
       createDialogFieldsCode,
       updateDialogFieldsCode,
+      tableConfig.instanceName,
     )
 
     return this.codeFormat(code)
@@ -218,6 +219,7 @@ export class FrontcodegenService {
     className: string,
     createDialogFieldsCode: string,
     updateDialogFieldsCode: string,
+    instanceName: string,
   ) {
     return `
       <template>
@@ -396,11 +398,8 @@ export class FrontcodegenService {
         async function openForm(openType: String, row?: any) {
           dialog.type = openType;
           if (dialog.type === "edit") {
-            const teachingModule = await devToolApiClient.get${className}ById(row.id);
-            teachingModule.tags = teachingModule.teachingModuleTags.map(
-              (teachingModuleTag: any) => teachingModuleTag.tag,
-            );
-            dialogData.value = _.cloneDeep(teachingModule);
+            const ${instanceName} = await devToolApiClient.get${className}ById(row.id);
+            dialogData.value = _.cloneDeep(${instanceName});
           } else if (dialog.type === "add") {
             dialogData.value = ref<any>({});
           }
