@@ -48,7 +48,9 @@ export class FrontcodegenService {
       return `
         <el-table-column  label="${this.getLabel(columnConfig)}" >
           <template #default="scope">
-            {{ moment(scope.row.${columnConfig.name}).format("YYYY-MM-DD HH:mm") }}
+            {{ moment(scope.row.${
+              columnConfig.name
+            }).format("YYYY-MM-DD HH:mm") }}
           </template>
         </el-table-column>`
     } else if (columnConfig.refTable) {
@@ -124,7 +126,7 @@ export class FrontcodegenService {
                 type="datetime"
                 ${disabledCode}/>`
     } else if (columnConfig.refTable) {
-      return `<el-select v-model="${objectName}.${columnConfig.name}" class="m-2" placeholder="Select" size="large" ${disabledCode}>
+      return `<el-select v-model="${objectName}.${columnConfig.name}" class="m-2" placeholder="Select"  ${disabledCode}>
                 <el-option
                   v-for="item in ${columnConfig.refTable.instanceName}List"
                   :key="item.id"
@@ -214,7 +216,8 @@ export class FrontcodegenService {
         continue
       }
       if (
-        interfacesCode.indexOf(columnConfig.refTable.instanceName + 'List') === -1
+        interfacesCode.indexOf(columnConfig.refTable.instanceName + 'List') ===
+        -1
       ) {
         interfacesCode += this.getRefCode(columnConfig)
       }
@@ -476,7 +479,7 @@ export class FrontcodegenService {
           dialog.visible = true;
         }
 
-        function handle(row: any,column: any){
+        function handle(row: any , column: any){
           if (column.label != "操作") {
             openForm('view', row)
           }
@@ -530,10 +533,6 @@ export class FrontcodegenService {
       
       .btn-add
         margin-left 20px
-      
-      :global(.el-form-item__label)
-        height 40px
-        line-height 40px  
       </style>
     `
   }
