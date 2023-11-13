@@ -67,18 +67,21 @@ export class FrontcodegenService {
     }
   }
 
-  getFieldCode(columnConfig: any, type: string) {
+  getFieldCode(
+    columnConfig: any,
+    type: 'createDialog' | 'updateDialog' | 'filter',
+  ) {
     let formItemCode = `` //表单项代码
     let disabledCode = `` //表单项是否启用判断代码
     let objectName = `` //表单项内容存储对象名称
 
-    if (['createdialog', 'updatedialog'].includes(type)) {
+    if (['createDialog', 'updateDialog'].includes(type)) {
       objectName = `dialogData`
-    } else if (type == 'filter') {
+    } else if (type === 'filter') {
       objectName = `params`
     }
 
-    if (type == 'updatedialog' && !columnConfig.updateable) {
+    if (type === 'updateDialog' && !columnConfig.updateable) {
       disabledCode = 'disabled'
     }
     formItemCode = this.getFormItemCode(
@@ -127,14 +130,14 @@ export class FrontcodegenService {
                 ${disabledCode}/>`
     } else if (
       ['int', 'varchar(40)'].includes(columnConfig.dataType.dataType) &&
-      ['createdialog', 'updatedialog'].includes(type)
+      ['createDialog', 'updateDialog'].includes(type)
     ) {
       return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
       ['varchar(255)', 'text', 'json(array)'].includes(
         columnConfig.dataType.dataType,
       ) &&
-      ['createdialog', 'updatedialog'].includes(type)
+      ['createDialog', 'updateDialog'].includes(type)
     ) {
       return `<el-input
                 type="textarea"
@@ -185,13 +188,13 @@ export class FrontcodegenService {
       if (columnConfig.createable) {
         createDialogFieldsCode += this.getFieldCode(
           columnConfig,
-          'createdialog',
+          'createDialog',
         )
       }
     }
 
     for (const columnConfig of tableConfig.table.updateDialogFieldItems) {
-      updateDialogFieldsCode += this.getFieldCode(columnConfig, 'updatedialog')
+      updateDialogFieldsCode += this.getFieldCode(columnConfig, 'updateDialog')
     }
 
     const code = this.renderTemplate(
