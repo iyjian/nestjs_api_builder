@@ -51,6 +51,77 @@ export class ResponseCodeGenService {
     })
 
     for (const column of columns.rows) {
+      // if (
+      //   `${nodeId}-${column.id}` in validNodeIds &&
+      //   column.relation === 'HasMany'
+      // ) {
+      //   // hasMany的关系
+      //   this.logger.debug(
+      //     `generate property3 definition table: ${tableId} column: ${
+      //       column.name
+      //     } nodeId: ${nodeId} valideNodeIds: ${validNodeIds} ${
+      //       nodeId in validNodeIds
+      //     }`,
+      //   )
+      //   properties[column.name] = {
+      //     type: 'array',
+      //     items: {
+      //       type: 'object',
+      //       properties: await this.genResponseSchema(
+      //         column.refTableId,
+      //         type,
+      //         validNodeIds,
+      //         `${nodeId}-${column.id}`,
+      //       ),
+      //     },
+      //   }
+      // } else if (`${nodeId}-${column.id}` in validNodeIds && column.dataType.dataType === 'vrelation') {
+      //   // hasOne BelongsTo的关系
+      //   this.logger.debug(
+      //     `generate property2 definition table: ${tableId} column: ${
+      //       column.name
+      //     } nodeId: ${nodeId} valideNodeIds: ${JSON.stringify(validNodeIds)} ${
+      //       nodeId in validNodeIds
+      //     }`,
+      //   )
+      //   properties[column.name] = {
+      //     type: 'object',
+      //     properties: await this.genResponseSchema(
+      //       column.refTableId,
+      //       type,
+      //       validNodeIds,
+      //       `${nodeId}-${column.id}`,
+      //     ),
+      //   }
+      // } else {
+      //   // this.logger.debug(
+      //   //   `generate property1 definition table: ${tableId} column: ${
+      //   //     column.name
+      //   //   } nodeId: ${nodeId} valideNodeIds: ${JSON.stringify(validNodeIds)} ${
+      //   //     nodeId in validNodeIds
+      //   //   }`,
+      //   // )
+
+      //   // TODO: 不能用mappingDataType 需要用swagger的dataType
+      //   // https://swagger.io/docs/specification/data-models/data-types/
+      //   if (column.dataType.swaggerDataType === 'object[]') {
+      //     properties[column.name] = {
+      //       type: 'array',
+      //       example: column.sampleData || '',
+      //       description: column.fullComment,
+      //       items: {
+      //         type: 'object',
+      //       },
+      //     }
+      //   } else {
+      //     properties[column.name] = {
+      //       type: column.dataType.swaggerDataType,
+      //       example: column.sampleData || '',
+      //       description: column.fullComment,
+      //     }
+      //   }
+      // }
+
       if (column.dataType.dataType !== 'vrelation') {
         this.logger.debug(
           `generate property1 definition table: ${tableId} column: ${
@@ -62,10 +133,26 @@ export class ResponseCodeGenService {
 
         // TODO: 不能用mappingDataType 需要用swagger的dataType
         // https://swagger.io/docs/specification/data-models/data-types/
-        properties[column.name] = {
-          type: column.dataType.mappingDataType,
-          example: column.sampleData || '',
-          description: column.fullComment,
+        // properties[column.name] = {
+        //   type: column.dataType.swaggerDataType,
+        //   example: column.sampleData || '',
+        //   description: column.fullComment,
+        // }
+        if (column.dataType.swaggerDataType === 'object[]') {
+          properties[column.name] = {
+            type: 'array',
+            example: column.sampleData || '',
+            description: column.fullComment,
+            items: {
+              type: 'object',
+            },
+          }
+        } else {
+          properties[column.name] = {
+            type: column.dataType.swaggerDataType,
+            example: column.sampleData || '',
+            description: column.fullComment,
+          }
         }
       } else if (
         column.relation !== 'HasMany' &&

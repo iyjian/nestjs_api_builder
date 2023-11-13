@@ -601,7 +601,7 @@ export class DBSyncService {
 
     this.logger.debug(`executionSql - result: ${result}`)
 
-    await this.dbMigrateLogService.create({sql, tableId})
+    await this.dbMigrateLogService.create({ sql, tableId })
 
     return true
   }

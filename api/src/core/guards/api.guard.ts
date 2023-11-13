@@ -18,7 +18,10 @@ export class ApiGuard implements CanActivate {
     appHost: this.configService.get('auth.authingAppHost'),
   })
 
-  constructor(private readonly configService: ConfigService, private readonly userService: UserService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly userService: UserService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
@@ -55,13 +58,13 @@ export class ApiGuard implements CanActivate {
         const user = await this.userService.findOne({
           accountId: loginStatus.data.id,
         })
-  
+
         if (!user || !user.isEnable) {
           throw new HttpException('无权限', HttpStatus.UNAUTHORIZED)
         }
-        
+
         request['locals'] = { userId: loginStatus.data.id }
-        
+
         return true
       } else {
         this.logger.debug(`apiGuard - canActivate - token: ${token}`)
