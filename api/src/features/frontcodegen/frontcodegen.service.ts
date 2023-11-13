@@ -72,12 +72,15 @@ export class FrontcodegenService {
     let disabledCode = `` //表单项是否启用判断代码
     let objectName = `` //表单项内容存储对象名称
 
-    if (type == 'dialog') {
+    if (['createdialog', 'updatedialog'].includes(type)) {
       objectName = `dialogData`
     } else if (type == 'filter') {
       objectName = `params`
     }
 
+    if (type == 'updatedialog' && !columnConfig.updateable) {
+      disabledCode = 'disabled'
+    }
     formItemCode = this.getFormItemCode(
       columnConfig,
       disabledCode,
@@ -124,14 +127,14 @@ export class FrontcodegenService {
                 ${disabledCode}/>`
     } else if (
       ['int', 'varchar(40)'].includes(columnConfig.dataType.dataType) &&
-      type === 'dialog'
+      ['createdialog', 'updatedialog'].includes(type)
     ) {
       return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
       ['varchar(255)', 'text', 'json(array)'].includes(
         columnConfig.dataType.dataType,
       ) &&
-      type === 'dialog'
+      ['createdialog', 'updatedialog'].includes(type)
     ) {
       return `<el-input
                 type="textarea"
@@ -180,14 +183,15 @@ export class FrontcodegenService {
 
     for (const columnConfig of tableConfig.table.createDialogFieldItems) {
       if (columnConfig.createable) {
-        createDialogFieldsCode += this.getFieldCode(columnConfig, 'dialog')
+        createDialogFieldsCode += this.getFieldCode(
+          columnConfig,
+          'createdialog',
+        )
       }
     }
 
     for (const columnConfig of tableConfig.table.updateDialogFieldItems) {
-      if (columnConfig.updateable) {
-        updateDialogFieldsCode += this.getFieldCode(columnConfig, 'dialog')
-      }
+      updateDialogFieldsCode += this.getFieldCode(columnConfig, 'updatedialog')
     }
 
     const code = this.renderTemplate(
