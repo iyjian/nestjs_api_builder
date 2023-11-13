@@ -156,7 +156,7 @@ export class FrontcodegenService {
       ).rows;\n`
   }
 
-  generator(tableConfig: any) {
+  generate(tableConfig: any) {
     let createDialogFieldsCode = `` //新增弹窗内表单项代码
     let updateDialogFieldsCode = `` //修改弹窗内表单项代码
     let interfacesCode = `` //获取下拉列表项接口代码
