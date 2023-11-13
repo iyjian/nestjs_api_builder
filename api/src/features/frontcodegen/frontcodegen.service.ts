@@ -353,7 +353,7 @@ export class FrontcodegenService {
           <template #header>
             <span class="dialog-footer">
               <el-button @click="dialog.visible = false">关闭</el-button>
-              <el-button type="primary" @click="submit" v-if="dialog.type!='view'">保存</el-button>
+              <el-button type="primary" @click="submit" v-if="dialog.type != 'view'">保存</el-button>
             </span>
           </template>
         </el-dialog>
