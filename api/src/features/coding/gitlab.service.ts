@@ -98,11 +98,13 @@ export class GitlabService {
         `gitService - getFileContent - request: repoId: ${repoId} branch: ${branch} fullFilePath: ${fullFilePath}`,
       )
       const gitlabClient = await this.getGitlabClient(repoId)
+
       const result = await gitlabClient.RepositoryFiles.show(
         repoId,
         fullFilePath,
         branch,
       )
+
       return {
         err: 0,
         content: Buffer.from(result.content, 'base64').toString(),
@@ -258,7 +260,10 @@ export class GitlabService {
     srcBranch: string,
     targetBranch: string,
   ) {
-    const result = await this.gitlabClient.MergeRequests.create(
+
+    const gitlabClient = await this.getGitlabClient(repoId)
+
+    const result = await gitlabClient.MergeRequests.create(
       repoId,
       srcBranch,
       targetBranch,

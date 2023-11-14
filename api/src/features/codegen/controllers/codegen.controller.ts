@@ -206,6 +206,71 @@ export class CodegenController {
     return this.codegenService.saveEntity(table)
   }
 
+  @Post('commitV2')
+  async commitV2(
+    @Body('repoId') repoId: number,
+    @Body('codes') codes: Code[],
+    @Body('sourceBranch') sourceBranch: string,
+    @Body('targetBranch') targetBranch?: string,
+    @Body('comment') comment?: string,
+  ) {
+    // 如果没有指定目标分支, 则创建一个
+    if (!targetBranch) {
+      targetBranch = `${repoId}_${moment().format('YYYYMMDD_HHmmss')}`
+      await this.gitService.createBranch(repoId, targetBranch, sourceBranch)
+    }
+
+    const commitFiles = [] as any
+
+    for (const code of codes) {
+      
+      const existingFile = await this.gitService.getFileContent(repoId, targetBranch, code.path)
+      console.log(existingFile)
+
+      if (existingFile.err === 404) {
+        this.logger.debug(`commitV2 - add new file ${code.path}`)
+        commitFiles.push({
+          filePath: code.path,
+          content: code.content,
+          action: 'create',
+        })
+      } else if (code.content !== existingFile.content) {
+        this.logger.debug(`commitV2 - update file`, code.content, existingFile.content)
+        commitFiles.push({
+          filePath: code.path,
+          content: code.content,
+          action: 'update',
+        })
+      } else {
+        this.logger.debug(`commitV2 - skip commit - file: ${code.path} does not change`)
+      }
+    }
+
+    // 如果没有文件要提交，则直接返回true
+    if (commitFiles.length === 0) {
+      return true
+    }
+
+    await this.gitService.commitFiles(
+      repoId,
+      targetBranch,
+      commitFiles as any,
+      comment ? comment : 'commit',
+    )
+
+    if (sourceBranch !== targetBranch) {
+      return this.gitService.createMergeRequest(
+        repoId,
+        targetBranch,
+        targetBranch,
+        targetBranch,
+        sourceBranch,
+      )
+    } else {
+      return true
+    }
+  }
+
   @Post('saveAndSubmitPR')
   async saveAndSubmitPR(
     @Body('codes') codes: Code[],

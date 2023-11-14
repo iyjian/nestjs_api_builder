@@ -8,11 +8,11 @@ const api = new Gitlab({
 })
 
 ;(async () => {
-  console.log(`getAllProjects - start`)
+  console.log(`getAllProjects - start - gitlab host: ${process.env.GITLAB_HOST}`)
   // 仅读取私有的项目
   const projects = await api.Projects.all({ membership: true })
   for (const project of projects) {
     console.log(project.id, project.name)
   }
-  console.log(`getAllProjects - done`)
+  console.log(`getAllProjects - done - total projects: ${projects.length}`)
 })()
