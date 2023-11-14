@@ -20,7 +20,6 @@ export class GitlabController {
     private readonly gitlabProjectService: GitlabProjectService,
   ) {}
   @Get('file')
-  @Get('filenames')
   @ApiOperation({
     summary: '获取文件内容',
   })
@@ -33,7 +32,6 @@ export class GitlabController {
   }
 
   @Get('files')
-  @Get('filenames')
   @ApiOperation({
     summary: '获取目录下文件列表(含文件内容)',
   })
