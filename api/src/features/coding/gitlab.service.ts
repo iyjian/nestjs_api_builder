@@ -168,14 +168,7 @@ export class GitlabService {
       per_page: 10000,
     })
 
-    // const files = await gitlabClient.Repositories.allRepositoryTrees(repoId, {
-    //   ref: branch,
-    //   path: directory,
-    //   recursive,
-    //   perPage: 10000,
-    // })
-
-    // 改成promise.all
+    // TODO: 改成promise.all
     for (const file of files) {
       if (file.type === 'blob') {
         const result = await this.getFileContent(repoId, branch, file.path)
@@ -193,29 +186,33 @@ export class GitlabService {
     return codes
   }
 
+  /**
+   * 获取git仓库指定目录下的文件列表
+   *
+   * @param repoId
+   * @param branch
+   * @param directory
+   * @param recursive
+   * @returns
+   */
   async getFiles(
     repoId: number,
     branch: string,
     directory: string,
     recursive: boolean = false,
-  ): Promise<any> {
+  ): Promise<Types.RepositoryTreeSchema[]> {
     this.logger.debug(
       `gitService - getFilesContent - repoId: ${repoId} branch: ${branch} directory: ${directory}`,
     )
-    const codes: Code[] = []
+
     const gitlabClient = await this.getGitlabClient(repoId)
+
     const files = await gitlabClient.Repositories.tree(repoId, {
       ref: branch,
       path: directory,
       recursive,
       per_page: 10000,
     })
-    // const files = await gitlabClient.Repositories.allRepositoryTrees(repoId, {
-    //   ref: branch,
-    //   path: directory,
-    //   recursive,
-    //   perPage: 10000,
-    // })
 
     return files
   }
