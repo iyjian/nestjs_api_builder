@@ -20,7 +20,7 @@ export class CodeGenUICodeService {
     //
     const importDeclaration = sourceFile.getImportDeclaration(
       (importDeclaration) => {
-        return importDeclaration.getDefaultImport().getText() === component
+        return importDeclaration?.getDefaultImport()?.getText() === component
       },
     )
 
