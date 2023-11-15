@@ -53,18 +53,20 @@ export class FrontcodegenService {
             }).format("YYYY-MM-DD HH:mm") }}
           </template>
         </el-table-column>`
-    } else if (columnConfig.refTable) {
-      return `
-        <el-table-column  label="${this.getLabel(columnConfig)}"   >
-          <template #default="scope">
-            <div v-for="item in ${columnConfig.refTable.instanceName}List ">
-              <el-text  v-if="scope.row.${
-                columnConfig.name
-              } === item.id" type="" >{{item.name}}</el-text>
-            </div>
-          </template>
-        </el-table-column>`
-    } else if (columnConfig.dataType.dataType === 'boolean') {
+    }
+    // else if (columnConfig.refTable) {
+    //   return `
+    //     <el-table-column  label="${this.getLabel(columnConfig)}"   >
+    //       <template #default="scope">
+    //         <div v-for="item in ${columnConfig.refTable.instanceName}List ">
+    //           <el-text  v-if="scope.row.${
+    //             columnConfig.name
+    //           } === item.id" type="" >{{item.name}}</el-text>
+    //         </div>
+    //       </template>
+    //     </el-table-column>`
+    // }
+    else if (columnConfig.dataType.dataType === 'boolean') {
       return `
         <el-table-column  label="${this.getLabel(columnConfig)}"   >
           <template #default="scope">
@@ -132,7 +134,7 @@ export class FrontcodegenService {
                 <el-option
                   v-for="item in ${columnConfig.refTable.instanceName}List"
                   :key="item.id"
-                  :label="item.name"
+                  :label="item.${columnConfig.forSelectDisplayName}"
                   :value="item.id"/>
               </el-select>`
     } else if (columnConfig.dataType.dataType === 'boolean') {
@@ -179,7 +181,7 @@ export class FrontcodegenService {
     let paramsCode = `` //存取输入框内容变量名代码
     let filtersCode = `` //筛选条件项代码
     let columnsCode = `` //表格列代码
-    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service.ts'` //引用API文件路径
+    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service'` //引用API文件路径
     let dialogDataParamsCode = `` //存取弹窗内容变量名代码
 
     for (const columnConfig of tableConfig.table.filterItems) {
@@ -200,7 +202,7 @@ export class FrontcodegenService {
       if (
         apiFilesCode.indexOf(columnConfig.refTable.instanceName + 'Api') === -1
       ) {
-        apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service.ts'\n`
+        apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service'\n`
       }
     }
 
