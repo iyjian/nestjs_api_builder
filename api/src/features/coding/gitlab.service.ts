@@ -260,7 +260,6 @@ export class GitlabService {
     srcBranch: string,
     targetBranch: string,
   ) {
-
     const gitlabClient = await this.getGitlabClient(repoId)
 
     const result = await gitlabClient.MergeRequests.create(

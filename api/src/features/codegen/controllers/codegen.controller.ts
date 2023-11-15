@@ -11,6 +11,7 @@ import { CodegenEntityService } from '../services/codegen.entity.service'
 import { CodegenModuleService } from '../services/codegen.module.service'
 import { CodePreviewRequestDTO } from '../dto'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { CodeGenUICodeService } from '../services/codegen.ui.code.service'
 
 @Controller('codegen')
 @ApiTags('codegen')
@@ -25,6 +26,7 @@ export class CodegenController {
     private readonly gitService: GitService,
     private readonly metaTableService: MetaTableService,
     private readonly codegenModuleService: CodegenModuleService,
+    private readonly codeGenUICodeService: CodeGenUICodeService,
   ) {}
 
   @Post('codePreview')
@@ -223,8 +225,11 @@ export class CodegenController {
     const commitFiles = [] as any
 
     for (const code of codes) {
-      
-      const existingFile = await this.gitService.getFileContent(repoId, targetBranch, code.path)
+      const existingFile = await this.gitService.getFileContent(
+        repoId,
+        targetBranch,
+        code.path,
+      )
       console.log(existingFile)
 
       if (existingFile.err === 404) {
@@ -235,14 +240,20 @@ export class CodegenController {
           action: 'create',
         })
       } else if (code.content !== existingFile.content) {
-        this.logger.debug(`commitV2 - update file`, code.content, existingFile.content)
+        this.logger.debug(
+          `commitV2 - update file`,
+          code.content,
+          existingFile.content,
+        )
         commitFiles.push({
           filePath: code.path,
           content: code.content,
           action: 'update',
         })
       } else {
-        this.logger.debug(`commitV2 - skip commit - file: ${code.path} does not change`)
+        this.logger.debug(
+          `commitV2 - skip commit - file: ${code.path} does not change`,
+        )
       }
     }
 
@@ -333,8 +344,19 @@ export class CodegenController {
     return result
   }
 
-  @Post('genFrontCode')
-  genFrontCode(@Body() config: any) {
-    return true
+  @Post('ensureUIRoutes')
+  ensureUIRoutes(
+    @Body('code') code: string,
+    @Body('specifier') specifier: string,
+    @Body('name') name: string,
+    @Body('component') component: string,
+  ) {
+    const result = this.codeGenUICodeService.ensureRoutes(
+      code,
+      specifier,
+      name,
+      component,
+    )
+    return result
   }
 }

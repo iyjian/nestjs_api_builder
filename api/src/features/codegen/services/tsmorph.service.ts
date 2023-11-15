@@ -1,11 +1,4 @@
-import {
-  CACHE_MANAGER,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { Code } from '../../../core'
 import {
   Project,
@@ -23,6 +16,8 @@ import { ExportsStruncture } from '../types'
 
 @Injectable()
 export class TSMorphService {
+  private readonly logger = new Logger(TSMorphService.name)
+
   constructor() {}
 
   /**
