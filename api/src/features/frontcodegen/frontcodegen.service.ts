@@ -58,9 +58,9 @@ export class FrontcodegenService {
         <el-table-column  label="${this.getLabel(columnConfig)}"   >
           <template #default="scope">
             <div v-for="item in ${columnConfig.refTable.instanceName}List ">
-              <el-tag  v-if="scope.row.${
+              <el-text  v-if="scope.row.${
                 columnConfig.name
-              } === item.id" type="" >{{item.name}}</el-tag>
+              } === item.id" type="" >{{item.name}}</el-text>
             </div>
           </template>
         </el-table-column>`
@@ -68,8 +68,8 @@ export class FrontcodegenService {
       return `
         <el-table-column  label="${this.getLabel(columnConfig)}"   >
           <template #default="scope">
-            <el-tag v-if="scope.row.${columnConfig.name} === true">是</el-tag>
-            <el-tag v-else>否</el-tag>
+            <el-text v-if="scope.row.${columnConfig.name} === true">是</el-text>
+            <el-text v-else>否</el-text>
           </template>
         </el-table-column>`
     } else {
@@ -82,19 +82,21 @@ export class FrontcodegenService {
 
   getFieldCode(
     columnConfig: any,
-    type: 'createDialog' | 'updateDialog' | 'filter',
+    type: 'createDialog' | 'updateDialog' | 'viewDialog' | 'filter',
   ) {
     let formItemCode = `` //表单项代码
     let disabledCode = `` //表单项是否启用判断代码
     let objectName = `` //表单项内容存储对象名称
 
-    if (['createDialog', 'updateDialog'].includes(type)) {
+    if (['createDialog', 'updateDialog', 'viewDialog'].includes(type)) {
       objectName = `dialogData`
     } else if (type === 'filter') {
       objectName = `params`
     }
 
     if (type === 'updateDialog' && !columnConfig.updateable) {
+      disabledCode = 'disabled'
+    } else if (type === 'viewDialog') {
       disabledCode = 'disabled'
     }
     formItemCode = this.getFormItemCode(
@@ -126,7 +128,7 @@ export class FrontcodegenService {
                 type="datetime"
                 ${disabledCode}/>`
     } else if (columnConfig.refTable) {
-      return `<el-select v-model="${objectName}.${columnConfig.name}" class="m-2" placeholder="Select"  ${disabledCode}>
+      return `<el-select v-model="${objectName}.${columnConfig.name}" class="m-2" placeholder="Select" clearable ${disabledCode}>
                 <el-option
                   v-for="item in ${columnConfig.refTable.instanceName}List"
                   :key="item.id"
@@ -143,14 +145,14 @@ export class FrontcodegenService {
                 ${disabledCode}/>`
     } else if (
       ['int', 'varchar(40)'].includes(columnConfig.dataType.dataType) &&
-      ['createDialog', 'updateDialog'].includes(type)
+      ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
     ) {
       return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
       ['varchar(255)', 'text', 'json(array)'].includes(
         columnConfig.dataType.dataType,
       ) &&
-      ['createDialog', 'updateDialog'].includes(type)
+      ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
     ) {
       return `<el-input
                 type="textarea"
@@ -159,33 +161,6 @@ export class FrontcodegenService {
                 ${disabledCode} />`
     }
     return ``
-  }
-
-  getViewDialogItem(columnConfig: any) {
-    let textCode = ``
-    if (columnConfig.dataType.dataType === 'datetime') {
-      textCode = `<el-text>{{moment(dialogData.${columnConfig.name}).format("YYYY-MM-DD HH:mm")}}</el-text>`
-    } else if (columnConfig.dataType.dataType === 'boolean') {
-      textCode = `
-        <el-text v-if="dialogData.${columnConfig.name}">是</el-text>
-        <el-text v-else>否</el-text>
-      `
-    } else if (columnConfig.refTable) {
-      textCode = `
-        <el-text v-for="item in ${columnConfig.refTable.instanceName}List" v-if="item.id===dialogData.${columnConfig.name}">{{item.name}}</el-text>
-      `
-    } else {
-      textCode = `<el-text>{{dialogData.${columnConfig.name}}}</el-text>`
-    }
-
-    return `
-      <el-row>
-        <el-col :span="4" style="text-align:right;"><el-text tag="b">${this.getLabel(
-          columnConfig,
-        )}：</el-text></el-col>
-        <el-col :span="20">${textCode}</el-col>
-      </el-row>
-    `
   }
 
   getRefCode(columnConfig: any) {
@@ -204,7 +179,7 @@ export class FrontcodegenService {
     let paramsCode = `` //存取输入框内容变量名代码
     let filtersCode = `` //筛选条件项代码
     let columnsCode = `` //表格列代码
-    let apiFilesCode = `` //引用链接表API文件路径
+    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service.ts'` //引用API文件路径
     let dialogDataParamsCode = `` //存取弹窗内容变量名代码
 
     for (const columnConfig of tableConfig.table.filterItems) {
@@ -253,7 +228,7 @@ export class FrontcodegenService {
 
     for (const columnConfig of tableConfig.table.viewDialogItems) {
       if (columnConfig.viewable) {
-        viewDialogItemsCode += this.getViewDialogItem(columnConfig)
+        viewDialogItemsCode += this.getFieldCode(columnConfig, 'viewDialog')
       }
     }
 
@@ -368,7 +343,6 @@ export class FrontcodegenService {
 
       <script lang="ts" setup>
         import { ref, watch, computed, shallowRef, reactive, devtools } from "vue";
-        import * as ${instanceName}Api from '@/plugins/${instanceName}.service.ts'
         ${apiFilesCode}
         import { Search, Plus } from "@element-plus/icons-vue";
         import _ from "lodash";
@@ -402,10 +376,10 @@ export class FrontcodegenService {
         }
 
         function tableRowClassName(params: any) {
-          if (!params.row.isEnable) {
-            return "disabled-row";
+          if (!params.row.isEnable&&'isEnable' in params.row) {
+            return 'disabled-row'
           } else {
-            return "";
+            return ''
           }
         }
 
@@ -500,7 +474,12 @@ export class FrontcodegenService {
              const result = await ${instanceName}Api.delete${className}(row.id);
              lazyRefreshTable();
            } catch (e) {
-             ElMessage({ message: '数据删除失败', type: 'warning', })
+              if(e === 'cancel'){
+                ElMessage({ message: '取消删除', type: 'warning' })
+              }
+              else{
+                ElMessage({ message: '数据删除失败', type: 'warning' })
+              }
            }
          }
         
