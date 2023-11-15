@@ -31,7 +31,7 @@ import { CodeGenUICodeService } from './services/codegen.ui.code.service'
     DataTypeReductionService,
     ResponseCodeGenService,
     CodegenModuleService,
-    CodeGenUICodeService
+    CodeGenUICodeService,
   ],
   imports: [BaseModule, CodingModule],
   exports: [DataTypeReductionService],
