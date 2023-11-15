@@ -15,6 +15,7 @@ import { DataTypeReductionService } from './services/datatype.reduction.service'
 import { DBSyncService } from './services/db.sync.service'
 import { TSMorphService } from './services/tsmorph.service'
 import { CodegenModuleService } from './services/codegen.module.service'
+import { CodeGenUICodeService } from './services/codegen.ui.code.service'
 
 @Module({
   controllers: [CodegenController, ERController, DBSyncController],
@@ -30,6 +31,7 @@ import { CodegenModuleService } from './services/codegen.module.service'
     DataTypeReductionService,
     ResponseCodeGenService,
     CodegenModuleService,
+    CodeGenUICodeService
   ],
   imports: [BaseModule, CodingModule],
   exports: [DataTypeReductionService],
