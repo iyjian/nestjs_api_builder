@@ -181,7 +181,7 @@ export class FrontcodegenService {
     let paramsCode = `` //存取输入框内容变量名代码
     let filtersCode = `` //筛选条件项代码
     let columnsCode = `` //表格列代码
-    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service'` //引用API文件路径
+    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service';\n` //引用API文件路径
     let dialogDataParamsCode = `` //存取弹窗内容变量名代码
 
     for (const columnConfig of tableConfig.table.filterItems) {
@@ -202,7 +202,7 @@ export class FrontcodegenService {
       if (
         apiFilesCode.indexOf(columnConfig.refTable.instanceName + 'Api') === -1
       ) {
-        apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service'\n`
+        apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service';\n`
       }
     }
 
@@ -444,7 +444,7 @@ export class FrontcodegenService {
           }
         }
 
-        async function openForm(openType: String, row?: any) {
+        async function openForm(openType: string, row?: any) {
           dialog.type = openType;
           if (dialog.type === "edit") {
             const ${instanceName} = await ${instanceName}Api.get${className}ById(row.id);
