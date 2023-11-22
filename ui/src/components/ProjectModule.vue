@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <el-table :data="modulesFiltered" class="table-customize">
+  <el-table :data="projectModules" class="table-customize">
     <el-table-column prop="id" label="编号" width="90" />
     <el-table-column prop="code" label="模块" width="120" />
     <el-table-column prop="name" label="简称" width="200" />
@@ -181,15 +181,6 @@ export default defineComponent({
     projects() {
       return store.projects;
     },
-    modulesFiltered() {
-        return this.projectModules.filter(
-          (t:any) =>
-            new RegExp(this.search).test(t.name) ||
-            new RegExp(this.search).test(t.code) ||
-            new RegExp(this.search).test(t.id.toString()) ||
-            new RegExp(this.search).test(t.remark)
-        );
-    }
   },
   methods: {
     async refreshProjectModules() {
