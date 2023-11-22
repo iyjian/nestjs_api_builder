@@ -309,12 +309,12 @@ export class FrontcodegenService {
             ${columnsCode}
             <el-table-column  label="创建时间" >
               <template #default="scope">
-                {{ moment(scope.row.createdAt.format("YYYY-MM-DD HH:mm") }}
+                {{ moment(scope.row.createdAt).format("YYYY-MM-DD HH:mm") }}
               </template>
             </el-table-column>
-            <el-table-column  label="更新时间" >
+            <el-table-column  label="最后更新" >
               <template #default="scope">
-                {{ moment(scope.row.updatedAt.format("YYYY-MM-DD HH:mm") }}
+                {{ moment(scope.row.updatedAt).format("YYYY-MM-DD HH:mm") }}
               </template>
             </el-table-column>
             <el-table-column label="操作" width="150">
