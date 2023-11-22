@@ -1,3 +1,4 @@
+import { FindRelationTableRequestDTO } from './../dto/meta.table.request.dto'
 import {
   Controller,
   Get,
@@ -13,15 +14,28 @@ import {
   CreateMetaTableRequestDTO,
   FindAllMetaTableRequestDTO,
   UpdateMetaTableRequestDTO,
+  MoveMetaTableRequestDTO,
 } from '../dto'
 
 @Controller('metaTable')
 export class MetaTableController {
   constructor(private readonly metaTableService: MetaTableService) {}
 
+  @Get('relationTable')
+  findRelationTable(
+    @Query() findRelationTableRequestDTO: FindRelationTableRequestDTO,
+  ) {
+    return this.metaTableService.findRelationTable(findRelationTableRequestDTO)
+  }
+
   @Post('')
   create(@Body() createMetaTable: CreateMetaTableRequestDTO) {
     return this.metaTableService.createMetaTable(createMetaTable)
+  }
+
+  @Post('moveTable')
+  move(@Body() moveMetaTableRequestDTO: MoveMetaTableRequestDTO) {
+    return this.metaTableService.moveMetaTable(moveMetaTableRequestDTO)
   }
 
   @Patch(':id')

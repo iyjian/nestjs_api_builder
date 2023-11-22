@@ -7,6 +7,8 @@ import {
   UpdateMetaTableRequestDTO,
   CreateMetaTableRequestDTO,
   FindAllMetaTableRequestDTO,
+  MoveMetaTableRequestDTO,
+  FindRelationTableRequestDTO,
 } from '../dto'
 import { MetaTable } from '../entities/meta.table.entity'
 import { MetaColumn } from '../entities/meta.column.entity'
@@ -15,6 +17,7 @@ import { MetaDataTypeService } from './meta.data.type.service'
 import _ from 'lodash'
 import { MetaProjectService } from './meta.project.service'
 import { MetaDataType } from '../entities'
+import { moveTable, findRelationTables } from '../../../scripts/moveTable'
 
 @Injectable()
 export class MetaTableService extends BaseService {
@@ -40,6 +43,102 @@ export class MetaTableService extends BaseService {
       transaction,
     })
     return this.findOneMetaTable(metaTable.id, transaction)
+  }
+
+  async moveMetaTable(
+    moveMetaTableRequestDTO: MoveMetaTableRequestDTO,
+    transaction?: Transaction,
+  ) {
+    const srcProject = await MetaProject.findOne({
+      where: {
+        name: moveMetaTableRequestDTO.srcProjectName,
+      },
+    })
+
+    const targetProject = await MetaProject.findOne({
+      where: {
+        name: moveMetaTableRequestDTO.targetProjectName,
+      },
+    })
+
+    if (!transaction) {
+      transaction = await this.mysql.transaction()
+    }
+
+    try {
+      for (const srcTableName of moveMetaTableRequestDTO.srcTableNames) {
+        const srcTable = await MetaTable.findOne({
+          where: {
+            projectId: srcProject.id,
+            name: srcTableName,
+          },
+        })
+
+        if (srcTable) {
+          await moveTable(srcTable.id, targetProject.id, transaction)
+        } else {
+          console.error(
+            `Table ${srcTableName} not found in project ${srcProject.name}`,
+          )
+        }
+      }
+      transaction.commit()
+    } catch (e) {
+      console.log(e)
+      transaction.rollback()
+    }
+  }
+
+  async findRelationTable(
+    findRelationTableRequestDTO: FindRelationTableRequestDTO,
+    transaction?: Transaction,
+  ) {
+    try {
+      const srcProject = await MetaProject.findOne({
+        where: {
+          name: findRelationTableRequestDTO.srcProjectName,
+        },
+      })
+
+      const srcTableIds: number[] = []
+
+      // 将传入的 string 类，转为 string[]
+      const target = findRelationTableRequestDTO.srcTableNames
+      const srcTables = (target as unknown as string)
+        .replace(/\[|\]|'|"/g, '')
+        .split(',')
+
+      for (const srcTableName of srcTables) {
+        const srcTable = await MetaTable.findOne({
+          where: {
+            projectId: srcProject.id,
+            name: srcTableName,
+          },
+        })
+
+        if (srcTable) {
+          srcTableIds.push(srcTable.id)
+        }
+      }
+
+      if (!transaction) {
+        transaction = await this.mysql.transaction()
+      }
+
+      const result: { [key: number]: number[] } = {}
+
+      for (const srcTableId of srcTableIds) {
+        const res = await findRelationTables(srcTableId, transaction)
+        result[srcTableId] = res.uniqueRefTableIds
+      }
+
+      transaction.commit()
+
+      return result
+    } catch (e) {
+      console.error(e)
+      transaction.rollback()
+    }
   }
 
   async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableRequestDTO) {
