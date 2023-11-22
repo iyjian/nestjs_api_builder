@@ -110,7 +110,11 @@ export class FrontcodegenService {
 
     if (formItemCode) {
       return `
-        <el-form-item label="${columnConfig.refTable?this.getLabel(columnConfig).replace('id','').replace('Id',''):this.getLabel(columnConfig)}">
+        <el-form-item label="${
+          columnConfig.refTable
+            ? this.getLabel(columnConfig).replace(/id$/, '').replace(/Id$/, '')
+            : this.getLabel(columnConfig)
+        }">
           ${formItemCode}
         </el-form-item>\n`
     }
@@ -137,7 +141,10 @@ export class FrontcodegenService {
                   :label="item.${columnConfig.forSelectDisplayName}"
                   :value="item.id"/>
               </el-select>`
-    }  else if (columnConfig.dataType.dataType === 'boolean' &&  ['createDialog', 'updateDialog', 'viewDialog'].includes(type)) {
+    } else if (
+      columnConfig.dataType.dataType === 'boolean' &&
+      ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
+    ) {
       return `<el-switch
                 v-model="${objectName}.${columnConfig.name}"
                 inline-prompt
@@ -145,7 +152,10 @@ export class FrontcodegenService {
                 active-text="是"
                 inactive-text="否"
                 ${disabledCode}/>`
-    } else if (columnConfig.dataType.dataType === 'boolean' && type === 'filter') {
+    } else if (
+      columnConfig.dataType.dataType === 'boolean' &&
+      type === 'filter'
+    ) {
       return `<el-select
                 v-model="${objectName}.${columnConfig.name}"
                 class="m-2"
@@ -163,7 +173,7 @@ export class FrontcodegenService {
     ) {
       return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
-      ['varchar(255)', 'text', 'json(array)','longtext'].includes(
+      ['varchar(255)', 'text', 'json(array)', 'longtext'].includes(
         columnConfig.dataType.dataType,
       ) &&
       ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
