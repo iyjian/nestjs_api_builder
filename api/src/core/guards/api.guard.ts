@@ -36,7 +36,6 @@ export class ApiGuard implements CanActivate {
         return true
       }
 
-      return true
       /**
        * AUTHING 认证
        * loginStatus:

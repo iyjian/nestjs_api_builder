@@ -60,7 +60,10 @@ export class MetaTableService extends BaseService {
       let auxiliaryTables = []
 
       for (const srcTableId of moveMetaTableRequestDTO.srcTableIds) {
-        const srcTable = await this.findOneMetaTableSimple(srcTableId)
+        const srcTable = await this.findOneMetaTableSimple(
+          srcTableId,
+          transaction,
+        )
 
         if (srcTable) {
           const newRes = await moveTable(
@@ -68,13 +71,6 @@ export class MetaTableService extends BaseService {
             moveMetaTableRequestDTO.targetProjectId,
             transaction,
           )
-
-          await moveTable(
-            srcTable.id,
-            moveMetaTableRequestDTO.targetProjectId,
-            transaction,
-          )
-
           if (newRes) {
             newRes
               .filter((t) => t !== null && t !== undefined)
@@ -85,8 +81,7 @@ export class MetaTableService extends BaseService {
 
           newTables = Array.from(new Set(newTables))
 
-          // const findAllQueryMetaColumn = new FindAllMetaColumnRequestDTO()
-          const column = await this.metaColumnService.findAll()
+          const column = await this.metaColumnService.findAll(transaction)
 
           let allTableIds = column.map((row) => row.tableId)
 
@@ -95,18 +90,15 @@ export class MetaTableService extends BaseService {
           auxiliaryTables = newTables.filter(
             (value) => !allTableIds.includes(value),
           )
-
-          // for (const auxiliaryTableId of auxiliaryTables) {
-          //   await this.removeMetaTable(auxiliaryTableId)
-          // }
-
-          console.log(1111111, auxiliaryTables)
-          return newTables
         } else {
           console.error(`Table ${srcTableId} not found`)
         }
       }
+      for (const auxiliaryTableId of auxiliaryTables) {
+        await this.removeMetaTable(auxiliaryTableId, transaction)
+      }
       transaction.commit()
+      return newTables
     } catch (e) {
       console.log(e)
       transaction.rollback()

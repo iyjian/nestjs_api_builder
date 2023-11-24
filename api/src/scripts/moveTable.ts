@@ -113,12 +113,205 @@ export async function findRelationTables(
   }
 }
 
+// export async function moveTable(
+//   srcTableId: number,
+//   targetProjectId: number,
+//   transaction: Transaction,
+// ) {
+//   /**
+//    * 查询源表信息
+//    */
+//   const srcTable = await MetaTable.findByPk(srcTableId, {
+//     transaction,
+//   })
+
+//   console.log(srcTableId)
+
+//   const { isOld, table: targetTable } = await ensureTargetTable(
+//     srcTableId,
+//     targetProjectId,
+//     transaction,
+//   )
+
+//   console.log(
+//     `replicate table - srcTable: ${srcTable.name} - ${srcTable.id} ---> ${targetTable.id} (${isOld})`,
+//   )
+
+//   const posibleRefTables = {}
+
+//   if (!targetTable.columns || targetTable.columns.length === 0) {
+//     /**
+//      * 查询源字段信息
+//      */
+//     let srcColumns = await MetaColumn.findAll({
+//       where: {
+//         tableId: srcTableId,
+//         isActive: true,
+//       },
+//       include: [
+//         {
+//           model: MetaTable,
+//           as: 'refTable',
+//           required: false,
+//         },
+//         {
+//           model: MetaColumn,
+//           as: 'relationColumn',
+//           required: false,
+//         },
+//       ],
+//       // 排序以保证外键字段在其衍生关系字段的前面
+//       order: [['id', 'asc']],
+//       transaction,
+//     })
+
+//     srcColumns = JSON.parse(JSON.stringify(srcColumns))
+
+//     /**
+//      * 逐个将源字段复制到目标字段
+//      */
+//     const missingRelationColumns = []
+
+//     for (const column of srcColumns) {
+//       let targetRelationColumn
+
+//       if (column.relationColumnId && column.refTableId) {
+//         const { isOld, table: refTable } = await ensureTargetTable(
+//           column.refTableId,
+//           targetProjectId,
+//           transaction,
+//         )
+
+//         if (column.relationColumn.tableId !== column.tableId) {
+//           /**
+//            * 如果关联字段关联的是其他表上的字段，则需要递归的先复制整个关联表
+//            */
+//           await moveTable(
+//             column.relationColumn.tableId,
+//             targetProjectId,
+//             transaction,
+//           )
+//         }
+
+//         posibleRefTables[column.refTableId] = column.refTableId
+
+//         column.refTableId = refTable.id
+
+//         const srcRelationColumn = await MetaColumn.findByPk(
+//           column.relationColumnId,
+//           { transaction },
+//         )
+
+//         /**
+//          * 查找目标表的relationColumn
+//          */
+//         targetRelationColumn = await MetaColumn.findOne({
+//           where: {
+//             tableId: column.refTableId,
+//             name: srcRelationColumn.name,
+//           },
+//           transaction,
+//         })
+
+//         if (targetRelationColumn) {
+//           console.log(
+//             `table: ${srcTable.name} column: ${column.name} - relationColumn old: ${column.relationColumn.name} new: ${targetRelationColumn.id}`,
+//           )
+//         } else {
+//           console.log(
+//             `table: ${srcTable.name} column: ${column.name} - relationColumn old: ${column.relationColumn.name} new: not present`,
+//           )
+//         }
+//       }
+
+//       const newColumn = await MetaColumn.create(
+//         {
+//           name: column.name,
+//           allowNull: column.allowNull,
+//           comment: column.comment,
+//           dataTypeId: column.dataTypeId,
+//           enumKeys: column.enumKeys,
+//           remark: column.remark,
+//           tableId: targetTable.id,
+//           defaultValue: column.defaultValue,
+//           isAutoGen: column.isAutoGen,
+//           isEnable: column.isEnable,
+//           order: column.order,
+//           refTableId: column.refTableId,
+//           relationColumnId: targetRelationColumn?.id,
+//           relation: column.relation,
+//           searchable: column.searchable,
+//           findable: column.findable,
+//           createable: column.createable,
+//           updateable: column.updateable,
+//         },
+//         {
+//           transaction,
+//         },
+//       )
+//       console.log(
+//         `replicate column - table: ${srcTable.name} column: ${column.name} - ${column.id} ---> ${newColumn.id}`,
+//       )
+
+//       if (column.refTableId && !targetRelationColumn) {
+//         missingRelationColumns.push({
+//           column,
+//           newColumn,
+//         })
+//       }
+//     }
+
+//     /**
+//      * 更新缺失的relationColumnId
+//      */
+//     for (const column of missingRelationColumns) {
+//       const srcRelationColumn = await MetaColumn.findByPk(
+//         column.column.relationColumnId,
+//         { transaction },
+//       )
+
+//       /**
+//        * 查找relationColumn
+//        */
+//       const targetRelationColumn = await MetaColumn.findOne({
+//         where: {
+//           tableId: targetTable.id,
+//           name: srcRelationColumn.name,
+//         },
+//         transaction,
+//       })
+
+//       console.log(
+//         `srcTable: ${srcTable.name} targetTableId: ${targetTable.id} - update relation column - srcRelation column: ${srcRelationColumn.name}`,
+//       )
+
+//       await column.newColumn.update(
+//         { relationColumnId: targetRelationColumn.id },
+//         { transaction },
+//       )
+//     }
+//   }
+
+//   console.log(
+//     `table fully moved - table: ${srcTable.name} new TableId: ${targetTable.id}`,
+//   )
+
+//   // for (const table in posibleRefTables) {
+//   //   if (posibleRefTables[table].tableId) {
+//   //     await moveTable(
+//   //       posibleRefTables[table].tableId,
+//   //       targetProjectId,
+//   //       transaction,
+//   //     )
+//   //   }
+//   // }
+// }
+
 export async function moveTable(
   srcTableId: number,
   targetProjectId: number,
   transaction: Transaction,
 ) {
-  console.log(111111111111, '我在 moveTable')
   /**
    * 查询源表信息
    */
@@ -131,7 +324,6 @@ export async function moveTable(
     targetProjectId,
     transaction,
   )
-
   console.log(
     `replicate table - srcTable: ${srcTable.name} - ${srcTable.id} ---> ${targetTable.id} (${isOld})`,
   )
@@ -187,7 +379,7 @@ export async function moveTable(
         )
 
         if (
-          !column.relationColumn ||
+          // !column.relationColumn ||
           column.relationColumn.tableId !== column.tableId
         ) {
           /**
@@ -200,7 +392,6 @@ export async function moveTable(
           )
         }
 
-        // posibleRefTables --> 关联表id
         posibleRefTables[column.refTableId] = column.refTableId
 
         column.refTableId = refTable.id
