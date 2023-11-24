@@ -110,7 +110,11 @@ export class FrontcodegenService {
 
     if (formItemCode) {
       return `
-        <el-form-item label="${this.getLabel(columnConfig)}">
+        <el-form-item label="${
+          columnConfig.refTable
+            ? this.getLabel(columnConfig).replace(/id$/, '').replace(/Id$/, '')
+            : this.getLabel(columnConfig)
+        }">
           ${formItemCode}
         </el-form-item>\n`
     }
@@ -137,7 +141,10 @@ export class FrontcodegenService {
                   :label="item.${columnConfig.forSelectDisplayName}"
                   :value="item.id"/>
               </el-select>`
-    } else if (columnConfig.dataType.dataType === 'boolean') {
+    } else if (
+      columnConfig.dataType.dataType === 'boolean' &&
+      ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
+    ) {
       return `<el-switch
                 v-model="${objectName}.${columnConfig.name}"
                 inline-prompt
@@ -146,12 +153,27 @@ export class FrontcodegenService {
                 inactive-text="否"
                 ${disabledCode}/>`
     } else if (
+      columnConfig.dataType.dataType === 'boolean' &&
+      type === 'filter'
+    ) {
+      return `<el-select
+                v-model="${objectName}.${columnConfig.name}"
+                class="m-2"
+                placeholder="Select"
+                clearable>
+                <el-option
+                  v-for="item in flagList"
+                  :key="item.key"
+                  :label="item.label"
+                  :value="item.value" />
+              </el-select>`
+    } else if (
       ['int', 'varchar(40)'].includes(columnConfig.dataType.dataType) &&
       ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
     ) {
       return `<el-input v-model="${objectName}.${columnConfig.name}" ${disabledCode}/>`
     } else if (
-      ['varchar(255)', 'text', 'json(array)'].includes(
+      ['varchar(255)', 'text', 'json(array)', 'longtext'].includes(
         columnConfig.dataType.dataType,
       ) &&
       ['createDialog', 'updateDialog', 'viewDialog'].includes(type)
@@ -181,7 +203,7 @@ export class FrontcodegenService {
     let paramsCode = `` //存取输入框内容变量名代码
     let filtersCode = `` //筛选条件项代码
     let columnsCode = `` //表格列代码
-    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service'` //引用API文件路径
+    let apiFilesCode = `import * as ${tableConfig.instanceName}Api from '@/plugins/${tableConfig.instanceName}.service';\n` //引用API文件路径
     let dialogDataParamsCode = `` //存取弹窗内容变量名代码
 
     for (const columnConfig of tableConfig.table.filterItems) {
@@ -202,7 +224,7 @@ export class FrontcodegenService {
       if (
         apiFilesCode.indexOf(columnConfig.refTable.instanceName + 'Api') === -1
       ) {
-        apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service'\n`
+        apiFilesCode += `import * as ${columnConfig.refTable.instanceName}Api from '@/plugins/${columnConfig.refTable.instanceName}.service';\n`
       }
     }
 
@@ -293,7 +315,18 @@ export class FrontcodegenService {
           @sort-change="onColumnSort"
           :row-class-name="tableRowClassName"
           @row-click="onRowClick">
+            <el-table-column prop="id" label="编号" width="90" />
             ${columnsCode}
+            <el-table-column  label="创建时间" >
+              <template #default="scope">
+                {{ moment(scope.row.createdAt).format("YYYY-MM-DD HH:mm") }}
+              </template>
+            </el-table-column>
+            <el-table-column  label="最后更新" >
+              <template #default="scope">
+                {{ moment(scope.row.updatedAt).format("YYYY-MM-DD HH:mm") }}
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="150">
               <template #default="scope">
                 <div
@@ -371,6 +404,8 @@ export class FrontcodegenService {
           ${paramsCode}
         });
         
+        const flagList=ref<any>([{label:'是',value:true,key:1},{label:'否',value:false,key:0}])
+
         function onColumnSort(props: any) {
           const { column, prop, order } = props;
           params.value.sortColumn = prop;
@@ -444,7 +479,7 @@ export class FrontcodegenService {
           }
         }
 
-        async function openForm(openType: String, row?: any) {
+        async function openForm(openType: string, row?: any) {
           dialog.type = openType;
           if (dialog.type === "edit") {
             const ${instanceName} = await ${instanceName}Api.get${className}ById(row.id);
