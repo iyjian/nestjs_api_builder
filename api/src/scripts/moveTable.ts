@@ -184,10 +184,7 @@ export async function moveTable(
           transaction,
         )
 
-        if (
-          // !column.relationColumn ||
-          column.relationColumn.tableId !== column.tableId
-        ) {
+        if (column.relationColumn.tableId !== column.tableId) {
           /**
            * 如果关联字段关联的是其他表上的字段，则需要递归的先复制整个关联表
            */
