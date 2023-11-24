@@ -40,17 +40,13 @@ export class CreateMetaTableRequestDTO {
 }
 
 export class MoveMetaTableRequestDTO {
-  srcProjectName: string
+  srcTableIds: number[]
 
-  srcTableNames: string[]
-
-  targetProjectName: string
+  targetProjectId: number
 }
 
 export class FindRelationTableRequestDTO {
-  srcProjectName: string
-
-  srcTableNames: string[]
+  srcTableIds: number[]
 }
 
 export class UpdateMetaTableRequestDTO {
