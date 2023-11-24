@@ -96,6 +96,10 @@ export class MetaTableService extends BaseService {
             (value) => !allTableIds.includes(value),
           )
 
+          // for (const auxiliaryTableId of auxiliaryTables) {
+          //   await this.removeMetaTable(auxiliaryTableId)
+          // }
+
           console.log(1111111, auxiliaryTables)
           return newTables
         } else {
