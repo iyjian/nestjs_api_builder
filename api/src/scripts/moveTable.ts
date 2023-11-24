@@ -118,6 +118,7 @@ export async function moveTable(
   targetProjectId: number,
   transaction: Transaction,
 ) {
+  console.log(111111111111, '我在 moveTable')
   /**
    * 查询源表信息
    */
@@ -136,6 +137,8 @@ export async function moveTable(
   )
 
   const posibleRefTables = {}
+
+  let newTables = []
 
   if (!targetTable.columns || targetTable.columns.length === 0) {
     /**
@@ -258,6 +261,9 @@ export async function moveTable(
         `replicate column - table: ${srcTable.name} column: ${column.name} - ${column.id} ---> ${newColumn.id}`,
       )
 
+      newTables.push(newColumn.tableId)
+      newTables.push(newColumn.refTableId)
+
       if (column.refTableId && !targetRelationColumn) {
         missingRelationColumns.push({
           column,
@@ -294,7 +300,12 @@ export async function moveTable(
         { relationColumnId: targetRelationColumn.id },
         { transaction },
       )
+
+      newTables.push(column.tableId)
+      newTables.push(column.refTableId)
     }
+
+    return newTables
   }
 
   console.log(
