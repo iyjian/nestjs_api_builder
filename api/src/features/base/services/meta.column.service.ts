@@ -152,6 +152,15 @@ export class MetaColumnService extends BaseService {
     })
   }
 
+  async findAll(transaction?: Transaction) {
+    const metaColumns = await this.metaColumnModel.findAll({
+      where: { isActive: true },
+      transaction,
+    })
+
+    return metaColumns
+  }
+
   async findAllMetaColumn(
     findAllQueryMetaColumn: FindAllMetaColumnRequestDTO,
     transaction?: Transaction,

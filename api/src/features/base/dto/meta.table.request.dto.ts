@@ -39,6 +39,16 @@ export class CreateMetaTableRequestDTO {
   relationNodesForOne?: any
 }
 
+export class MoveMetaTableRequestDTO {
+  srcTableIds: number[]
+
+  targetProjectId: number
+}
+
+export class FindRelationTableRequestDTO {
+  srcTableIds: number[]
+}
+
 export class UpdateMetaTableRequestDTO {
   name?: string
 

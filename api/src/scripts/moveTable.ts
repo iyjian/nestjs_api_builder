@@ -69,7 +69,51 @@ async function ensureTargetTable(
   }
 }
 
-async function moveTable(
+export async function findRelationTables(
+  srcTableId: number,
+  transaction: Transaction,
+): Promise<{
+  srcColumns: any[]
+  uniqueRefTableIds: number[]
+}> {
+  let srcColumns = await MetaColumn.findAll({
+    where: {
+      tableId: srcTableId,
+      isActive: true,
+    },
+    include: [
+      {
+        model: MetaTable,
+        as: 'refTable',
+        required: false,
+      },
+      {
+        model: MetaColumn,
+        as: 'relationColumn',
+        required: false,
+      },
+    ],
+    order: [['id', 'asc']],
+    transaction,
+  })
+
+  srcColumns = JSON.parse(JSON.stringify(srcColumns))
+
+  const uniqueRefTableIds: number[] = []
+
+  for (const column of srcColumns) {
+    if (column.refTable && !uniqueRefTableIds.includes(column.refTable.id)) {
+      uniqueRefTableIds.push(column.refTable.id)
+    }
+  }
+
+  return {
+    srcColumns,
+    uniqueRefTableIds,
+  }
+}
+
+export async function moveTable(
   srcTableId: number,
   targetProjectId: number,
   transaction: Transaction,
@@ -81,47 +125,49 @@ async function moveTable(
     transaction,
   })
 
-  console.log(srcTableId)
-
   const { isOld, table: targetTable } = await ensureTargetTable(
     srcTableId,
     targetProjectId,
     transaction,
   )
-
   console.log(
     `replicate table - srcTable: ${srcTable.name} - ${srcTable.id} ---> ${targetTable.id} (${isOld})`,
   )
 
   const posibleRefTables = {}
 
+  let newTables = []
+
   if (!targetTable.columns || targetTable.columns.length === 0) {
     /**
      * 查询源字段信息
      */
-    let srcColumns = await MetaColumn.findAll({
-      where: {
-        tableId: srcTableId,
-        isActive: null,
-      },
-      include: [
-        {
-          model: MetaTable,
-          as: 'refTable',
-          required: false,
-        },
-        {
-          model: MetaColumn,
-          as: 'relationColumn',
-          required: false,
-        },
-      ],
-      // 排序以保证外键字段在其衍生关系字段的前面
-      order: [['id', 'asc']],
-      transaction,
-    })
+    // let srcColumns = await MetaColumn.findAll({
+    //   where: {
+    //     tableId: srcTableId,
+    //     isActive: null,
+    //   },
+    //   include: [
+    //     {
+    //       model: MetaTable,
+    //       as: 'refTable',
+    //       required: false,
+    //     },
+    //     {
+    //       model: MetaColumn,
+    //       as: 'relationColumn',
+    //       required: false,
+    //     },
+    //   ],
+    //   // 排序以保证外键字段在其衍生关系字段的前面
+    //   order: [['id', 'asc']],
+    //   transaction,
+    // })
 
-    srcColumns = JSON.parse(JSON.stringify(srcColumns))
+    // srcColumns = JSON.parse(JSON.stringify(srcColumns))
+
+    const srcColumns = (await findRelationTables(srcTableId, transaction))
+      .srcColumns
 
     /**
      * 逐个将源字段复制到目标字段
@@ -209,6 +255,9 @@ async function moveTable(
         `replicate column - table: ${srcTable.name} column: ${column.name} - ${column.id} ---> ${newColumn.id}`,
       )
 
+      newTables.push(newColumn.tableId)
+      newTables.push(newColumn.refTableId)
+
       if (column.refTableId && !targetRelationColumn) {
         missingRelationColumns.push({
           column,
@@ -245,7 +294,12 @@ async function moveTable(
         { relationColumnId: targetRelationColumn.id },
         { transaction },
       )
+
+      newTables.push(column.tableId)
+      newTables.push(column.refTableId)
     }
+
+    return newTables
   }
 
   console.log(
@@ -263,52 +317,52 @@ async function moveTable(
   // }
 }
 
-;(async () => {
-  const sequelize = new Sequelize({
-    host: process.env.MYSQL_HOST,
-    dialect: 'mysql',
-    database: process.env.MYSQL_DB,
-    port: parseInt(process.env.MYSQL_PORT || '3306'),
-    username: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWD,
-    models: [MetaTable, MetaColumn, MetaProject, MetaDataType],
-    logging: false,
-  })
+// ;(async () => {
+//   const sequelize = new Sequelize({
+//     host: process.env.MYSQL_HOST,
+//     dialect: 'mysql',
+//     database: process.env.MYSQL_DB,
+//     port: parseInt(process.env.MYSQL_PORT || '3306'),
+//     username: process.env.MYSQL_USER,
+//     password: process.env.MYSQL_PASSWD,
+//     models: [MetaTable, MetaColumn, MetaProject, MetaDataType],
+//     logging: false,
+//   })
 
-  const srcProjectName = 'nest_sequelize_template'
-  const targetProjectName = process.argv[2]
-  const srcTableName = process.argv[3] // 't_attachment'
+//   const srcProjectName = 'nest_sequelize_template'
+//   const targetProjectName = process.argv[2]
+//   const srcTableName = process.argv[3] // 't_attachment'
 
-  const srcProject = await MetaProject.findOne({
-    where: {
-      name: srcProjectName,
-    },
-  })
+//   const srcProject = await MetaProject.findOne({
+//     where: {
+//       name: srcProjectName,
+//     },
+//   })
 
-  const srcTable = await MetaTable.findOne({
-    where: {
-      projectId: srcProject.id,
-      name: srcTableName,
-    },
-  })
+//   const srcTable = await MetaTable.findOne({
+//     where: {
+//       projectId: srcProject.id,
+//       name: srcTableName,
+//     },
+//   })
 
-  const targetProject = await MetaProject.findOne({
-    where: {
-      name: targetProjectName,
-    },
-  })
+//   const targetProject = await MetaProject.findOne({
+//     where: {
+//       name: targetProjectName,
+//     },
+//   })
 
-  const transaction = await sequelize.transaction()
+//   const transaction = await sequelize.transaction()
 
-  try {
-    await moveTable(srcTable.id, targetProject.id, transaction)
-    // transaction.rollback()
-    transaction.commit()
-  } catch (e) {
-    console.log(e)
-    transaction.rollback()
-  }
-})()
+//   try {
+//     await moveTable(srcTable.id, targetProject.id, transaction)
+//     // transaction.rollback()
+//     transaction.commit()
+//   } catch (e) {
+//     console.log(e)
+//     transaction.rollback()
+//   }
+// })()
 
 /*
     set FOREIGN_KEY_CHECKS=0;
