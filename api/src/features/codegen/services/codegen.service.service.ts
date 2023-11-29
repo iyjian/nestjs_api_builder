@@ -473,6 +473,7 @@ export class CodegenServiceService {
     export class ${table.className}Service extends BaseService {
       private readonly include: any[]
       private readonly includeForOne: any[]
+      private readonly logger = new Logger(${table.className}Service.name)
     
       constructor(
         @InjectModel(${table.className})
