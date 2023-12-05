@@ -7,6 +7,8 @@ import {
   UpdateMetaTableRequestDTO,
   CreateMetaTableRequestDTO,
   FindAllMetaTableRequestDTO,
+  MoveMetaTableRequestDTO,
+  FindRelationTableRequestDTO,
 } from '../dto'
 import { MetaTable } from '../entities/meta.table.entity'
 import { MetaColumn } from '../entities/meta.column.entity'
@@ -15,6 +17,8 @@ import { MetaDataTypeService } from './meta.data.type.service'
 import _ from 'lodash'
 import { MetaProjectService } from './meta.project.service'
 import { MetaDataType } from '../entities'
+import { moveTable, findRelationTables } from '../../../scripts/moveTable'
+import { MetaColumnService } from './meta.column.service'
 
 @Injectable()
 export class MetaTableService extends BaseService {
@@ -24,6 +28,7 @@ export class MetaTableService extends BaseService {
   constructor(
     @InjectModel(MetaTable)
     private readonly metaTableModel: typeof MetaTable,
+    private readonly metaColumnService: MetaColumnService,
     private readonly metaDataTypeService: MetaDataTypeService,
     private readonly projectService: MetaProjectService,
     private readonly mysql: Sequelize2,
@@ -40,6 +45,99 @@ export class MetaTableService extends BaseService {
       transaction,
     })
     return this.findOneMetaTable(metaTable.id, transaction)
+  }
+
+  async moveMetaTable(
+    moveMetaTableRequestDTO: MoveMetaTableRequestDTO,
+    transaction?: Transaction,
+  ) {
+    if (!transaction) {
+      transaction = await this.mysql.transaction()
+    }
+
+    try {
+      let newTables = []
+      let auxiliaryTables = []
+      let addTables = []
+
+      for (const srcTableId of moveMetaTableRequestDTO.srcTableIds) {
+        const srcTable = await this.findOneMetaTableSimple(
+          srcTableId,
+          transaction,
+        )
+
+        if (srcTable) {
+          const newRes = await moveTable(
+            srcTable.id,
+            moveMetaTableRequestDTO.targetProjectId,
+            transaction,
+          )
+          if (newRes) {
+            newRes
+              .filter((t) => t !== null && t !== undefined)
+              .forEach((t) => {
+                newTables.push(t)
+              })
+          }
+
+          newTables = Array.from(new Set(newTables))
+
+          const column = await this.metaColumnService.findAll(transaction)
+
+          let allTableIds = column.map((row) => row.tableId)
+
+          allTableIds = Array.from(new Set(allTableIds))
+
+          auxiliaryTables = newTables.filter(
+            (value) => !allTableIds.includes(value),
+          )
+
+          addTables = newTables.filter((value) => allTableIds.includes(value))
+        } else {
+          console.error(`Table ${srcTableId} not found`)
+        }
+      }
+      for (const auxiliaryTableId of auxiliaryTables) {
+        await this.removeMetaTable(auxiliaryTableId, transaction)
+      }
+      transaction.commit()
+      return addTables
+    } catch (e) {
+      console.log(e)
+      transaction.rollback()
+    }
+  }
+
+  async findRelationTable(
+    findRelationTableRequestDTO: FindRelationTableRequestDTO,
+    transaction?: Transaction,
+  ) {
+    try {
+      // 将传入的 string 类，转为 string[]
+      const target = findRelationTableRequestDTO.srcTableIds
+      const srcTables = (target as unknown as string)
+        .replace(/\[|\]|'|"/g, '')
+        .split(',')
+
+      if (!transaction) {
+        transaction = await this.mysql.transaction()
+      }
+
+      const result: { [key: number]: number[] } = {}
+
+      for (const srcTable of srcTables) {
+        const srcTableId = srcTable as unknown as number
+        const res = await findRelationTables(srcTableId, transaction)
+        result[srcTableId] = res.uniqueRefTableIds
+      }
+
+      transaction.commit()
+
+      return result
+    } catch (e) {
+      console.error(e)
+      transaction.rollback()
+    }
   }
 
   async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableRequestDTO) {

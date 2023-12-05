@@ -13,6 +13,8 @@ export {
   CreateMetaTableRequestDTO,
   UpdateMetaTableRequestDTO,
   FindAllMetaTableRequestDTO,
+  MoveMetaTableRequestDTO,
+  FindRelationTableRequestDTO,
 } from './meta.table.request.dto'
 export {
   CreateMetaColumnRequestDTO,
