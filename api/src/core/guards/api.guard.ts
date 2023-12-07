@@ -27,6 +27,7 @@ export class ApiGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest<Request>()
       const token = request.headers['token'] || request['query']['token']
+      
       if (
         this.configService.get('auth.superToken') &&
         token === this.configService.get('auth.superToken')
