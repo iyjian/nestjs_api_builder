@@ -97,7 +97,28 @@ export class MetaTableService extends BaseService {
           console.error(`Table ${srcTableId} not found`)
         }
       }
+
+      // 删除新建辅助表格，并将关联辅助表的字段 refTableId 和 relationColumnId 更新为 null
       for (const auxiliaryTableId of auxiliaryTables) {
+        const modifiableColumns =
+          await this.metaColumnService.findAllMetaColumnSimple(
+            {
+              skipPaging: true,
+              refTableId: auxiliaryTableId,
+            },
+            transaction,
+          )
+
+        for (const modifiableColumn of modifiableColumns) {
+          await this.metaColumnService.updateMetaColumn(
+            modifiableColumn.id,
+            {
+              refTableId: null,
+              relationColumnId: null,
+            },
+            transaction,
+          )
+        }
         await this.removeMetaTable(auxiliaryTableId, transaction)
       }
       transaction.commit()
