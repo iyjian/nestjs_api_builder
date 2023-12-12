@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@authing/native-js-ui-components": "^4.5.1",
     "@authing/vue-ui-components": "^4.3.1",
     "@element-plus/icons-vue": "^2.0.9",
     "authing-js-sdk": "^4.23.37",

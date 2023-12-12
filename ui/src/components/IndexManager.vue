@@ -18,7 +18,10 @@
             style="width: 400px; margin-right: 10px"
           >
             <el-option
-              v-for="column in columns"
+              v-for="column in columns.concat({
+                name: 'isActive',
+                id: -1,
+              })"
               :key="column.id"
               :label="column.name"
               :value="column.id"
