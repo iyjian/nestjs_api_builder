@@ -416,7 +416,7 @@ export const projectTableStore = defineStore("projectTable", {
             clonedTable.columns[i].order = parseInt(i) + 1;
           }
 
-          const savedTable = await devToolApiClient.saveEntity(this.table);
+          const savedTable = await devToolApiClient.saveEntity(clonedTable);
           this.updateTable(savedTable);
           this.updatePersistTable(savedTable);
         }
