@@ -12,6 +12,7 @@ import { CodegenModuleService } from '../services/codegen.module.service'
 import { CodePreviewRequestDTO } from '../dto'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CodeGenUICodeService } from '../services/codegen.ui.code.service'
+import { CommitAction } from './../../coding/dto/coding.dto'
 
 @Controller('codegen')
 @ApiTags('codegen')
@@ -307,16 +308,22 @@ export class CodegenController {
     const comitFiles = codes.map((code) => ({
       filePath: code.path,
       content: code.content,
-      action: code.isExist ? 'update' : 'create',
+      action: code.isExist ? CommitAction.update : CommitAction.create,
     }))
 
+    /**
+     * 可以提交未修改的文件内容
+     */
     await this.gitService.commitFiles(
       table.project.repoId,
       targetBranch,
-      comitFiles as any,
+      comitFiles,
       comment ? comment : 'commit',
     )
 
+    /**
+     * 如果目标分支不是源分支，则从目标分支创建一个PR到源分支。
+     */
     if (sourceBranch !== targetBranch) {
       return this.gitService.createMergeRequest(
         table.project.repoId,
