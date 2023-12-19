@@ -475,12 +475,14 @@ export class FrontcodegenService {
             lazyRefreshTable();
           } catch (e) {
             dialog.button.loading = false;
+            console.log(e)
             ElMessage({ message: '数据更新失败', type: 'warning', })
           }
         }
 
         async function openForm(openType: string, row?: any) {
           dialog.type = openType;
+          dialog.button.loading = false;
           if (dialog.type === "edit") {
             const ${instanceName} = await ${instanceName}Api.get${className}ById(row.id);
             dialogData.value = _.cloneDeep(${instanceName});
