@@ -245,13 +245,15 @@ export class DBSyncService {
 
         if (comparedDefinition.metaColumnDefinition.hasConstraintData) {
           errorReasonSql.push(
-            `select count(id) as count from ${tableName} where ${columnName} not in (select id from ${refTableName});`,
+            `select count(id) as count 
+             from \`${tableName}\` 
+             where \`${columnName}\` not in (select id from \`${refTableName})\` and \`${columnName}\` is not null;`,
           )
           error.push(ERROR_REASON.ERROR_CONSTRAINT_NEW)
         }
 
         syncSqls.push(
-          `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id);`,
+          `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (\`${columnName}\`) REFERENCES \`${refTableName}\`(id);`,
         )
       } else {
         if (actionType === 'ADD COLUMN') {
@@ -510,7 +512,11 @@ export class DBSyncService {
               table.projectId,
             )
             const count: any = await projectConnection.query(
-              `select count(id) as count from ${metaColumnDefinition.tableName} where ${metaColumnDefinition.columnName} not in (select id from ${metaColumnDefinition.refTableName});`,
+              `select count(id) as count 
+               from \`${metaColumnDefinition.tableName}\` 
+               where \`${metaColumnDefinition.columnName}\` not in (
+                          select id from \`${metaColumnDefinition.refTableName}\`
+                      ) and \`${metaColumnDefinition.columnName}\` is not null;`,
               { type: QueryTypes.SELECT },
             )
             if (count[0].count > 0) {
