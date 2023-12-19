@@ -229,18 +229,22 @@ export class DBSyncService {
       ) {
         // 修改依赖
         const { constraintName } = comparedDefinition.mysqlColumnDefinition
+        
         syncReasonCodes.push(SYNC_REASON.SYNC_CONSTRAINT_MODIFY)
+        
         if (constraintName) {
           syncSqls.push(
             `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName};`,
           )
         }
+        
         if (comparedDefinition.metaColumnDefinition.hasConstraintData) {
           errorReasonSql.push(
             `select count(id) as count from ${tableName} where ${columnName} not in (select id from ${refTableName});`,
           )
           error.push(ERROR_REASON.ERROR_CONSTRAINT_NEW)
         }
+
         syncSqls.push(
           `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id);`,
         )
@@ -473,9 +477,10 @@ export class DBSyncService {
           metaColumnDefinition.refTableName !==
             keyedMysqlColumnDefinitions[compareKey].refTableName
         ) {
-          // 如果都有，但是关联的表不一致,则Modify
+          // 数据库的定义和meta的定义有冲突
           metaColumnDefinition.constraintType = CONSTRAINT_COMPARE_TYPE.CONFLICT
-          // 判断是否字段有值不在外键表里
+          
+          // 判断是否字段有值不在外键表里 TODO: 如果比较生产上的字段定义无法直接查询生产数据库，这里需要做适配
           if (!columnDefinition) {
             const projectConnection = await this.getProjectConnection(
               table.projectId,
@@ -488,6 +493,7 @@ export class DBSyncService {
               metaColumnDefinition.hasConstraintData = true
             }
           }
+
           const { syncSqls, error, syncReasonCodes, errorReasonSql } =
             this.syncSqlBuilder({
               metaColumnDefinition,

@@ -87,7 +87,11 @@ export class CodegenService {
        */
       for (const column of table.columns) {
         column.tableId = tableObj.id
-
+        
+        /**
+         * 初始化`columnInstance`
+         * 如果column中有id属性，则是已有字段，否则是新字段
+         */
         let columnInstance: MetaColumn
 
         if (column.id) {
@@ -106,8 +110,8 @@ export class CodegenService {
         }
 
         /**
-         * 在下面的逻辑中如果删除了外键，外键所关联的relation字段会一并删除
-         * 所以可能出现有column.id但是找不到这个column的情况
+         * 由于删除外键会将外键所关联的relation字段会一并删除
+         * 所以可能出现有column.id，但是`columnInstance`为空的情况。
          */
         if (!columnInstance) {
           this.logger.verbose(
@@ -137,13 +141,23 @@ export class CodegenService {
           )
 
           /**
-           * 更新字段信息
+           * 如果一个字段本来是外键字段，现在取消了外键属性，则需要清空(purge)此字段上和外键相关的属性。
+           * 需要情况的字段如下有：
+           * > refTableId
+           * > relation
+           * > relationColumnId
            */
           const purgeRelation =
             column.isFK === false &&
             columnInstance.refTableId &&
-            columnInstance.relation === 'BelongsTo'
+            columnInstance.relation === 'BelongsTo' &&
+            columnInstance.dataType.dataType !== 'vrelation'
 
+          this.logger.debug(`saveEntity - id: ${column.id} name: ${column.name} purgeRelation: ${purgeRelation}`,)
+
+          /**
+           * 更新字段信息
+           */
           await columnInstance.update(
             {
               name: column.name,
@@ -180,6 +194,7 @@ export class CodegenService {
           ) {
             /**
              * 如果字段本来有外键, 现在没有外键了，则删除所有和外键有关的关系字段。
+             * TODO: 我觉得这应该要复用purgeRelation这个判断标志，现在没有时间仔细看，先这样。
              */
             this.logger.debug(
               `saveEntity - remove related columns of column: ${column.id}`,
@@ -192,8 +207,8 @@ export class CodegenService {
         }
 
         /**
-         * 如果字段定义中有外键字段，且没有根据此外键字段创建过关系字段
-         * 则需要根据外键字段创建关系
+         * 如果该字段是外键，且没有根据此外键创建过关系字段
+         * 则需要根据外键额外创建关系
          */
         if (
           column.isFK &&
@@ -202,7 +217,7 @@ export class CodegenService {
           !columnInstance.relationColumnId
         ) {
           /**
-           * 如果是外键，且没有创建过关系，则创建关系，并把关系反更新此字段上
+           * 如果是外键，且没有创建过关系，则创建关系字段，并把关系字段的id更新至此字段的relationColumnId上
            */
           this.logger.debug(
             `saveEntity - create relation column - FK column: ${column.name} relation: BelongsTo refTableId: ${column.refTableId}`,
@@ -226,6 +241,7 @@ export class CodegenService {
             },
             transaction,
           )
+
           this.logger.verbose(
             `saveEntity - create relation column - ${column.name.replace(
               /Id$/,
@@ -251,11 +267,14 @@ export class CodegenService {
               },
               transaction,
             )
+
           this.logger.verbose(`saveEntity - step3`)
+
           const hasManyColumnName =
             existingHasManyRelations.rows.length > 0
               ? tableObj.pluralName + columnInstance.id.toString()
               : tableObj.pluralName
+
           this.logger.verbose(
             `saveEntity - createMetaColumn - tableId: ${column.refTableId} column: ${hasManyColumnName}`,
           )
