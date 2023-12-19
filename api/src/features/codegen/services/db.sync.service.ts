@@ -15,6 +15,17 @@ export type SYNC_RESULT = {
   errorReasonSql?: string
 }
 
+enum CONSTRAINT_COMPARE_TYPE {
+  // meta中定义了外键，mysql中没有
+  MYSQL_ABSENT = 1,
+  // meta中没有定义外键，mysql中却有
+  MYSQL_REDUNDANCY = 2,
+  // mysql中的外键定义和meta不一致
+  CONFLICT = 3,
+  // meta没有定义外键，mysql中也没有外键
+  NOT_APPLICABLE = 0
+}
+
 type COLUMN_DEFINITION = {
   tableName: string
   columnName: string
@@ -198,14 +209,14 @@ export class DBSyncService {
         refTableName,
       } = comparedDefinition.metaColumnDefinition
       // 判断依赖关系
-      if (comparedDefinition.metaColumnDefinition?.constraintType === 1) {
+      if (comparedDefinition.metaColumnDefinition?.constraintType === CONSTRAINT_COMPARE_TYPE.MYSQL_ABSENT) {
         // 添加依赖
         syncReasonCodes.push(SYNC_REASON.SYNC_CONSTRAINT_NEW)
         syncSqls.push(
           `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id);`,
         )
       } else if (
-        comparedDefinition.metaColumnDefinition?.constraintType === 2
+        comparedDefinition.metaColumnDefinition?.constraintType === CONSTRAINT_COMPARE_TYPE.MYSQL_REDUNDANCY
       ) {
         // 删除依赖
         const { constraintName } = comparedDefinition.mysqlColumnDefinition
@@ -214,7 +225,7 @@ export class DBSyncService {
           `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName};`,
         )
       } else if (
-        comparedDefinition.metaColumnDefinition?.constraintType === 3
+        comparedDefinition.metaColumnDefinition?.constraintType === CONSTRAINT_COMPARE_TYPE.CONFLICT
       ) {
         // 修改依赖
         const { constraintName } = comparedDefinition.mysqlColumnDefinition
@@ -332,8 +343,10 @@ export class DBSyncService {
   /**
    *  比对metacolumnName与数据库字段
    *
-   *  @param tableId 比对表的id
-   *  @prarm ignoreColumns 不需要比对的系统保留字段
+   *  @param {number} tableId - 比对表的id
+   *  @param {COLUMN_DEFINITION[]} columnDefinition - 字段信息(数据库中实际的字段信息)。由于有可能在生产环境中无法直连数据，则可以
+   *  通过接口将字段信息传入，然后生成相应的migrate语句。如果没有传入，则直连数据库获取。
+   *  @prarm {string} ignoreColumns - 不需要比对的系统保留字段
    *  @return
    */
   async getColumnDiffs(
@@ -369,17 +382,18 @@ export class DBSyncService {
         refColumnName: 'id',
         constraintName: '',
         hasTouched: 0,
-        constraintType: 0,
+        constraintType: CONSTRAINT_COMPARE_TYPE.NOT_APPLICABLE,
         hasConstraintData: false,
       }))
 
     // 获取数据库中的字段定义
-    let mysqlColumnDefinitions
+    let mysqlColumnDefinitions: COLUMN_DEFINITION[]
 
     if (columnDefinition) {
       mysqlColumnDefinitions = columnDefinition
     } else {
       const projectConnection = await this.getProjectConnection(table.projectId)
+      
       // 获取数据库中的字段定义
       mysqlColumnDefinitions = await projectConnection.query<COLUMN_DEFINITION>(
         this.mysqlDefinitionSQL,
@@ -402,8 +416,12 @@ export class DBSyncService {
 
     for (const metaColumnDefinition of metaColumnDefinitions) {
       const compareKey = `${metaColumnDefinition.tableName}-${metaColumnDefinition.columnName}`
+      
       if (compareKey in keyedMysqlColumnDefinitions) {
-        // 找到字段，对比是否需要修改
+        /**
+         * 比较metaColumnDefinition和mysqlColumnDefinition中的字段
+         * 如果 数据类型/空/默认值/字段注释 有不同则生成migrate语句
+         */
         if (
           metaColumnDefinition.dataType !==
             keyedMysqlColumnDefinitions[compareKey].dataType ||
@@ -419,6 +437,7 @@ export class DBSyncService {
               metaColumnDefinition,
               mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
             })
+
           if (syncSqls.toString() !== '') {
             resObj.push({
               sql: syncSqls.toString(),
@@ -430,13 +449,14 @@ export class DBSyncService {
         }
 
         keyedMysqlColumnDefinitions[compareKey].hasTouched = true
+        
         // 查找是否有依赖关系不匹配的
         if (
           keyedMysqlColumnDefinitions[compareKey].constraintName &&
           !metaColumnDefinition.refTableName
         ) {
           // 如果数据库有meta没有，则删除多余的依赖关系
-          metaColumnDefinition.constraintType = 2
+          metaColumnDefinition.constraintType = CONSTRAINT_COMPARE_TYPE.MYSQL_REDUNDANCY
           const { syncSqls, error, syncReasonCodes, errorReasonSql } =
             this.syncSqlBuilder({
               metaColumnDefinition,
@@ -454,7 +474,7 @@ export class DBSyncService {
             keyedMysqlColumnDefinitions[compareKey].refTableName
         ) {
           // 如果都有，但是关联的表不一致,则Modify
-          metaColumnDefinition.constraintType = 3
+          metaColumnDefinition.constraintType = CONSTRAINT_COMPARE_TYPE.CONFLICT
           // 判断是否字段有值不在外键表里
           if (!columnDefinition) {
             const projectConnection = await this.getProjectConnection(
@@ -492,9 +512,10 @@ export class DBSyncService {
           code: syncReasonCodes,
           errorReasonSql: errorReasonSql.toString(),
         })
+        
         // 查找是否有依赖关系，如果有，则添加依赖关系
         if (metaColumnDefinition.refTableName) {
-          metaColumnDefinition.constraintType = 1
+          metaColumnDefinition.constraintType = CONSTRAINT_COMPARE_TYPE.MYSQL_ABSENT
           const { syncSqls, error, syncReasonCodes, errorReasonSql } =
             this.syncSqlBuilder({
               metaColumnDefinition,
@@ -519,7 +540,8 @@ export class DBSyncService {
           this.syncSqlBuilder({
             mysqlColumnDefinition: keyedMysqlColumnDefinitions[i],
           })
-        // 判断是否有多条语句，如果有，则拆开
+        
+          // 判断是否有多条语句，如果有，则拆开
         if (syncSqls.toString().split(';').length > 2) {
           syncSqls
             .toString()
