@@ -87,7 +87,7 @@ export class CodegenService {
        */
       for (const column of table.columns) {
         column.tableId = tableObj.id
-        
+
         /**
          * 初始化`columnInstance`
          * 如果column中有id属性，则是已有字段，否则是新字段
@@ -153,7 +153,9 @@ export class CodegenService {
             columnInstance.relation === 'BelongsTo' &&
             columnInstance.dataType.dataType !== 'vrelation'
 
-          this.logger.debug(`saveEntity - id: ${column.id} name: ${column.name} purgeRelation: ${purgeRelation}`,)
+          this.logger.debug(
+            `saveEntity - id: ${column.id} name: ${column.name} purgeRelation: ${purgeRelation}`,
+          )
 
           /**
            * 更新字段信息

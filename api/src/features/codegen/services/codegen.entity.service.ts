@@ -588,7 +588,9 @@ export class CodegenEntityService {
         index.unique = true
       }
       // TODO: 由于数据表中没有isActive这个字段，导致前端无法传isActive字段的id, 需要重构column的定义
-      index.fields = index.fields.map((field: any) => columnHash[field]?columnHash[field]['name'] : 'isActive')
+      index.fields = index.fields.map((field: any) =>
+        columnHash[field] ? columnHash[field]['name'] : 'isActive',
+      )
       delete index.type
     }
 

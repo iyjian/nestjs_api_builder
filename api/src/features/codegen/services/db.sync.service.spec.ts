@@ -28,8 +28,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       "ALTER TABLE `t_certificate` ADD COLUMN `certId` int(11) NULL COMMENT '2222';",
@@ -52,8 +52,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       'ALTER TABLE `t_certificate` DROP COLUMN test;',
@@ -76,8 +76,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       'ALTER TABLE `t_certificate` DROP FOREIGN KEY t_certificate_ibfk_3;ALTER TABLE `t_certificate` DROP COLUMN enmuId;',
@@ -112,8 +112,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` datetime NULL COMMENT '发布时间';",
@@ -148,8 +148,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` date NULL COMMENT '发布时间';",
@@ -184,8 +184,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` datetime NULL COMMENT '发布时间';",
@@ -209,8 +209,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (certId) REFERENCES t_employee(id);',
@@ -246,8 +246,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       'ALTER TABLE `t_certificate` DROP FOREIGN KEY t_certificate_ibfk_2;',
@@ -283,8 +283,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       'ALTER TABLE `t_certificate` DROP FOREIGN KEY t_certificate_ibfk_2;',
@@ -321,8 +321,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([
       'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (employeeId) REFERENCES t_certificate(id);',
@@ -357,8 +357,8 @@ describe('DBSyncService Test', () => {
       },
     }
 
-    const { syncSqls, syncReasonCodes } =
-      dbSyncService.syncSqlBuilder(comparedDefinition)
+    const { sql: syncSqls, code: syncReasonCodes } =
+      dbSyncService.syncSqlBuilder(comparedDefinition)[0]
 
     expect(syncSqls).toStrictEqual([])
   })
