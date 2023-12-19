@@ -305,7 +305,7 @@ export class FrontcodegenService {
                   : ''
               }
             </div>
-            <el-pagination :current-page="params.page" :page-size="params.pageSize" layout="total, prev, pager, next"
+            <el-pagination  v-if="table.data.count" :current-page="params.page" :page-size="params.pageSize" layout="total, prev, pager, next"
               :total="table.data.count" @current-change="changeCurrentPage"></el-pagination>
           </div>
           <el-table
@@ -474,8 +474,8 @@ export class FrontcodegenService {
             dialog.visible = false;
             await lazyRefreshTable();
           } catch (e) {
-            dialog.button.loading = false;
             console.log(e)
+            dialog.button.loading = false;
             ElMessage({ message: '数据更新失败', type: 'warning', })
           }
         }
