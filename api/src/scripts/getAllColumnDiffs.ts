@@ -35,10 +35,7 @@ const main = async () => {
     if (
       [
         't_authing_user',
-        't_teaching_material_block',
-        't_enum_type',
         't_enum_category',
-        't_log',
       ].includes(row.name)
     ) {
       continue

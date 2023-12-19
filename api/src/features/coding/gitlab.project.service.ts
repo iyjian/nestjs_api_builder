@@ -55,7 +55,7 @@ export class GitlabProjectService {
       try {
         const commitFiles = await this.gitService.getFilesContent(
           templateProjectId,
-          'master',
+          'main',
           '',
           true,
         )
