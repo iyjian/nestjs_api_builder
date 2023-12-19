@@ -425,7 +425,7 @@ export class FrontcodegenService {
         });
 
         watch(stringifiedParams, () => {
-          lazyRefreshTable();
+          await lazyRefreshTable();
         });
 
         async function refreshTable() {
@@ -472,7 +472,7 @@ export class FrontcodegenService {
         
             dialog.button.loading = false;
             dialog.visible = false;
-            lazyRefreshTable();
+            await lazyRefreshTable();
           } catch (e) {
             dialog.button.loading = false;
             console.log(e)
@@ -511,7 +511,7 @@ export class FrontcodegenService {
                cancelButtonText: "取消",
              });
              const result = await ${instanceName}Api.delete${className}(row.id);
-             lazyRefreshTable();
+             await lazyRefreshTable();
            } catch (e) {
               if(e === 'cancel'){
                 ElMessage({ message: '取消删除', type: 'warning' })
