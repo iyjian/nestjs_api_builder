@@ -155,7 +155,7 @@ export class DBSyncService {
   /**
    * 获取数据类型同义词，如果没有同义词，则返回原数据
    */
-  public getDataTypeSynonym(dataType): string {
+  public getDataTypeSynonym(dataType: string): string {
     const dataTypeSynonym = {
       'int(11)': 'int',
       'tinyint(1)': 'tinyint',
