@@ -142,7 +142,7 @@
           v-bind="dragOptions"
           :component-data="{ type: 'transtion-group' }"
         >
-        <template #item="{ element: column, index }">
+          <template #item="{ element: column, index }">
             <div
               class="table-row"
               v-if="column.dataType?.dataType !== 'vrelation'"
