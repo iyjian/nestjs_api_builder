@@ -1,3 +1,4 @@
+import { defineConfig } from "vite";
 import { defineStore } from "pinia";
 import {
   Column,
@@ -45,6 +46,33 @@ const columnTemplate: Column = {
   remark: "",
   sampleData: "",
 };
+
+function createDefaultColumn(
+  name: string,
+  dataTypeId: number,
+  defaultValue: string
+): Column {
+  return {
+    name,
+    comment: "",
+    dataTypeId,
+    allowNull: false,
+    refTableId: undefined,
+    defaultValue,
+    enumKeys: "",
+    isEnable: true,
+    searchable: false,
+    findable: true,
+    createable: false,
+    updateable: true,
+    order: 0,
+    getCode: "",
+    setCode: "",
+    enumTypeCode: "",
+    remark: "",
+    sampleData: "",
+  };
+}
 
 export const projectTableStore = defineStore("projectTable", {
   state: (): State => ({
@@ -304,6 +332,7 @@ export const projectTableStore = defineStore("projectTable", {
       const table = await devToolApiClient.getTableInfo(tableId);
       this.updateTable(table);
       this.updatePersistTable(table);
+      this.addDefaultColumn();
       this.addEmptyColumn();
       // await this.triggerCodePreviewAsync('switchTableAsync');
     },
@@ -328,6 +357,43 @@ export const projectTableStore = defineStore("projectTable", {
             _column.order = idx + 1;
             return _column;
           });
+      }
+    },
+
+    /**
+     * 加表格中的默认列 isActive, createAt, updateAt
+     */
+    addDefaultColumn() {
+      if (this.isTableValid) {
+        if (this.table.columns.length === 0) {
+          const defaultColumns = [
+            { name: "id", dataType: 1, defaultValue: "" },
+            { name: "syncKey", dataType: 4, defaultValue: "" },
+            { name: "isActive", dataType: 5, defaultValue: "1" },
+            { name: "createdAt", dataType: 6, defaultValue: "" },
+            { name: "updatedAt", dataType: 6, defaultValue: "" },
+            { name: "deletedAt", dataType: 6, defaultValue: "" },
+            { name: "version", dataType: 1, defaultValue: "" },
+          ];
+
+          defaultColumns.forEach((defaultColumn) => {
+            this.addColumn(
+              _.extend(
+                _.clone(
+                  createDefaultColumn(
+                    defaultColumn.name,
+                    defaultColumn.dataType,
+                    defaultColumn.defaultValue
+                  )
+                ),
+                {
+                  order: this.totalColumns + 1,
+                  isEnable: false,
+                }
+              )
+            );
+          });
+        }
       }
     },
 
@@ -436,6 +502,7 @@ export const projectTableStore = defineStore("projectTable", {
           return code;
         });
 
+        this.addDefaultColumn();
         this.addEmptyColumn();
         this.toPreviewMode();
         console.log("debug...............");
