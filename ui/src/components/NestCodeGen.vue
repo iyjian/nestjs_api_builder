@@ -145,7 +145,7 @@
           <template #item="{ element: column, index }">
             <div
               class="table-row"
-              v-if="column.dataType?.dataType !== 'vrelation'"
+              v-if="column.dataType?.dataType !== 'vrelation' && column.isEnable"
             >
               <!-- 表的基本定义 -->
               <TableRow v-model="table.columns[index]" :groupedDataTypes="groupedDataTypes" :dataTypeByDataTypeId="dataTypeByDataTypeId"
