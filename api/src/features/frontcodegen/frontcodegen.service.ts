@@ -305,7 +305,7 @@ export class FrontcodegenService {
                   : ''
               }
             </div>
-            <el-pagination :current-page="params.page" :page-size="params.pageSize" layout="total, prev, pager, next"
+            <el-pagination  v-if="table.data.count" :current-page="params.page" :page-size="params.pageSize" layout="total, prev, pager, next"
               :total="table.data.count" @current-change="changeCurrentPage"></el-pagination>
           </div>
           <el-table
@@ -370,7 +370,7 @@ export class FrontcodegenService {
           <template #header>
             <span class="dialog-footer">
               <el-button @click="dialog.visible = false">关闭</el-button>
-              <el-button type="primary" @click="submit" v-if="dialog.type != 'view'">保存</el-button>
+              <el-button type="primary" @click="submit" v-if="dialog.type != 'view'" :loading="dialog.button.loading">保存</el-button>
             </span>
           </template>
         </el-dialog>
@@ -425,7 +425,7 @@ export class FrontcodegenService {
         });
 
         watch(stringifiedParams, () => {
-          lazyRefreshTable();
+          await lazyRefreshTable();
         });
 
         async function refreshTable() {
@@ -472,8 +472,9 @@ export class FrontcodegenService {
         
             dialog.button.loading = false;
             dialog.visible = false;
-            lazyRefreshTable();
+            await lazyRefreshTable();
           } catch (e) {
+            console.log(e)
             dialog.button.loading = false;
             ElMessage({ message: '数据更新失败', type: 'warning', })
           }
@@ -481,6 +482,7 @@ export class FrontcodegenService {
 
         async function openForm(openType: string, row?: any) {
           dialog.type = openType;
+          dialog.button.loading = false;
           if (dialog.type === "edit") {
             const ${instanceName} = await ${instanceName}Api.get${className}ById(row.id);
             dialogData.value = _.cloneDeep(${instanceName});
@@ -509,7 +511,7 @@ export class FrontcodegenService {
                cancelButtonText: "取消",
              });
              const result = await ${instanceName}Api.delete${className}(row.id);
-             lazyRefreshTable();
+             await lazyRefreshTable();
            } catch (e) {
               if(e === 'cancel'){
                 ElMessage({ message: '取消删除', type: 'warning' })
