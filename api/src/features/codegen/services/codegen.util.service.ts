@@ -56,7 +56,7 @@ export class CodegenUtilService {
 
   public getImportSpecifier(from: string, to: string) {
     this.logger.debug(`getImportPath - from: ${from} to: ${to}`)
-    return ('./' + path.relative(path.dirname(from), to)).replace(/\.ts$/, '')
+    return ('./' + path.relative(path.dirname(from), to)).replace(/\.ts$/, '').replace(/\\/g, '/')
   }
 
   /**
