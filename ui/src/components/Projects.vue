@@ -7,6 +7,7 @@
 
   <div class="tableView">
     <el-table :data="table" style="width: 100%">
+      <el-table-column prop="id" label="项目编号" />
       <el-table-column prop="repoId" label="仓库id" />
       <el-table-column prop="repoName" label="仓库名称" />
       <el-table-column prop="name" label="项目名称" />
