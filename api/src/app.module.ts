@@ -30,7 +30,8 @@ import fs from 'fs'
         models: [],
         autoLoadModels: true,
         synchronize: true,
-        logging: configService.get<string>('sqlLogging') === 'true' ? true : false,
+        logging:
+          configService.get<string>('sqlLogging') === 'true' ? true : false,
         sync: {
           alter: false,
         },

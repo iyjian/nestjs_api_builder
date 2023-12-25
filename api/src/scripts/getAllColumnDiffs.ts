@@ -32,12 +32,7 @@ const main = async () => {
   )
 
   for (const row of tablesResponse.data.data.rows) {
-    if (
-      [
-        't_authing_user',
-        't_enum_category',
-      ].includes(row.name)
-    ) {
+    if (['t_authing_user', 't_enum_category'].includes(row.name)) {
       continue
     }
     const tableId = row.id
