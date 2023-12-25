@@ -4,6 +4,7 @@ import { codeGen, BaseModel } from './../../../core'
 @Table({
   tableName: 't_project_priviledge',
   comment: '项目权限',
+  indexes: [{ fields: ['projectId', 'userId', 'isActive'], unique: true }],
 })
 @codeGen('scopesGen')
 @Scopes(() => ({
