@@ -365,7 +365,7 @@ export class DBSyncService {
    *  @param {number} tableId - 比对表的id
    *  @param {COLUMN_DEFINITION[]} columnDefinition - 字段信息(数据库中实际的字段信息)。由于有可能在生产环境中无法直连数据，则可以
    *  通过接口将字段信息传入，然后生成相应的migrate语句。如果没有传入，则直连数据库获取。
-   *  @prarm {string} ignoreColumns - 不需要比对的系统保留字段
+   *  @prarm {string} ignoreColumns - 不需要比对的系统保留字段 TODO: 现在是写死的，以后需要判断这个表是从哪个表继承的
    *  @return
    */
   async getColumnDiffs(
