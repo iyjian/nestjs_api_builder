@@ -1,4 +1,5 @@
 export default (): any => ({
+  sqlLogging: process.env.SQL_LOGGING,
   app: {
     sentryDSN: process.env.SENTRY_DSN,
     code: process.env.APP_CODE,
