@@ -40,6 +40,9 @@ import { User } from './entities/user.entity'
 import { DbMigrateLogController } from './controllers/db.migrate.log.controller'
 import { DbMigrateLogService } from './services/db.migrate.log.service'
 import { DbMigrateLog } from './entities/db.migrate.log.entity'
+import { ProjectPriviledgeController } from './controllers/project.priviledge.controller'
+import { ProjectPriviledgeService } from './services/project.priviledge.service'
+import { ProjectPriviledge } from './entities/project.priviledge.entity'
 
 @Module({
   imports: [
@@ -54,6 +57,7 @@ import { DbMigrateLog } from './entities/db.migrate.log.entity'
       Log,
       User,
       DbMigrateLog,
+      ProjectPriviledge,
     ]),
     forwardRef(() => CodingModule),
   ],
@@ -65,6 +69,7 @@ import { DbMigrateLog } from './entities/db.migrate.log.entity'
     ProjectModuleService,
     UserService,
     DbMigrateLogService,
+    ProjectPriviledgeService,
   ],
   controllers: [
     MetaProjectController,
@@ -76,6 +81,7 @@ import { DbMigrateLog } from './entities/db.migrate.log.entity'
     SwaggerController,
     UserController,
     DbMigrateLogController,
+    ProjectPriviledgeController,
   ],
   providers: [
     MetaProjectService,
@@ -88,6 +94,7 @@ import { DbMigrateLog } from './entities/db.migrate.log.entity'
     LogService,
     UserService,
     DbMigrateLogService,
+    ProjectPriviledgeService,
   ],
 })
 export class BaseModule {}

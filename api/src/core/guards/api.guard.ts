@@ -64,7 +64,7 @@ export class ApiGuard implements CanActivate {
           throw new HttpException('无权限', HttpStatus.UNAUTHORIZED)
         }
 
-        request['locals'] = { userId: loginStatus.data.id }
+        request['locals'] = { userId: user.id }
 
         return true
       } else {

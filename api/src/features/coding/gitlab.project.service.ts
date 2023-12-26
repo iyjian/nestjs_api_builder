@@ -30,7 +30,7 @@ export class GitlabProjectService {
    * @param projectName 
    * @param templateProjectId 
    * @param visibility 
-   * @param namespaceId 
+   * @param namespaceId - Namespace for the new project (defaults to the current user’s namespace).
    * @returns 
    */
   public async createProject(
@@ -53,19 +53,27 @@ export class GitlabProjectService {
 
     if (templateProjectId) {
       try {
+        // 从模板项目的main分支中提取代码
         const commitFiles = await this.gitService.getFilesContent(
           templateProjectId,
           'main',
           '',
           true,
         )
-
+        
+        /**
+         * 从已创建项目的defaultBranch分支创建dev分支
+         * defaultBranch在gitlab中配置，默认应该是main分支
+        */
         await this.gitService.createBranch(
           project.id,
           'dev',
           this.configService.get('gitlab.defaultBranch'),
         )
 
+        /**
+         * 将模板项目的代码提交到已创建项目的dev分支
+         */
         await this.gitService.commitFiles(
           project.id,
           'dev',

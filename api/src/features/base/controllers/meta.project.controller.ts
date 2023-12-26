@@ -24,6 +24,7 @@ import {
   RequestUserId,
 } from './../../../core'
 import { GitlabProjectService } from './../../coding/gitlab.project.service'
+import { ProjectPriviledgeService } from '../services/project.priviledge.service'
 
 @Controller('metaProject')
 export class MetaProjectController {
@@ -31,14 +32,26 @@ export class MetaProjectController {
   constructor(
     private readonly metaProjectService: MetaProjectService,
     private readonly gitlabProjectService: GitlabProjectService,
+    private readonly projectPriviledgeService: ProjectPriviledgeService,
   ) {}
 
   @Post('')
-  async create(@Body() createMetaProject: CreateMetaProjectRequestDTO) {
+  async create(
+    @RequestUserId() userId: number,
+    @Body() createMetaProject: CreateMetaProjectRequestDTO,
+  ) {
+    createMetaProject.userId = userId
+
     const metaProject = await this.metaProjectService.createMetaProject(
       createMetaProject,
     )
 
+    await this.projectPriviledgeService.create({
+      projectId: metaProject.id,
+      userId,
+    })
+
+    // 异步创建gitlab仓库代码
     this.gitlabProjectService
       .createProject(
         createMetaProject.name,
@@ -74,10 +87,13 @@ export class MetaProjectController {
 
   @Get('')
   findAll(
-    @RequestUserId() userId: string,
+    @RequestUserId() userId: number,
     @Query() findAllQueryMetaProject: FindAllMetaProjectRequestDTO,
   ) {
-    return this.metaProjectService.findAllMetaProject(findAllQueryMetaProject)
+    return this.metaProjectService.findAllMetaProject(
+      userId,
+      findAllQueryMetaProject,
+    )
   }
 
   @Get(':id')

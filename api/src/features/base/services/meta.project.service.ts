@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { BaseService } from '../../../core'
 import { Op } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
 import {
   UpdateMetaProjectRequestDTO,
   CreateMetaProjectRequestDTO,
@@ -16,6 +17,7 @@ export class MetaProjectService extends BaseService {
   constructor(
     @InjectModel(MetaProject)
     private readonly metaProjectModel: typeof MetaProject,
+    private readonly mysql: Sequelize,
   ) {
     super()
     this.include = []
@@ -27,9 +29,14 @@ export class MetaProjectService extends BaseService {
   }
 
   async findAllMetaProject(
+    userId: number,
     findAllQueryMetaProject: FindAllMetaProjectRequestDTO,
   ) {
     const { page, pageSize, skipPaging, ...payload } = findAllQueryMetaProject
+
+    payload[Op.and] = this.mysql.literal(
+      'MetaProject.id in (select projectId from t_project_priviledge)',
+    )
 
     const metaProjects = await this.metaProjectModel.findAndCountAll({
       where: { ...payload },
