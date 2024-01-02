@@ -563,16 +563,6 @@ export class DBSyncService {
         if (metaColumnDefinition.refTableName) {
           metaColumnDefinition.constraintType =
             CONSTRAINT_COMPARE_TYPE.MYSQL_ABSENT
-          // const { syncSqls, error, syncReasonCodes, errorReasonSql } =
-          //   this.syncSqlBuilder({
-          //     metaColumnDefinition,
-          //   })
-          // resObj.push({
-          //   sql: syncSqls.toString(),
-          //   error: error,
-          //   code: syncReasonCodes,
-          //   errorReasonSql: errorReasonSql.toString(),
-          // })
           const migrateSql = this.syncSqlBuilder({
             metaColumnDefinition,
             mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
@@ -588,34 +578,6 @@ export class DBSyncService {
         !keyedMysqlColumnDefinitions[i].hasTouched &&
         ignoreColumns.indexOf(keyedMysqlColumnDefinitions[i].columnName) === -1 //去掉不需要比对的系统保留字段
       ) {
-        // const { syncSqls, error, syncReasonCodes, errorReasonSql } =
-        //   this.syncSqlBuilder({
-        //     mysqlColumnDefinition: keyedMysqlColumnDefinitions[i],
-        //   })
-
-        //   // 判断是否有多条语句，如果有，则拆开
-        // if (syncSqls.toString().split(';').length > 2) {
-        //   syncSqls
-        //     .toString()
-        //     .split(';')
-        //     .map((item) => {
-        //       item
-        //         ? resObj.push({
-        //             sql: item,
-        //             error: error,
-        //             code: syncReasonCodes,
-        //             errorReasonSql: errorReasonSql.toString(),
-        //           })
-        //         : ''
-        //     })
-        // } else {
-        //   resObj.push({
-        //     sql: syncSqls.toString(),
-        //     error: error,
-        //     code: syncReasonCodes,
-        //     errorReasonSql: errorReasonSql.toString(),
-        //   })
-        // }
         const migrateSql = this.syncSqlBuilder({
           mysqlColumnDefinition: keyedMysqlColumnDefinitions[i],
         })
