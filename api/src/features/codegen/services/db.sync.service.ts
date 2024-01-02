@@ -39,7 +39,7 @@ type COLUMN_DEFINITION = {
   hasTouched: number
   syncReason?: SYNC_REASON
   constraintType?: number
-  hasConstraintData?: boolean
+  constraintDataConflict?: boolean
 }
 
 type COMPARED_DEFINITION = {
@@ -243,7 +243,7 @@ export class DBSyncService {
           )
         }
 
-        if (comparedDefinition.metaColumnDefinition.hasConstraintData) {
+        if (comparedDefinition.metaColumnDefinition.constraintDataConflict) {
           errorReasonSql.push(
             `select count(id) as count 
              from \`${tableName}\` 
@@ -375,7 +375,6 @@ export class DBSyncService {
   ): Promise<SYNC_RESULT[]> {
     let resObj: SYNC_RESULT[] = []
 
-    // 根据 tableId 查询 t_meta_table 表查询出 projectId
     const table = await this.metaTableService.findOneMetaTable(tableId)
 
     if (!table) {
@@ -389,7 +388,7 @@ export class DBSyncService {
         tableId,
       })
     ).rows
-      .filter((row) => row.dataType.category != 'system')
+      .filter((row) => row.dataType.category !== 'system')
       .map((column) => ({
         tableName: column.table.name,
         columnName: column.name,
@@ -402,12 +401,15 @@ export class DBSyncService {
         constraintName: '',
         hasTouched: 0,
         constraintType: CONSTRAINT_COMPARE_TYPE.NOT_APPLICABLE,
-        hasConstraintData: false,
+        constraintDataConflict: false,
       }))
 
-    // 获取数据库中的字段定义
+    // 数据库中的字段定义
     let mysqlColumnDefinitions: COLUMN_DEFINITION[]
 
+    /**
+     * 初始化从数据库中获取的真实的字段定义，如果没有从外部传入则直接查询(开发模式下可以直接查询)
+     */
     if (columnDefinition) {
       mysqlColumnDefinitions = columnDefinition
     } else {
@@ -427,7 +429,7 @@ export class DBSyncService {
       )
     }
 
-    // 将数据库中的字段定义按照 tableName+columnName 为key, 组成hash, 方便比较
+    // 将数据库中的字段定义按照 tableName-columnName 为key, 组成hash, 方便比较
     const keyedMysqlColumnDefinitions = _.keyBy(
       mysqlColumnDefinitions,
       (definition: any) => `${definition.tableName}-${definition.columnName}`,
@@ -484,7 +486,9 @@ export class DBSyncService {
           // 数据库的定义和meta的定义有冲突
           metaColumnDefinition.constraintType = CONSTRAINT_COMPARE_TYPE.CONFLICT
 
-          // 判断是否字段有值不在外键表里 TODO: 如果比较生产上的字段定义无法直接查询生产数据库，这里需要做适配
+          /**
+           * 判断外键约束是否会产生冲突
+           */
           if (!columnDefinition) {
             const projectConnection = await this.getProjectConnection(
               table.projectId,
@@ -497,8 +501,9 @@ export class DBSyncService {
                       ) and \`${metaColumnDefinition.columnName}\` is not null;`,
               { type: QueryTypes.SELECT },
             )
+
             if (count[0].count > 0) {
-              metaColumnDefinition.hasConstraintData = true
+              metaColumnDefinition.constraintDataConflict = true
             }
           }
 
@@ -530,25 +535,28 @@ export class DBSyncService {
       }
     }
 
-    // 删除上一步循环中没有touch的定义(metaColumn中不存在但是数据库中有的定义)
+    // 处理metaColumn中不存在的字段，但数据库中存在的字段。(需删除)
     for (const i in keyedMysqlColumnDefinitions) {
       if (
         !keyedMysqlColumnDefinitions[i].hasTouched &&
-        ignoreColumns.indexOf(keyedMysqlColumnDefinitions[i].columnName) === -1 //去掉不需要比对的系统保留字段
+        ignoreColumns.indexOf(keyedMysqlColumnDefinitions[i].columnName) === -1 // 去掉不需要比对的系统保留字段
       ) {
         const migrateSql = this.syncSqlBuilder({
           mysqlColumnDefinition: keyedMysqlColumnDefinitions[i],
         })
+
         resObj = resObj.concat(migrateSql)
       }
     }
 
     // 在resObj上增加id
     let num = 1
+
     for (const resobj of resObj) {
       resobj.id = num
       num += 1
     }
+
     return resObj
   }
 
