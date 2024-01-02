@@ -451,24 +451,11 @@ export class DBSyncService {
           metaColumnDefinition.columnComment !==
             keyedMysqlColumnDefinitions[compareKey].columnComment
         ) {
-          // const { syncSqls, error, syncReasonCodes, errorReasonSql } =
-          //   this.syncSqlBuilder({
-          //     metaColumnDefinition,
-          //     mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          //   })
-
-          // if (syncSqls.toString() !== '') {
-          //   resObj.push({
-          //     sql: syncSqls.toString(),
-          //     error: error,
-          //     code: syncReasonCodes,
-          //     errorReasonSql: errorReasonSql.toString(),
-          //   })
-          // }
           const migrateSql = this.syncSqlBuilder({
             metaColumnDefinition,
             mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
           })
+
           resObj = resObj.concat(migrateSql)
         }
 
@@ -482,21 +469,12 @@ export class DBSyncService {
           // 如果数据库有meta没有，则删除多余的依赖关系
           metaColumnDefinition.constraintType =
             CONSTRAINT_COMPARE_TYPE.MYSQL_REDUNDANCY
-          // const { syncSqls, error, syncReasonCodes, errorReasonSql } =
-          //   this.syncSqlBuilder({
-          //     metaColumnDefinition,
-          //     mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          //   })
-          // resObj.push({
-          //   sql: syncSqls.toString(),
-          //   error: error,
-          //   code: syncReasonCodes,
-          //   errorReasonSql: errorReasonSql.toString(),
-          // })
+
           const migrateSql = this.syncSqlBuilder({
             metaColumnDefinition,
             mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
           })
+
           resObj = resObj.concat(migrateSql)
         } else if (
           metaColumnDefinition.refTableName &&
@@ -524,39 +502,19 @@ export class DBSyncService {
             }
           }
 
-          // const { syncSqls, error, syncReasonCodes, errorReasonSql } =
-          //   this.syncSqlBuilder({
-          //     metaColumnDefinition,
-          //     mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          //   })
-          // resObj.push({
-          //   sql: syncSqls.toString(),
-          //   error: error,
-          //   code: syncReasonCodes,
-          //   errorReasonSql: errorReasonSql.toString(),
-          // })
           const migrateSql = this.syncSqlBuilder({
             metaColumnDefinition,
             mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
           })
+
           resObj = resObj.concat(migrateSql)
         }
       } else {
-        // 没有找到字段，需要ADD
-        // const { syncSqls, error, syncReasonCodes, errorReasonSql } =
-        //   this.syncSqlBuilder({
-        //     metaColumnDefinition,
-        //   })
-        // resObj.push({
-        //   sql: syncSqls.toString(),
-        //   error: error,
-        //   code: syncReasonCodes,
-        //   errorReasonSql: errorReasonSql.toString(),
-        // })
         const migrateSql = this.syncSqlBuilder({
           metaColumnDefinition,
           mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
         })
+
         resObj = resObj.concat(migrateSql)
 
         // 查找是否有依赖关系，如果有，则添加依赖关系
