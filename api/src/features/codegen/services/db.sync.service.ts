@@ -246,14 +246,14 @@ export class DBSyncService {
       ) {
         // 如果有约束，需要先删除约束
         result.push({
-          sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName};`,
+          sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName}`,
           code: SYNC_REASON.SYNC_CONSTRAINT_DROP,
           reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_DROP),
         })
       }
 
       result.push({
-        sql: `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP COLUMN ${comparedDefinition.mysqlColumnDefinition.columnName};`,
+        sql: `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP COLUMN ${comparedDefinition.mysqlColumnDefinition.columnName}`,
         code: SYNC_REASON.SYNC_FEILD_DELETE,
         reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_FEILD_DELETE),
       })
@@ -264,7 +264,7 @@ export class DBSyncService {
       result.push({
         sql: `ALTER TABLE \`${tableName}\` ${actionType} \`${columnName}\` ${dataType} ${
           allowNull ? 'NULL' : 'NOT NULL'
-        } COMMENT '${columnComment || ''}';`,
+        } COMMENT '${columnComment || ''}'`,
         code: SYNC_REASON.SYNC_FEILD_NEW,
         reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_FEILD_NEW),
       })
@@ -274,19 +274,22 @@ export class DBSyncService {
     if (columnModifiedItem > 0) {
       let sql = `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
         allowNull ? 'NULL' : 'NOT NULL'
-      } COMMENT '${columnComment || ''}';`
+      } COMMENT '${columnComment || ''}'`
+
       /**
        * 如果需要更改defaultValue，则要判断是否是字符类型，字符类型的defaultValue需要加引号，否则不需要。
        */
-      if ((columnModifiedItem & 4) === 4 && /varchar/.test(dataType)) {
-        sql = `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
-          allowNull ? 'NULL' : 'NOT NULL'
-        } DEFAULT '${defaultValue}' COMMENT '${columnComment || ''}';`
-      } else if ((columnModifiedItem & 4) === 4) {
-        sql = `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
-          allowNull ? 'NULL' : 'NOT NULL'
-        } DEFAULT ${defaultValue} COMMENT '${columnComment || ''}';`
+      if (defaultValue && (columnModifiedItem & 4) === 4) {
+        if (/varchar|text/.test(dataType)) {
+          sql += ` DEFAULT '${defaultValue}'`
+        } else if (dataType === 'tinyint') {
+          sql += ` DEFAULT ${defaultValue === 'true' ? 1 : 0}`
+        } else {
+          sql += ` DEFAULT ${defaultValue}`
+        }
       }
+
+      // console.log(`dataType: ${dataType} ${defaultValue}`)
 
       result.push({
         sql,
@@ -297,7 +300,9 @@ export class DBSyncService {
           (columnModifiedItem & 2) === 2 ? 'NULL' : '',
           (columnModifiedItem & 4) === 4 ? '默认值' : '',
           (columnModifiedItem & 8) === 8 ? '注释' : '',
-        ].filter(o => o).join(','),
+        ]
+          .filter((o) => o)
+          .join(','),
         mysqlDefinition: comparedDefinition.mysqlColumnDefinition,
       })
     }
@@ -305,7 +310,7 @@ export class DBSyncService {
     // (meta有 mysql无)新增约束
     if (constraintType === CONSTRAINT_STATUS.MYSQL_ABSENT) {
       result.push({
-        sql: `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id);`,
+        sql: `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id)`,
         code: SYNC_REASON.SYNC_CONSTRAINT_NEW,
         reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_NEW),
       })
@@ -315,7 +320,7 @@ export class DBSyncService {
     if (constraintType === CONSTRAINT_STATUS.MYSQL_REDUNDANCY) {
       const { constraintName } = comparedDefinition.mysqlColumnDefinition
       result.push({
-        sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName};`,
+        sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName}`,
         code: SYNC_REASON.SYNC_CONSTRAINT_DROP,
         reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_DROP),
       })
@@ -325,14 +330,14 @@ export class DBSyncService {
     if (constraintType === CONSTRAINT_STATUS.CONFLICT) {
       if (comparedDefinition.mysqlColumnDefinition.constraintName) {
         result.push({
-          sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName};`,
+          sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName}`,
           code: SYNC_REASON.SYNC_CONSTRAINT_MODIFY,
           reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_MODIFY),
         })
       }
 
       result.push({
-        sql: `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (\`${columnName}\`) REFERENCES \`${refTableName}\`(id);`,
+        sql: `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (\`${columnName}\`) REFERENCES \`${refTableName}\`(id)`,
         code: SYNC_REASON.SYNC_CONSTRAINT_MODIFY,
         reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_MODIFY),
       })
@@ -409,9 +414,9 @@ export class DBSyncService {
       ) {
         metaColumnDefinition.columnModifiedItem += 8
       }
-      console.log(
-        `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} ${metaColumnDefinition.defaultValue} '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
-      )
+      // console.log(
+      //   `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} ${metaColumnDefinition.defaultValue} '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
+      // )
 
       /**
        * ## 约束处理
@@ -518,8 +523,12 @@ export class DBSyncService {
         columnName: column.name,
         allowNull: column.allowNull ? 1 : 0,
         dataType: this.getDataTypeSynonym(column.mysqlDataType),
-        // dataTypeForCompare: this.getDataTypeSynonym(column.mysqlDataType),
-        defaultValue: column.defaultValue,
+        defaultValue:
+          column.defaultValue === 'false'
+            ? '0'
+            : column.defaultValue === 'true'
+            ? '1'
+            : column.defaultValue,
         columnComment: column.comment,
         refTableName: column.refTable?.name,
         refColumnName: column.refTable ? 'id' : '',
@@ -610,7 +619,9 @@ export class DBSyncService {
       type: QueryTypes.RAW,
     })
 
-    this.logger.debug(`executionSql - result: ${result}`)
+    this.logger.debug(
+      `executionSql - result: ${JSON.stringify(result, null, 2)}`,
+    )
 
     await this.dbMigrateLogService.create({ sql, tableId })
 

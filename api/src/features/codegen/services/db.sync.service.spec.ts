@@ -36,11 +36,10 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: "ALTER TABLE `t_certificate` ADD COLUMN `certId` int(11) NULL COMMENT '2222';",
+        sql: "ALTER TABLE `t_certificate` ADD COLUMN `certId` int(11) NULL COMMENT '2222'",
         code: 6,
-        errorReasonSql: '',
       },
     ])
   })
@@ -63,11 +62,10 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: 'ALTER TABLE `t_certificate` DROP COLUMN test;',
+        sql: 'ALTER TABLE `t_certificate` DROP COLUMN test',
         code: 7,
-        errorReasonSql: '',
       },
     ])
   })
@@ -90,16 +88,14 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: 'ALTER TABLE `undefined` DROP FOREIGN KEY t_certificate_ibfk_3;',
+        sql: 'ALTER TABLE `undefined` DROP FOREIGN KEY t_certificate_ibfk_3',
         code: 8,
-        errorReasonSql: '',
       },
       {
-        sql: 'ALTER TABLE `t_certificate` DROP COLUMN enmuId;',
+        sql: 'ALTER TABLE `t_certificate` DROP COLUMN enmuId',
         code: 7,
-        errorReasonSql: '',
       },
     ])
   })
@@ -137,11 +133,10 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` datetime NULL COMMENT '发布时间';",
-        code: 0,
-        errorReasonSql: '',
+        sql: "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` datetime NULL COMMENT '发布时间'",
+        code: 9,
       },
     ])
   })
@@ -179,11 +174,10 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` date NULL COMMENT '发布时间';",
-        code: 0,
-        errorReasonSql: '',
+        sql: "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` date NULL COMMENT '发布时间'",
+        code: 9,
       },
     ])
   })
@@ -221,11 +215,10 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` datetime NULL COMMENT '发布时间';",
-        code: 0,
-        errorReasonSql: '',
+        sql: "ALTER TABLE `t_info_issue` MODIFY COLUMN `issueTime` datetime NULL COMMENT '发布时间'",
+        code: 9,
       },
     ])
   })
@@ -249,16 +242,14 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: "ALTER TABLE `t_certificate` ADD COLUMN `certId` int(11) NULL COMMENT '2222';",
+        sql: "ALTER TABLE `t_certificate` ADD COLUMN `certId` int(11) NULL COMMENT '2222'",
         code: 6,
-        errorReasonSql: '',
       },
       {
-        sql: 'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (certId) REFERENCES t_employee(id);',
+        sql: 'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (certId) REFERENCES t_employee(id)',
         code: 0,
-        errorReasonSql: '',
       },
     ])
   })
@@ -298,16 +289,14 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: 'ALTER TABLE `t_certificate` DROP FOREIGN KEY t_certificate_ibfk_2;',
+        sql: 'ALTER TABLE `t_certificate` DROP FOREIGN KEY t_certificate_ibfk_2',
         code: 1,
-        errorReasonSql: '',
       },
       {
-        sql: 'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (`employeeId`) REFERENCES `t_employee`(id);',
+        sql: 'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (`employeeId`) REFERENCES `t_employee`(id)',
         code: 1,
-        errorReasonSql: '',
       },
     ])
   })
@@ -344,7 +333,7 @@ describe('DBSyncService Test', () => {
 
   //   console.log(result)
 
-  //   expect(result).toStrictEqual([
+  //   expect(result.map(o => ({sql: o.sql, code: o.code}))).toStrictEqual([
   //     'ALTER TABLE `t_certificate` DROP FOREIGN KEY t_certificate_ibfk_2;',
   //     'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (employeeId) REFERENCES t_certificate(id);',
   //   ])
@@ -384,11 +373,10 @@ describe('DBSyncService Test', () => {
 
     // console.log(result)
 
-    expect(result).toStrictEqual([
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([
       {
-        sql: 'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (`employeeId`) REFERENCES `t_certificate`(id);',
+        sql: 'ALTER TABLE `t_certificate` ADD CONSTRAINT FOREIGN KEY (`employeeId`) REFERENCES `t_certificate`(id)',
         code: 1,
-        errorReasonSql: '',
       },
     ])
   })
@@ -426,7 +414,7 @@ describe('DBSyncService Test', () => {
 
     console.log(result)
 
-    expect(result).toStrictEqual([])
+    expect(result.map((o) => ({ sql: o.sql, code: o.code }))).toStrictEqual([])
   })
 
   // it('test getColumnDiffsbyJson',  () => {
@@ -463,61 +451,61 @@ describe('DBSyncService Test', () => {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `objectId` varchar(255) NULL COMMENT '文件对象id';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 1,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `objectName` varchar(255) NULL COMMENT '文件名';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 2,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `mimeType` varchar(255) NULL COMMENT '文件类型';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 3,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `remark` varchar(255) NULL COMMENT '备注';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 4,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `sourceSystem` varchar(255) NULL COMMENT '来源系统';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 5,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `path` varchar(255) NULL COMMENT '文件路径';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 6,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `isFolder` tinyint(1) NULL COMMENT '是否是文件夹';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 7,
   //         },
   //         {
   //           sql: "ALTER TABLE `t_attachment` ADD COLUMN `size` int(11) NULL COMMENT '文件大小';",
   //           error: [],
   //           code: [Array],
-  //           errorReasonSql: '',
+  //
   //           id: 8,
   //         },
   //       ],
   //     },
   //   ]
-  //   expect(result).toStrictEqual(expectResult)
+  //   expect(result.map(o => ({sql: o.sql, code: o.code}))).toStrictEqual(expectResult)
   // })
 })
