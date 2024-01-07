@@ -8,11 +8,10 @@ import _ from 'lodash'
 import { DbMigrateLogService } from './../../base/services/db.migrate.log.service'
 
 export type SYNC_RESULT = {
-  id?: number
   sql: string
-  error?: number[]
-  code: SYNC_REASON[]
-  errorReasonSql?: string
+  code: SYNC_REASON
+  reason?: string
+  columnModifiedItem: string
 }
 
 export enum CONSTRAINT_STATUS {
@@ -195,7 +194,7 @@ export class DBSyncService {
   /**
    * 获取数据类型同义词，如果没有同义词，则返回原数据
    */
-  public getDataTypeSynonym(dataType: string): string {
+  private getDataTypeSynonym(dataType: string): string {
     const dataTypeSynonym = {
       'int(11)': 'int',
       'tinyint(1)': 'tinyint',
@@ -209,7 +208,7 @@ export class DBSyncService {
    */
   public syncSqlBuilder(
     comparedDefinition: COMPARED_DEFINITION, // : { //   sql: string //   error: number[] //   code: number[] //   errorReasonSql: string // }[]
-  ) {
+  ): SYNC_RESULT[] {
     const result = []
 
     // this.logger.debug(
@@ -303,7 +302,6 @@ export class DBSyncService {
         ]
           .filter((o) => o)
           .join(','),
-        mysqlDefinition: comparedDefinition.mysqlColumnDefinition,
       })
     }
 
@@ -350,7 +348,7 @@ export class DBSyncService {
     metaColumnDefinitions?: COLUMN_DEFINITION[],
     mysqlColumnDefinitions?: COLUMN_DEFINITION[],
     ignoreColumns: string = 'syncKey,deleted,createdAt,updatedAt,id,isActive',
-  ) {
+  ): SYNC_RESULT[] {
     let resObj: SYNC_RESULT[] = []
 
     // 将数据库中的字段定义按照 tableName-columnName 为key, 组成hash, 方便比较
@@ -581,8 +579,6 @@ export class DBSyncService {
    *  @return
    */
   async getColumnDiffs(tableId: number): Promise<SYNC_RESULT[]> {
-    // let resObj: SYNC_RESULT[] = []
-
     const table = await this.metaTableService.findOneMetaTable(tableId)
 
     if (!table) {
