@@ -7,7 +7,12 @@ export class DBSyncController {
 
   @Get('column/diff')
   getDiff(@Query('tableId') tableId: number) {
-    return this.dbSyncService.getColumnDiffs(tableId)
+    return this.dbSyncService.getColumnDiffs(+tableId)
+  }
+
+  @Get('column/meta/definition')
+  getMetaDefinitions(@Query('tableId') tableId: number) {
+    return this.dbSyncService.getMetaDefinitions(+tableId)
   }
 
   @Post('column/executionsql')
@@ -15,10 +20,10 @@ export class DBSyncController {
     return this.dbSyncService.executionSql(tableId, sql)
   }
 
-  @Post('column/diff/production')
-  getDiff_json(@Body('') json: JSON) {
-    return this.dbSyncService.getColumnDiffsbyJson(json)
-  }
+  // @Post('column/diff/production')
+  // getDiff_json(@Body('') json: JSON) {
+  //   return this.dbSyncService.getColumnDiffsbyJson(json)
+  // }
 
   @Get('enumReport/project/:projectId')
   getEnumReport(@Param('projectId') projectId: number) {
