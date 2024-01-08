@@ -60,11 +60,11 @@ export class GitlabProjectService {
           '',
           true,
         )
-        
+
         /**
          * 从已创建项目的defaultBranch分支创建dev分支
          * defaultBranch在gitlab中配置，默认应该是main分支
-        */
+         */
         await this.gitService.createBranch(
           project.id,
           'dev',
