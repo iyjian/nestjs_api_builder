@@ -6,16 +6,16 @@ import { MetaColumnService } from '../../base/services/meta.column.service'
 import { MetaProjectService } from '../../base/services/meta.project.service'
 import _ from 'lodash'
 import { DbMigrateLogService } from './../../base/services/db.migrate.log.service'
+import { FindAllMetaColumnRequestDTO } from './../../base/dto'
 
 export type SYNC_RESULT = {
-  id?: number
   sql: string
-  error?: number[]
-  code: SYNC_REASON[]
-  errorReasonSql?: string
+  code: SYNC_REASON
+  reason?: string
+  columnModifiedItem: string
 }
 
-enum CONSTRAINT_COMPARE_TYPE {
+export enum CONSTRAINT_STATUS {
   // meta中定义了外键，mysql中没有
   MYSQL_ABSENT = 1,
   // meta中没有定义外键，mysql中却有
@@ -26,7 +26,7 @@ enum CONSTRAINT_COMPARE_TYPE {
   NOT_APPLICABLE = 0,
 }
 
-type COLUMN_DEFINITION = {
+export type COLUMN_DEFINITION = {
   tableName: string
   columnName: string
   allowNull: number
@@ -36,9 +36,10 @@ type COLUMN_DEFINITION = {
   refTableName: string
   refColumnName: string
   constraintName: string
-  hasTouched: number
+  hasTouched?: number
+  columnModifiedItem?: number
   syncReason?: SYNC_REASON
-  constraintType?: number
+  constraintType?: CONSTRAINT_STATUS
   constraintDataConflict?: boolean
 }
 
@@ -48,15 +49,16 @@ type COMPARED_DEFINITION = {
 }
 
 export enum SYNC_REASON {
-  SYNC_CONSTRAINT_NEW,
-  SYNC_CONSTRAINT_MODIFY,
-  SYNC_ALLOWNULL_MODIFY,
-  SYNC_DEFAULTVALUE_MODIFY,
-  SYNC_COMMENT_MODIFY,
-  SYNC_DTATTYPE_MODIFY,
-  SYNC_FEILD_NEW,
-  SYNC_FEILD_DELETE,
-  SYNC_CONSTRAINT_DROP,
+  SYNC_CONSTRAINT_NEW = 0,
+  SYNC_CONSTRAINT_MODIFY = 1,
+  SYNC_ALLOWNULL_MODIFY = 2,
+  SYNC_DEFAULTVALUE_MODIFY = 3,
+  SYNC_COMMENT_MODIFY = 4,
+  SYNC_DTATTYPE_MODIFY = 5,
+  SYNC_FEILD_NEW = 6,
+  SYNC_FEILD_DELETE = 7,
+  SYNC_CONSTRAINT_DROP = 8,
+  SYNC_MODIFY = 9,
 }
 
 export enum ERROR_REASON {
@@ -66,7 +68,7 @@ export enum ERROR_REASON {
 @Injectable()
 export class DBSyncService {
   private readonly targetDBConnections: { [projectId: string]: Sequelize } = {}
-  private readonly mysqlDefinitionSQL: string
+  public readonly mysqlDefinitionSQL: string
   private readonly logger = new Logger(DBSyncService.name)
   constructor(
     private readonly metaTableService: MetaTableService,
@@ -107,6 +109,33 @@ export class DBSyncService {
                                       s.table_schema = ?`
   }
 
+  private getSyncReasonByCode(code: SYNC_REASON): string {
+    switch (code) {
+      case SYNC_REASON.SYNC_CONSTRAINT_NEW:
+        return '新约束'
+      case SYNC_REASON.SYNC_CONSTRAINT_DROP:
+        return 'error'
+      case SYNC_REASON.SYNC_CONSTRAINT_MODIFY:
+        return '改约束'
+      case SYNC_REASON.SYNC_ALLOWNULL_MODIFY:
+        return '改null'
+      case SYNC_REASON.SYNC_DEFAULTVALUE_MODIFY:
+        return '改默认值'
+      case SYNC_REASON.SYNC_COMMENT_MODIFY:
+        return '改注释'
+      case SYNC_REASON.SYNC_DTATTYPE_MODIFY:
+        return '改数据类型'
+      case SYNC_REASON.SYNC_FEILD_NEW:
+        return '加列'
+      case SYNC_REASON.SYNC_FEILD_DELETE:
+        return '删列'
+      case SYNC_REASON.SYNC_MODIFY:
+        return '改列'
+      default:
+        return code
+    }
+  }
+
   /**
    * 根据项目id初始化数据库连接
    *
@@ -127,15 +156,15 @@ export class DBSyncService {
       config.host !== project.dbHost ||
       config.port !== project.dbPort
     ) {
-      console.log({
-        host: project.dbHost,
-        dialect: 'mysql',
-        database: project.dbName,
-        username: project.dbUser,
-        password: project.dbPassword,
-        port: parseInt(project.dbPort),
-        logging: false,
-      })
+      // console.log({
+      //   host: project.dbHost,
+      //   dialect: 'mysql',
+      //   database: project.dbName,
+      //   username: project.dbUser,
+      //   password: project.dbPassword,
+      //   port: parseInt(project.dbPort),
+      //   logging: false,
+      // })
 
       // 如果没有初始化过数据库链接或者数据库链接的参数变了则初始化数据库链接
       this.targetDBConnections[projectId] = new Sequelize({
@@ -166,7 +195,7 @@ export class DBSyncService {
   /**
    * 获取数据类型同义词，如果没有同义词，则返回原数据
    */
-  public getDataTypeSynonym(dataType: string): string {
+  private getDataTypeSynonym(dataType: string): string {
     const dataTypeSynonym = {
       'int(11)': 'int',
       'tinyint(1)': 'tinyint',
@@ -178,11 +207,30 @@ export class DBSyncService {
   /**
    *  SQL Bulider
    */
-  public syncSqlBuilder(comparedDefinition: COMPARED_DEFINITION) {
-    const syncSqls: string[] = []
-    let syncReasonCodes: number[] = []
-    let error: number[] = []
-    let errorReasonSql = []
+  public syncSqlBuilder(
+    comparedDefinition: COMPARED_DEFINITION, // : { //   sql: string //   error: number[] //   code: number[] //   errorReasonSql: string // }[]
+  ): SYNC_RESULT[] {
+    const result = []
+
+    // this.logger.debug(
+    //   `syncSqlBuilder -  comparedDefinition: ${JSON.stringify(
+    //     comparedDefinition,
+    //     null,
+    //     2,
+    //   )}`,
+    // )
+
+    const {
+      tableName,
+      columnName,
+      dataType,
+      allowNull,
+      columnComment,
+      refTableName,
+      constraintType,
+      columnModifiedItem,
+      defaultValue,
+    } = comparedDefinition.metaColumnDefinition || {}
 
     const actionType = comparedDefinition.metaColumnDefinition
       ? comparedDefinition.mysqlColumnDefinition
@@ -190,173 +238,333 @@ export class DBSyncService {
         : 'ADD COLUMN'
       : 'DROP COLUMN'
 
+    // (meta无 mysql有)删除列
     if (actionType === 'DROP COLUMN') {
-      let dropColumnSql: string = ''
-      if (comparedDefinition.mysqlColumnDefinition.constraintName) {
-        dropColumnSql += `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName};`
-      }
-      syncReasonCodes.push(SYNC_REASON.SYNC_FEILD_DELETE)
-
-      dropColumnSql += `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP COLUMN ${comparedDefinition.mysqlColumnDefinition.columnName};`
-      syncSqls.push(dropColumnSql)
-    } else {
-      const {
-        tableName,
-        columnName,
-        dataType,
-        allowNull,
-        columnComment,
-        refTableName,
-      } = comparedDefinition.metaColumnDefinition
-      // 判断依赖关系
       if (
-        comparedDefinition.metaColumnDefinition?.constraintType ===
-        CONSTRAINT_COMPARE_TYPE.MYSQL_ABSENT
+        comparedDefinition.mysqlColumnDefinition.constraintType ===
+        CONSTRAINT_STATUS.MYSQL_REDUNDANCY
       ) {
-        // 添加依赖
-        syncReasonCodes.push(SYNC_REASON.SYNC_CONSTRAINT_NEW)
-        syncSqls.push(
-          `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id);`,
-        )
-      } else if (
-        comparedDefinition.metaColumnDefinition?.constraintType ===
-        CONSTRAINT_COMPARE_TYPE.MYSQL_REDUNDANCY
-      ) {
-        // 删除依赖
-        const { constraintName } = comparedDefinition.mysqlColumnDefinition
-        syncReasonCodes.push(SYNC_REASON.SYNC_CONSTRAINT_DROP)
-        syncSqls.push(
-          `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName};`,
-        )
-      } else if (
-        comparedDefinition.metaColumnDefinition?.constraintType ===
-        CONSTRAINT_COMPARE_TYPE.CONFLICT
-      ) {
-        // 修改依赖
-        const { constraintName } = comparedDefinition.mysqlColumnDefinition
+        // 如果有约束，需要先删除约束
+        result.push({
+          sql: `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName}`,
+          code: SYNC_REASON.SYNC_CONSTRAINT_DROP,
+          reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_DROP),
+        })
+      }
 
-        syncReasonCodes.push(SYNC_REASON.SYNC_CONSTRAINT_MODIFY)
+      result.push({
+        sql: `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP COLUMN ${comparedDefinition.mysqlColumnDefinition.columnName}`,
+        code: SYNC_REASON.SYNC_FEILD_DELETE,
+        reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_FEILD_DELETE),
+      })
+    }
 
-        if (constraintName) {
-          syncSqls.push(
-            `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName};`,
-          )
-        }
+    // (meta有 mysql无)加列
+    if (actionType === 'ADD COLUMN') {
+      result.push({
+        sql: `ALTER TABLE \`${tableName}\` ${actionType} \`${columnName}\` ${dataType} ${
+          allowNull ? 'NULL' : 'NOT NULL'
+        } COMMENT '${columnComment || ''}'`,
+        code: SYNC_REASON.SYNC_FEILD_NEW,
+        reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_FEILD_NEW),
+      })
+    }
 
-        if (comparedDefinition.metaColumnDefinition.constraintDataConflict) {
-          errorReasonSql.push(
-            `select count(id) as count 
-             from \`${tableName}\` 
-             where \`${columnName}\` not in (select id from \`${refTableName})\` and \`${columnName}\` is not null;`,
-          )
-          error.push(ERROR_REASON.ERROR_CONSTRAINT_NEW)
-        }
+    // (meta有 mysql有)改列
+    if (columnModifiedItem > 0) {
+      let sql = `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
+        allowNull ? 'NULL' : 'NOT NULL'
+      } COMMENT '${columnComment || ''}'`
 
-        syncSqls.push(
-          `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (\`${columnName}\`) REFERENCES \`${refTableName}\`(id);`,
-        )
-      } else {
-        if (actionType === 'ADD COLUMN') {
-          syncReasonCodes.push(SYNC_REASON.SYNC_FEILD_NEW)
-          syncSqls.push(
-            `ALTER TABLE \`${tableName}\` ${actionType} \`${columnName}\` ${dataType} ${
-              allowNull ? 'NULL' : 'NOT NULL'
-            } COMMENT '${columnComment || ''}';`,
-          )
+      /**
+       * 如果需要更改defaultValue，则要判断是否是字符类型，字符类型的defaultValue需要加引号，否则不需要。
+       */
+      if (defaultValue && (columnModifiedItem & 4) === 4) {
+        if (/varchar|text/.test(dataType)) {
+          sql += ` DEFAULT '${defaultValue}'`
+        } else if (dataType === 'tinyint') {
+          sql += ` DEFAULT ${defaultValue === 'true' ? 1 : 0}`
         } else {
-          if (!comparedDefinition.metaColumnDefinition.defaultValue) {
-            comparedDefinition.metaColumnDefinition.defaultValue = ''
-          }
-          if (!comparedDefinition.mysqlColumnDefinition.defaultValue) {
-            comparedDefinition.mysqlColumnDefinition.defaultValue = ''
-          }
-
-          if (
-            this.getDataTypeSynonym(
-              comparedDefinition.metaColumnDefinition.dataType,
-            ) !==
-            this.getDataTypeSynonym(
-              comparedDefinition.mysqlColumnDefinition.dataType,
-            )
-          ) {
-            syncSqls.push(
-              `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
-                allowNull ? 'NULL' : 'NOT NULL'
-              } COMMENT '${columnComment || ''}';`,
-            )
-          } else if (
-            comparedDefinition.metaColumnDefinition.columnComment !==
-            comparedDefinition.mysqlColumnDefinition.columnComment
-          ) {
-            syncSqls.push(
-              `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
-                allowNull ? 'NULL' : 'NOT NULL'
-              } COMMENT '${columnComment || ''}';`,
-            )
-          } else if (
-            comparedDefinition.metaColumnDefinition.allowNull !==
-            comparedDefinition.mysqlColumnDefinition.allowNull
-          ) {
-            syncSqls.push(
-              `ALTER TABLE \`${tableName}\` MODIFY COLUMN \`${columnName}\` ${dataType} ${
-                allowNull ? 'NULL' : 'NOT NULL'
-              } COMMENT '${columnComment || ''}';`,
-            )
-          }
-          // 如果有多个syncReasonCodes，则都显示
-          if (
-            this.getDataTypeSynonym(
-              comparedDefinition.metaColumnDefinition.dataType,
-            ) !==
-            this.getDataTypeSynonym(
-              comparedDefinition.mysqlColumnDefinition.dataType,
-            )
-          ) {
-            syncReasonCodes.push(SYNC_REASON.SYNC_DTATTYPE_MODIFY)
-          }
-
-          if (
-            comparedDefinition.metaColumnDefinition.columnComment !==
-            comparedDefinition.mysqlColumnDefinition.columnComment
-          ) {
-            syncReasonCodes.push(SYNC_REASON.SYNC_COMMENT_MODIFY)
-          }
-
-          if (
-            comparedDefinition.metaColumnDefinition.allowNull !==
-            comparedDefinition.mysqlColumnDefinition.allowNull
-          ) {
-            syncReasonCodes.push(SYNC_REASON.SYNC_ALLOWNULL_MODIFY)
-          }
-
-          // TODO: defaultValue 的判断需要转化
-          // else if (
-          //   comparedDefinition.metaColumnDefinition.defaultValue !==
-          //   comparedDefinition.mysqlColumnDefinition.defaultValue
-          // ) {
-          //   syncReasonCodes = SYNC_REASON.SYNC_DEFAULTVALUE_MODIFY
-          //   syncSqls.push(
-          //     `ALTER TABLE ${tableName} MODIFY COLUMN ${columnName} ${dataType} ${
-          //       allowNull ? 'NULL' : 'NOT NULL'
-          //     } COMMENT '${columnComment || ''}'`,
-          //   )
-          // }
+          sql += ` DEFAULT ${defaultValue}`
         }
+      }
+
+      // console.log(`dataType: ${dataType} ${defaultValue}`)
+
+      result.push({
+        sql,
+        code: SYNC_REASON.SYNC_MODIFY,
+        reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_MODIFY),
+        columnModifiedItem: [
+          (columnModifiedItem & 1) === 1 ? '数据类型' : '',
+          (columnModifiedItem & 2) === 2 ? 'NULL' : '',
+          (columnModifiedItem & 4) === 4 ? '默认值' : '',
+          (columnModifiedItem & 8) === 8 ? '注释' : '',
+        ]
+          .filter((o) => o)
+          .join(','),
+      })
+    }
+
+    // (meta有 mysql无)新增约束
+    if (constraintType === CONSTRAINT_STATUS.MYSQL_ABSENT) {
+      result.push({
+        sql: `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (${columnName}) REFERENCES ${refTableName}(id)`,
+        code: SYNC_REASON.SYNC_CONSTRAINT_NEW,
+        reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_NEW),
+      })
+    }
+
+    // (meta无 mysql有)删除约束
+    if (constraintType === CONSTRAINT_STATUS.MYSQL_REDUNDANCY) {
+      const { constraintName } = comparedDefinition.mysqlColumnDefinition
+      result.push({
+        sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${constraintName}`,
+        code: SYNC_REASON.SYNC_CONSTRAINT_DROP,
+        reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_DROP),
+      })
+    }
+
+    // (meta有 mysql有)(冲突) 修改约束, 先删除再创建
+    if (constraintType === CONSTRAINT_STATUS.CONFLICT) {
+      if (comparedDefinition.mysqlColumnDefinition.constraintName) {
+        result.push({
+          sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName}`,
+          code: SYNC_REASON.SYNC_CONSTRAINT_MODIFY,
+          reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_MODIFY),
+        })
+      }
+
+      result.push({
+        sql: `ALTER TABLE \`${tableName}\` ADD CONSTRAINT FOREIGN KEY (\`${columnName}\`) REFERENCES \`${refTableName}\`(id)`,
+        code: SYNC_REASON.SYNC_CONSTRAINT_MODIFY,
+        reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_MODIFY),
+      })
+    }
+
+    return result
+  }
+
+  public getMigrateSql(
+    metaColumnDefinitions?: COLUMN_DEFINITION[],
+    mysqlColumnDefinitions?: COLUMN_DEFINITION[],
+    ignoreColumns: string = 'syncKey,deleted,createdAt,updatedAt,id,isActive',
+  ): SYNC_RESULT[] {
+    let resObj: SYNC_RESULT[] = []
+
+    // 将数据库中的字段定义按照 tableName-columnName 为key, 组成hash, 方便比较
+    const keyedMysqlColumnDefinitions = _.keyBy(
+      mysqlColumnDefinitions,
+      (definition: any) => `${definition.tableName}-${definition.columnName}`,
+    ) as { [key: string]: COLUMN_DEFINITION }
+
+    for (const metaColumnDefinition of metaColumnDefinitions) {
+      metaColumnDefinition.columnModifiedItem = 0
+
+      const compareKey = `${metaColumnDefinition.tableName}-${metaColumnDefinition.columnName}`
+
+      if (compareKey in keyedMysqlColumnDefinitions) {
+        keyedMysqlColumnDefinitions[compareKey].hasTouched = 1
+      } else {
+        // mysql里没有这个字段则需要加字段以及加约束
+        if (metaColumnDefinition.refTableName) {
+          metaColumnDefinition.constraintType = CONSTRAINT_STATUS.MYSQL_ABSENT
+        }
+        const migrateSql = this.syncSqlBuilder({
+          metaColumnDefinition,
+          mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
+        })
+
+        resObj = resObj.concat(migrateSql)
+        continue
+      }
+
+      /**
+       * # meta和mysql里都存在这个字段
+       */
+      /**
+       * ## 字段处理
+       */
+      if (
+        metaColumnDefinition.dataType !==
+        keyedMysqlColumnDefinitions[compareKey].dataType
+      ) {
+        metaColumnDefinition.columnModifiedItem += 1
+      }
+
+      if (
+        metaColumnDefinition.allowNull !==
+        keyedMysqlColumnDefinitions[compareKey].allowNull
+      ) {
+        metaColumnDefinition.columnModifiedItem += 2
+      }
+
+      if (
+        metaColumnDefinition.defaultValue !==
+          keyedMysqlColumnDefinitions[compareKey].defaultValue ||
+        ''
+      ) {
+        metaColumnDefinition.columnModifiedItem += 4
+      }
+
+      if (
+        metaColumnDefinition.columnComment !==
+        keyedMysqlColumnDefinitions[compareKey].columnComment
+      ) {
+        metaColumnDefinition.columnModifiedItem += 8
+      }
+      console.log(
+        `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} '${metaColumnDefinition.defaultValue}' '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
+      )
+
+      /**
+       * ## 约束处理
+       */
+      /**
+       * (meta无约束 mysql有约束)
+       * 需要drop contraint
+       */
+      if (
+        !metaColumnDefinition.refTableName &&
+        keyedMysqlColumnDefinitions[compareKey].constraintName
+      ) {
+        metaColumnDefinition.constraintType = CONSTRAINT_STATUS.MYSQL_REDUNDANCY
+      }
+
+      /**
+       * (meta有约束 mysql有约束)(冲突!)
+       * meta定义的约束和数据库里的约束有冲突，需要删除数据库里的约束并重建约束
+       */
+      if (
+        metaColumnDefinition.refTableName &&
+        metaColumnDefinition.refTableName !==
+          keyedMysqlColumnDefinitions[compareKey].refTableName
+      ) {
+        // 数据库的定义和meta的定义有冲突
+        metaColumnDefinition.constraintType = CONSTRAINT_STATUS.CONFLICT
+
+        /**
+         * 判断外键约束是否会产生冲突 TODO: 在组织definition的时候做
+         */
+        /*
+        if (!columnDefinition) {
+          const projectConnection = await this.getProjectConnection(
+            table.projectId,
+          )
+          const count: any = await projectConnection.query(
+            `select count(id) as count 
+               from \`${metaColumnDefinition.tableName}\` 
+               where \`${metaColumnDefinition.columnName}\` not in (
+                          select id from \`${metaColumnDefinition.refTableName}\`
+                      ) and \`${metaColumnDefinition.columnName}\` is not null;`,
+            { type: QueryTypes.SELECT },
+          )
+
+          if (count[0].count > 0) {
+            metaColumnDefinition.constraintDataConflict = true
+          }
+        }
+        */
+      }
+
+      const migrateSql = this.syncSqlBuilder({
+        metaColumnDefinition,
+        mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
+      })
+
+      resObj = resObj.concat(migrateSql)
+    }
+
+    /**
+     * # meta里没有 mysql里有
+     *
+     * 如果mysql字段上有约束是否可以直接删除约束
+     */
+    for (const [_, mysqlDef] of Object.entries(keyedMysqlColumnDefinitions)) {
+      if (
+        !mysqlDef.hasTouched &&
+        ignoreColumns.indexOf(mysqlDef.columnName) === -1 // 去掉不需要比对的系统保留字段 TODO: 上线gloria的记录所有字段的版本后不需要这个条件
+      ) {
+        if (mysqlDef.constraintName) {
+          mysqlDef.constraintType = CONSTRAINT_STATUS.MYSQL_REDUNDANCY
+        }
+
+        const migrateSql = this.syncSqlBuilder({
+          mysqlColumnDefinition: mysqlDef,
+        })
+
+        resObj = resObj.concat(migrateSql)
       }
     }
 
-    // return {
-    //   syncSqls,
-    //   error,
-    //   syncReasonCodes,
-    //   errorReasonSql,
+    return resObj
+  }
+
+  public async getMetaDefinitions(
+    tableId: number,
+    projectId?: number,
+  ): Promise<COLUMN_DEFINITION[]> {
+    // const table = await this.metaTableService.findOneMetaTable(tableId)
+
+    // if (!table) {
+    //   throw new Error('empty table')
     // }
-    return syncSqls.map((syncSql) => ({
-      sql: syncSql,
-      error,
-      code: syncReasonCodes,
-      errorReasonSql: errorReasonSql.join(','),
-    }))
+    // console.log(tableId === undefined, tableId, '-----')
+
+    const condition: FindAllMetaColumnRequestDTO = { skipPaging: true }
+
+    if (tableId) {
+      condition.tableId = tableId
+    }
+
+    if (projectId) {
+      condition['table.projectId'] = projectId
+    }
+
+    const metaColumns = await this.metaColumnService.findAllMetaColumn(
+      condition,
+    )
+
+    // 获取MetaColumn中的字段定义
+    const metaColumnDefinitions: COLUMN_DEFINITION[] = metaColumns.rows
+      .filter((row) => row.dataType.category !== 'system')
+      .map((column) => ({
+        tableName: column.table.name,
+        columnName: column.name,
+        allowNull: column.allowNull ? 1 : 0,
+        dataType: this.getDataTypeSynonym(column.mysqlDataType),
+        defaultValue:
+          column.defaultValue === 'false'
+            ? '0'
+            : column.defaultValue === 'true'
+            ? '1'
+            : column.defaultValue === null
+            ? ''
+            : column.defaultValue,
+        columnComment: column.comment,
+        refTableName: column.refTable?.name,
+        refColumnName: column.refTable ? 'id' : '',
+        constraintName: '',
+        hasTouched: 0,
+        columnModifiedItem: 0,
+        constraintType: CONSTRAINT_STATUS.NOT_APPLICABLE,
+        constraintDataConflict: false,
+      }))
+
+    return metaColumnDefinitions
+  }
+
+  public getMysqlDefinitions(mysqlColumnDefinitions: COLUMN_DEFINITION[]) {
+    for (const mysqlColumnDefinition of mysqlColumnDefinitions) {
+      mysqlColumnDefinition.dataType = this.getDataTypeSynonym(
+        mysqlColumnDefinition.dataType,
+      )
+      if (mysqlColumnDefinition.defaultValue === null) {
+        mysqlColumnDefinition.defaultValue = ''
+      }
+    }
+
+    return mysqlColumnDefinitions
   }
 
   /**
@@ -368,55 +576,21 @@ export class DBSyncService {
    *  @prarm {string} ignoreColumns - 不需要比对的系统保留字段 TODO: 现在是写死的，以后需要判断这个表是从哪个表继承的
    *  @return
    */
-  async getColumnDiffs(
-    tableId: number,
-    columnDefinition?: COLUMN_DEFINITION[],
-    ignoreColumns: string = 'syncKey,deleted,createdAt,updatedAt,id,isActive',
-  ): Promise<SYNC_RESULT[]> {
-    let resObj: SYNC_RESULT[] = []
-
+  async getColumnDiffs(tableId: number): Promise<SYNC_RESULT[]> {
     const table = await this.metaTableService.findOneMetaTable(tableId)
 
     if (!table) {
       throw new Error('empty table')
     }
 
-    // 获取MetaColumn中的字段定义
-    const metaColumnDefinitions: COLUMN_DEFINITION[] = (
-      await this.metaColumnService.findAllMetaColumn({
-        skipPaging: true,
-        tableId,
-      })
-    ).rows
-      .filter((row) => row.dataType.category !== 'system')
-      .map((column) => ({
-        tableName: column.table.name,
-        columnName: column.name,
-        allowNull: column.allowNull ? 1 : 0,
-        dataType: column.mysqlDataType,
-        defaultValue: column.defaultValue,
-        columnComment: column.comment,
-        refTableName: column.refTable?.name,
-        refColumnName: 'id',
-        constraintName: '',
-        hasTouched: 0,
-        constraintType: CONSTRAINT_COMPARE_TYPE.NOT_APPLICABLE,
-        constraintDataConflict: false,
-      }))
+    // 获取meta中的字段定义
+    const metaColumnDefinitions = await this.getMetaDefinitions(tableId)
 
-    // 数据库中的字段定义
-    let mysqlColumnDefinitions: COLUMN_DEFINITION[]
+    // 获取数据库中的字段定义
+    const projectConnection = await this.getProjectConnection(table.project.id)
 
-    /**
-     * 初始化从数据库中获取的真实的字段定义，如果没有从外部传入则直接查询(开发模式下可以直接查询)
-     */
-    if (columnDefinition) {
-      mysqlColumnDefinitions = columnDefinition
-    } else {
-      const projectConnection = await this.getProjectConnection(table.projectId)
-
-      // 获取数据库中的字段定义
-      mysqlColumnDefinitions = await projectConnection.query<COLUMN_DEFINITION>(
+    const mysqlColumnDefinitions =
+      await projectConnection.query<COLUMN_DEFINITION>(
         this.mysqlDefinitionSQL,
         {
           replacements: [
@@ -427,162 +601,11 @@ export class DBSyncService {
           type: QueryTypes.SELECT,
         },
       )
-    }
 
-    // 将数据库中的字段定义按照 tableName-columnName 为key, 组成hash, 方便比较
-    const keyedMysqlColumnDefinitions = _.keyBy(
-      mysqlColumnDefinitions,
-      (definition: any) => `${definition.tableName}-${definition.columnName}`,
+    return this.getMigrateSql(
+      metaColumnDefinitions,
+      this.getMysqlDefinitions(mysqlColumnDefinitions),
     )
-
-    for (const metaColumnDefinition of metaColumnDefinitions) {
-      const compareKey = `${metaColumnDefinition.tableName}-${metaColumnDefinition.columnName}`
-
-      if (compareKey in keyedMysqlColumnDefinitions) {
-        /**
-         * 比较metaColumnDefinition和mysqlColumnDefinition中的字段
-         * 如果 数据类型/空/默认值/字段注释 有不同则生成migrate语句
-         */
-        if (
-          metaColumnDefinition.dataType !==
-            keyedMysqlColumnDefinitions[compareKey].dataType ||
-          metaColumnDefinition.allowNull !==
-            keyedMysqlColumnDefinitions[compareKey].allowNull ||
-          metaColumnDefinition.defaultValue !==
-            keyedMysqlColumnDefinitions[compareKey].defaultValue ||
-          metaColumnDefinition.columnComment !==
-            keyedMysqlColumnDefinitions[compareKey].columnComment
-        ) {
-          const migrateSql = this.syncSqlBuilder({
-            metaColumnDefinition,
-            mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          })
-
-          resObj = resObj.concat(migrateSql)
-        }
-
-        keyedMysqlColumnDefinitions[compareKey].hasTouched = true
-
-        // 查找是否有依赖关系不匹配的
-        if (
-          keyedMysqlColumnDefinitions[compareKey].constraintName &&
-          !metaColumnDefinition.refTableName
-        ) {
-          // 如果数据库有meta没有，则删除多余的依赖关系
-          metaColumnDefinition.constraintType =
-            CONSTRAINT_COMPARE_TYPE.MYSQL_REDUNDANCY
-
-          const migrateSql = this.syncSqlBuilder({
-            metaColumnDefinition,
-            mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          })
-
-          resObj = resObj.concat(migrateSql)
-        } else if (
-          metaColumnDefinition.refTableName &&
-          metaColumnDefinition.refTableName !==
-            keyedMysqlColumnDefinitions[compareKey].refTableName
-        ) {
-          // 数据库的定义和meta的定义有冲突
-          metaColumnDefinition.constraintType = CONSTRAINT_COMPARE_TYPE.CONFLICT
-
-          /**
-           * 判断外键约束是否会产生冲突
-           */
-          if (!columnDefinition) {
-            const projectConnection = await this.getProjectConnection(
-              table.projectId,
-            )
-            const count: any = await projectConnection.query(
-              `select count(id) as count 
-               from \`${metaColumnDefinition.tableName}\` 
-               where \`${metaColumnDefinition.columnName}\` not in (
-                          select id from \`${metaColumnDefinition.refTableName}\`
-                      ) and \`${metaColumnDefinition.columnName}\` is not null;`,
-              { type: QueryTypes.SELECT },
-            )
-
-            if (count[0].count > 0) {
-              metaColumnDefinition.constraintDataConflict = true
-            }
-          }
-
-          const migrateSql = this.syncSqlBuilder({
-            metaColumnDefinition,
-            mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          })
-
-          resObj = resObj.concat(migrateSql)
-        }
-      } else {
-        const migrateSql = this.syncSqlBuilder({
-          metaColumnDefinition,
-          mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-        })
-
-        resObj = resObj.concat(migrateSql)
-
-        // 查找是否有依赖关系，如果有，则添加依赖关系
-        if (metaColumnDefinition.refTableName) {
-          metaColumnDefinition.constraintType =
-            CONSTRAINT_COMPARE_TYPE.MYSQL_ABSENT
-          const migrateSql = this.syncSqlBuilder({
-            metaColumnDefinition,
-            mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
-          })
-          resObj = resObj.concat(migrateSql)
-        }
-      }
-    }
-
-    // 处理metaColumn中不存在的字段，但数据库中存在的字段。(需删除)
-    for (const i in keyedMysqlColumnDefinitions) {
-      if (
-        !keyedMysqlColumnDefinitions[i].hasTouched &&
-        ignoreColumns.indexOf(keyedMysqlColumnDefinitions[i].columnName) === -1 // 去掉不需要比对的系统保留字段
-      ) {
-        const migrateSql = this.syncSqlBuilder({
-          mysqlColumnDefinition: keyedMysqlColumnDefinitions[i],
-        })
-
-        resObj = resObj.concat(migrateSql)
-      }
-    }
-
-    // 在resObj上增加id
-    let num = 1
-
-    for (const resobj of resObj) {
-      resobj.id = num
-      num += 1
-    }
-
-    return resObj
-  }
-
-  async getColumnDiffsbyJson(json: any): Promise<any> {
-    const projectId = json.projectId
-    const columnDefinitions = json.columnDefinitions
-    let result = {}
-    for (let key in columnDefinitions) {
-      if (columnDefinitions.hasOwnProperty(key)) {
-        const tableName = key
-        // 根据tableName获取tableId
-        const table = await this.metaTableService.findOneByName(
-          tableName,
-          projectId,
-        )
-
-        // 如果找到table里，则比对字段的区别
-        if (table[0]) {
-          result[key] = await this.getColumnDiffs(
-            table[0].id,
-            columnDefinitions[key],
-          )
-        }
-      }
-    }
-    return result
   }
 
   /**
@@ -605,7 +628,9 @@ export class DBSyncService {
       type: QueryTypes.RAW,
     })
 
-    this.logger.debug(`executionSql - result: ${result}`)
+    this.logger.debug(
+      `executionSql - result: ${JSON.stringify(result, null, 2)}`,
+    )
 
     await this.dbMigrateLogService.create({ sql, tableId })
 
@@ -669,3 +694,234 @@ export class DBSyncService {
     }
   }
 }
+
+// async getColumnDiffs(
+//   tableId: number,
+//   columnDefinition?: COLUMN_DEFINITION[],
+//   ignoreColumns: string = 'syncKey,deleted,createdAt,updatedAt,id,isActive',
+// ): Promise<SYNC_RESULT[]> {
+//   let resObj: SYNC_RESULT[] = []
+
+//   const table = await this.metaTableService.findOneMetaTable(tableId)
+
+//   if (!table) {
+//     throw new Error('empty table')
+//   }
+
+//   // 获取MetaColumn中的字段定义
+//   const metaColumnDefinitions: COLUMN_DEFINITION[] = (
+//     await this.metaColumnService.findAllMetaColumn({
+//       skipPaging: true,
+//       tableId,
+//     })
+//   ).rows
+//     .filter((row) => row.dataType.category !== 'system')
+//     .map((column) => ({
+//       tableName: column.table.name,
+//       columnName: column.name,
+//       allowNull: column.allowNull ? 1 : 0,
+//       dataType: column.mysqlDataType,
+//       defaultValue: column.defaultValue,
+//       columnComment: column.comment,
+//       refTableName: column.refTable?.name,
+//       refColumnName: 'id',
+//       constraintName: '',
+//       hasTouched: 0,
+//       columnModifiedItem: 0,
+//       constraintType: CONSTRAINT_STATUS.NOT_APPLICABLE,
+//       constraintDataConflict: false,
+//     }))
+
+//   // 数据库中的字段定义
+//   let mysqlColumnDefinitions: COLUMN_DEFINITION[]
+
+//   /**
+//    * 初始化从数据库中获取的真实的字段定义，如果没有从外部传入则直接查询(开发模式下可以直接查询)
+//    */
+//   if (columnDefinition) {
+//     mysqlColumnDefinitions = columnDefinition
+//   } else {
+//     const projectConnection = await this.getProjectConnection(table.projectId)
+
+//     // 获取数据库中的字段定义
+//     mysqlColumnDefinitions = await projectConnection.query<COLUMN_DEFINITION>(
+//       this.mysqlDefinitionSQL,
+//       {
+//         replacements: [
+//           table.project.dbName,
+//           table.name,
+//           table.project.dbName,
+//         ],
+//         type: QueryTypes.SELECT,
+//       },
+//     )
+//   }
+
+//   // 将数据库中的字段定义按照 tableName-columnName 为key, 组成hash, 方便比较
+//   const keyedMysqlColumnDefinitions = _.keyBy(
+//     mysqlColumnDefinitions,
+//     (definition: any) => `${definition.tableName}-${definition.columnName}`,
+//   ) as { [key: string]: COLUMN_DEFINITION }
+
+//   for (const metaColumnDefinition of metaColumnDefinitions) {
+//     const compareKey = `${metaColumnDefinition.tableName}-${metaColumnDefinition.columnName}`
+
+//     keyedMysqlColumnDefinitions[compareKey].hasTouched = 1
+
+//     if (!(compareKey in keyedMysqlColumnDefinitions)) {
+//       // mysql里没有这个字段则需要加字段以及加约束
+//       if (metaColumnDefinition.refTableName) {
+//         metaColumnDefinition.constraintType = CONSTRAINT_STATUS.MYSQL_ABSENT
+//       }
+//       continue
+//     }
+
+//     /**
+//      * # meta和mysql里都存在这个字段
+//      */
+//     /**
+//      * ## 字段处理
+//      */
+//     if (
+//       metaColumnDefinition.dataType !==
+//       keyedMysqlColumnDefinitions[compareKey].dataType
+//     ) {
+//       metaColumnDefinition.columnModifiedItem += 1
+//     }
+
+//     if (
+//       metaColumnDefinition.allowNull !==
+//       keyedMysqlColumnDefinitions[compareKey].allowNull
+//     ) {
+//       metaColumnDefinition.columnModifiedItem += 2
+//     }
+
+//     if (
+//       metaColumnDefinition.defaultValue !==
+//       keyedMysqlColumnDefinitions[compareKey].defaultValue
+//     ) {
+//       metaColumnDefinition.columnModifiedItem += 4
+//     }
+
+//     if (
+//       metaColumnDefinition.columnComment !==
+//       keyedMysqlColumnDefinitions[compareKey].columnComment
+//     ) {
+//       metaColumnDefinition.columnModifiedItem += 8
+//     }
+
+//     /**
+//      * ## 约束处理
+//      */
+//     /**
+//      * (meta无约束 mysql有约束)
+//      * 需要drop contraint
+//      */
+//     if (
+//       !metaColumnDefinition.refTableName &&
+//       keyedMysqlColumnDefinitions[compareKey].constraintName
+//     ) {
+//       metaColumnDefinition.constraintType = CONSTRAINT_STATUS.MYSQL_REDUNDANCY
+//     }
+
+//     /**
+//      * (meta有约束 mysql有约束)(冲突!)
+//      * meta定义的约束和数据库里的约束有冲突，需要删除数据库里的约束并重建约束
+//      */
+//     if (
+//       metaColumnDefinition.refTableName &&
+//       metaColumnDefinition.refTableName !==
+//         keyedMysqlColumnDefinitions[compareKey].refTableName
+//     ) {
+//       // 数据库的定义和meta的定义有冲突
+//       metaColumnDefinition.constraintType = CONSTRAINT_STATUS.CONFLICT
+
+//       /**
+//        * 判断外键约束是否会产生冲突
+//        */
+//       /*
+//       if (!columnDefinition) {
+//         const projectConnection = await this.getProjectConnection(
+//           table.projectId,
+//         )
+//         const count: any = await projectConnection.query(
+//           `select count(id) as count
+//              from \`${metaColumnDefinition.tableName}\`
+//              where \`${metaColumnDefinition.columnName}\` not in (
+//                         select id from \`${metaColumnDefinition.refTableName}\`
+//                     ) and \`${metaColumnDefinition.columnName}\` is not null;`,
+//           { type: QueryTypes.SELECT },
+//         )
+
+//         if (count[0].count > 0) {
+//           metaColumnDefinition.constraintDataConflict = true
+//         }
+//       }
+//       */
+//     }
+
+//     const migrateSql = this.syncSqlBuilder({
+//       metaColumnDefinition,
+//       mysqlColumnDefinition: keyedMysqlColumnDefinitions[compareKey],
+//     })
+
+//     resObj = resObj.concat(migrateSql)
+//   }
+
+//   /**
+//    * # meta里没有 mysql里有
+//    *
+//    * 如果mysql字段上有约束是否可以直接删除约束
+//    */
+//   for (const [_, mysqlDef] of Object.entries(keyedMysqlColumnDefinitions)) {
+//     if (
+//       !mysqlDef.hasTouched &&
+//       ignoreColumns.indexOf(mysqlDef.columnName) === -1 // 去掉不需要比对的系统保留字段 TODO: 上线gloria的记录所有字段的版本后不需要这个条件
+//     ) {
+//       if (mysqlDef.constraintName) {
+//         mysqlDef.constraintType = CONSTRAINT_STATUS.MYSQL_REDUNDANCY
+//       }
+
+//       const migrateSql = this.syncSqlBuilder({
+//         mysqlColumnDefinition: mysqlDef,
+//       })
+
+//       resObj = resObj.concat(migrateSql)
+//     }
+//   }
+
+//   // 在resObj上增加id
+//   let num = 1
+
+//   for (const resobj of resObj) {
+//     resobj.id = num
+//     num += 1
+//   }
+
+//   return resObj
+// }
+
+// async getColumnDiffsbyJson(json: any): Promise<any> {
+//   const projectId = json.projectId
+//   const columnDefinitions = json.columnDefinitions
+//   let result = {}
+//   for (let key in columnDefinitions) {
+//     if (columnDefinitions.hasOwnProperty(key)) {
+//       const tableName = key
+//       // 根据tableName获取tableId
+//       const table = await this.metaTableService.findOneByName(
+//         tableName,
+//         projectId,
+//       )
+
+//       // 如果找到table里，则比对字段的区别
+//       if (table[0]) {
+//         result[key] = await this.getColumnDiffs(
+//           table[0].id,
+//           columnDefinitions[key],
+//         )
+//       }
+//     }
+//   }
+//   return result
+// }
