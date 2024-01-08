@@ -6,6 +6,7 @@ import { MetaColumnService } from '../../base/services/meta.column.service'
 import { MetaProjectService } from '../../base/services/meta.project.service'
 import _ from 'lodash'
 import { DbMigrateLogService } from './../../base/services/db.migrate.log.service'
+import { FindAllMetaColumnRequestDTO } from './../../base/dto'
 
 export type SYNC_RESULT = {
   sql: string
@@ -245,7 +246,7 @@ export class DBSyncService {
       ) {
         // 如果有约束，需要先删除约束
         result.push({
-          sql: `ALTER TABLE \`${tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName}`,
+          sql: `ALTER TABLE \`${comparedDefinition.mysqlColumnDefinition.tableName}\` DROP FOREIGN KEY ${comparedDefinition.mysqlColumnDefinition.constraintName}`,
           code: SYNC_REASON.SYNC_CONSTRAINT_DROP,
           reason: this.getSyncReasonByCode(SYNC_REASON.SYNC_CONSTRAINT_DROP),
         })
@@ -412,9 +413,9 @@ export class DBSyncService {
       ) {
         metaColumnDefinition.columnModifiedItem += 8
       }
-      // console.log(
-      //   `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} '${metaColumnDefinition.defaultValue}' '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
-      // )
+      console.log(
+        `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} '${metaColumnDefinition.defaultValue}' '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
+      )
 
       /**
        * ## 约束处理
@@ -501,17 +502,28 @@ export class DBSyncService {
 
   public async getMetaDefinitions(
     tableId: number,
+    projectId?: number,
   ): Promise<COLUMN_DEFINITION[]> {
-    const table = await this.metaTableService.findOneMetaTable(tableId)
+    // const table = await this.metaTableService.findOneMetaTable(tableId)
 
-    if (!table) {
-      throw new Error('empty table')
+    // if (!table) {
+    //   throw new Error('empty table')
+    // }
+    // console.log(tableId === undefined, tableId, '-----')
+
+    const condition: FindAllMetaColumnRequestDTO = { skipPaging: true }
+
+    if (tableId) {
+      condition.tableId = tableId
     }
 
-    const metaColumns = await this.metaColumnService.findAllMetaColumn({
-      skipPaging: true,
-      tableId,
-    })
+    if (projectId) {
+      condition['table.projectId'] = projectId
+    }
+
+    const metaColumns = await this.metaColumnService.findAllMetaColumn(
+      condition,
+    )
 
     // 获取MetaColumn中的字段定义
     const metaColumnDefinitions: COLUMN_DEFINITION[] = metaColumns.rows
@@ -526,6 +538,8 @@ export class DBSyncService {
             ? '0'
             : column.defaultValue === 'true'
             ? '1'
+            : column.defaultValue === null
+            ? ''
             : column.defaultValue,
         columnComment: column.comment,
         refTableName: column.refTable?.name,
@@ -545,7 +559,6 @@ export class DBSyncService {
       mysqlColumnDefinition.dataType = this.getDataTypeSynonym(
         mysqlColumnDefinition.dataType,
       )
-      console.log(mysqlColumnDefinition)
       if (mysqlColumnDefinition.defaultValue === null) {
         mysqlColumnDefinition.defaultValue = ''
       }

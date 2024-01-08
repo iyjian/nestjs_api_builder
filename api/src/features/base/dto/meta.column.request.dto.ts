@@ -359,6 +359,12 @@ export class UpdateMetaColumnRequestDTO {
 }
 
 export class FindAllMetaColumnRequestDTO extends PagingRequestDTO {
+  @ApiProperty({
+    description: '项目id',
+    required: false,
+  })
+  'table.projectId'?: number
+
   @codeGen('3151')
   @ApiProperty({
     description: '字段名',

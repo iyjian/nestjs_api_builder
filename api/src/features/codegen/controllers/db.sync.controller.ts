@@ -30,8 +30,11 @@ export class DBSyncController {
    * @returns
    */
   @Get('column/definition/meta')
-  getMetaDefinitions(@Query('tableId') tableId: number) {
-    return this.dbSyncService.getMetaDefinitions(+tableId)
+  getMetaDefinitions(
+    @Query('tableId') tableId: number,
+    @Query('projectId') projectId?: number,
+  ) {
+    return this.dbSyncService.getMetaDefinitions(tableId, projectId)
   }
 
   /**
