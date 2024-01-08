@@ -25,7 +25,7 @@ export enum CONSTRAINT_STATUS {
   NOT_APPLICABLE = 0,
 }
 
-type COLUMN_DEFINITION = {
+export type COLUMN_DEFINITION = {
   tableName: string
   columnName: string
   allowNull: number
@@ -155,15 +155,15 @@ export class DBSyncService {
       config.host !== project.dbHost ||
       config.port !== project.dbPort
     ) {
-      console.log({
-        host: project.dbHost,
-        dialect: 'mysql',
-        database: project.dbName,
-        username: project.dbUser,
-        password: project.dbPassword,
-        port: parseInt(project.dbPort),
-        logging: false,
-      })
+      // console.log({
+      //   host: project.dbHost,
+      //   dialect: 'mysql',
+      //   database: project.dbName,
+      //   username: project.dbUser,
+      //   password: project.dbPassword,
+      //   port: parseInt(project.dbPort),
+      //   logging: false,
+      // })
 
       // 如果没有初始化过数据库链接或者数据库链接的参数变了则初始化数据库链接
       this.targetDBConnections[projectId] = new Sequelize({
@@ -413,7 +413,7 @@ export class DBSyncService {
         metaColumnDefinition.columnModifiedItem += 8
       }
       // console.log(
-      //   `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} ${metaColumnDefinition.defaultValue} '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
+      //   `compareKey: ${compareKey} columnModifiedItem: ${metaColumnDefinition.columnModifiedItem} '${metaColumnDefinition.defaultValue}' '${keyedMysqlColumnDefinitions[compareKey].defaultValue}'`,
       // )
 
       /**
@@ -540,27 +540,12 @@ export class DBSyncService {
     return metaColumnDefinitions
   }
 
-  public async getMysqlDefinitions(
-    projectId: number,
-    dbName: string,
-    tableName: string,
-  ) {
-    const projectConnection = await this.getProjectConnection(projectId)
-
-    // 获取数据库中的字段定义
-    const mysqlColumnDefinitions =
-      await projectConnection.query<COLUMN_DEFINITION>(
-        this.mysqlDefinitionSQL,
-        {
-          replacements: [dbName, tableName, dbName],
-          type: QueryTypes.SELECT,
-        },
-      )
-
+  public getMysqlDefinitions(mysqlColumnDefinitions: COLUMN_DEFINITION[]) {
     for (const mysqlColumnDefinition of mysqlColumnDefinitions) {
       mysqlColumnDefinition.dataType = this.getDataTypeSynonym(
         mysqlColumnDefinition.dataType,
       )
+      console.log(mysqlColumnDefinition)
       if (mysqlColumnDefinition.defaultValue === null) {
         mysqlColumnDefinition.defaultValue = ''
       }
@@ -585,14 +570,29 @@ export class DBSyncService {
       throw new Error('empty table')
     }
 
+    // 获取meta中的字段定义
     const metaColumnDefinitions = await this.getMetaDefinitions(tableId)
-    const mysqlColumnDefinitions = await this.getMysqlDefinitions(
-      table.project.id,
-      table.project.dbName,
-      table.name,
-    )
 
-    return this.getMigrateSql(metaColumnDefinitions, mysqlColumnDefinitions)
+    // 获取数据库中的字段定义
+    const projectConnection = await this.getProjectConnection(table.project.id)
+
+    const mysqlColumnDefinitions =
+      await projectConnection.query<COLUMN_DEFINITION>(
+        this.mysqlDefinitionSQL,
+        {
+          replacements: [
+            table.project.dbName,
+            table.name,
+            table.project.dbName,
+          ],
+          type: QueryTypes.SELECT,
+        },
+      )
+
+    return this.getMigrateSql(
+      metaColumnDefinitions,
+      this.getMysqlDefinitions(mysqlColumnDefinitions),
+    )
   }
 
   /**
