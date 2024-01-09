@@ -160,9 +160,7 @@
         <template v-for="(column, columnIndex) in table.columns">
           <div class="table-row" v-if="!column.isEnable && column.dataType?.dataType != 'vrelation'">
             <!-- 表的基本定义 -->
-            <TableRow v-model="table.columns[columnIndex]"  :groupedDataTypes="groupedDataTypes" :dataTypeByDataTypeId="dataTypeByDataTypeId"
-                @open-setting="openSetting" @delete-column="deleteColumn" />
-
+            <TableRow v-model="table.columns[columnIndex]"  :groupedDataTypes="groupedDataTypes" :dataTypeByDataTypeId="dataTypeByDataTypeId"/>
           </div>
 
         </template>

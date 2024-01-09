@@ -50,7 +50,8 @@ const columnTemplate: Column = {
 function createDefaultColumn(
   name: string,
   dataTypeId: number,
-  defaultValue: string
+  defaultValue: string,
+  order: number
 ): Column {
   return {
     name,
@@ -60,12 +61,12 @@ function createDefaultColumn(
     refTableId: undefined,
     defaultValue,
     enumKeys: "",
-    isEnable: true,
+    isEnable: false,
     searchable: false,
     findable: true,
     createable: false,
     updateable: true,
-    order: 0,
+    order,
     getCode: "",
     setCode: "",
     enumTypeCode: "",
@@ -361,40 +362,39 @@ export const projectTableStore = defineStore("projectTable", {
     },
 
     /**
-     * 加表格中的默认列 isActive, createAt, updateAt
+     * 加表格中的默认列 id, syncKey, isActive, createdAt, updatedAt
      */
     addDefaultColumn() {
-      if (this.isTableValid) {
-        if (this.table.columns.length === 0) {
-          const defaultColumns = [
-            { name: "id", dataType: 1, defaultValue: "" },
-            { name: "syncKey", dataType: 4, defaultValue: "" },
-            { name: "isActive", dataType: 5, defaultValue: "1" },
-            { name: "createdAt", dataType: 6, defaultValue: "" },
-            { name: "updatedAt", dataType: 6, defaultValue: "" },
-            { name: "deletedAt", dataType: 6, defaultValue: "" },
-            { name: "version", dataType: 1, defaultValue: "" },
-          ];
-
-          defaultColumns.forEach((defaultColumn) => {
-            this.addColumn(
-              _.extend(
-                _.clone(
-                  createDefaultColumn(
-                    defaultColumn.name,
-                    defaultColumn.dataType,
-                    defaultColumn.defaultValue
-                  )
-                ),
-                {
-                  order: this.totalColumns + 1,
-                  isEnable: false,
-                }
-              )
-            );
-          });
-        }
+      if (!this.isTableValid) {
+        console.debug("this table is not valid");
+        return;
       }
+
+      if (this.table.columns.length > 0) {
+        console.debug("this is not a new table");
+        return;
+      }
+
+      const defaultColumns = [
+        { name: "id", dataType: 1, defaultValue: "" },
+        { name: "syncKey", dataType: 4, defaultValue: "" },
+        { name: "isActive", dataType: 5, defaultValue: "1" },
+        { name: "createdAt", dataType: 6, defaultValue: "" },
+        { name: "updatedAt", dataType: 6, defaultValue: "" },
+      ];
+
+      defaultColumns.forEach((defaultColumn) => {
+        const newColumn = _.clone(
+          createDefaultColumn(
+            defaultColumn.name,
+            defaultColumn.dataType,
+            defaultColumn.defaultValue,
+            this.totalColumns + 1
+          )
+        );
+
+        this.addColumn(newColumn);
+      });
     },
 
     /**
