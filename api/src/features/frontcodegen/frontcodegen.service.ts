@@ -436,7 +436,7 @@ export class FrontcodegenService {
             );
             table.value.loading = false;
           } catch (e) {
-            table.loading = false;
+            table.value.loading = false;
           }
         }
 
