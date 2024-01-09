@@ -383,18 +383,16 @@ export const projectTableStore = defineStore("projectTable", {
         { name: "updatedAt", dataType: 6, defaultValue: "" },
       ];
 
-      defaultColumns.forEach((defaultColumn) => {
-        const newColumn = _.clone(
-          createDefaultColumn(
-            defaultColumn.name,
-            defaultColumn.dataType,
-            defaultColumn.defaultValue,
-            this.totalColumns + 1
-          )
+      for (const defaultColumn of defaultColumns) {
+        const newColumn = createDefaultColumn(
+          defaultColumn.name,
+          defaultColumn.dataType,
+          defaultColumn.defaultValue,
+          this.totalColumns + 1
         );
 
         this.addColumn(newColumn);
-      });
+      }
     },
 
     /**
