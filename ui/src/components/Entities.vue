@@ -137,7 +137,6 @@ export default defineComponent({
   data() {
     return {
       PlusIcon,
-      // projectId: undefined,
       tables: [],
       search: "",
       moment,

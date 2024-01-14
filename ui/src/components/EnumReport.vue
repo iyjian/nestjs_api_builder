@@ -99,7 +99,6 @@ export default defineComponent({
         return store.currentProjectId;
       },
       set(projectId: number) {
-        // store.commit("setCurrentProjectId", projectId);
         store.setCurrentProjectId(projectId);
       },
     },
