@@ -33,6 +33,14 @@ export class CreateUserRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isAdmin?: boolean
+
+  @codeGen('9611')
+  @ApiProperty({
+    description: 'gitlab组id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  namespaceId?: number
 }
 
 export class UpdateUserRequestDTO {
@@ -65,6 +73,14 @@ export class UpdateUserRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isAdmin?: boolean
+
+  @codeGen('9611')
+  @ApiProperty({
+    description: 'gitlab组id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  namespaceId?: number
 }
 
 export class FindOneUserRequestDTO {
@@ -97,6 +113,14 @@ export class FindOneUserRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isAdmin?: boolean
+
+  @codeGen('9611')
+  @ApiProperty({
+    description: 'gitlab组id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  namespaceId?: number
 }
 
 export class FindAllUserRequestDTO extends PagingRequestDTO {
@@ -129,4 +153,12 @@ export class FindAllUserRequestDTO extends PagingRequestDTO {
   })
   @Transform(getTransformer('booleanTransformer'))
   isAdmin?: boolean
+
+  @codeGen('9611')
+  @ApiProperty({
+    description: 'gitlab组id',
+    required: false,
+  })
+  @Transform(getTransformer('numberTransformer'))
+  namespaceId?: number
 }
