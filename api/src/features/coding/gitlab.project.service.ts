@@ -38,10 +38,11 @@ export class GitlabProjectService {
     templateProjectId: number = this.templateProjectId,
     visibility: string = 'private',
     namespaceId: number = this.namespaceId,
+    templateProjectBranch: string = 'main',
     cb?: (project: Types.ProjectExtendedSchema) => void,
   ): Promise<Types.ProjectExtendedSchema> {
     this.logger.debug(
-      `createProject - projectName: ${projectName} templateProjectId: ${templateProjectId} visibility: ${visibility} namespaceId: ${namespaceId}`,
+      `createProject - projectName: ${projectName} templateProjectId: ${templateProjectId} visibility: ${visibility} namespaceId: ${namespaceId} templateProjectBranch: ${templateProjectBranch}`,
     )
 
     const project = await this.gitlabClient.Projects.create({
@@ -56,7 +57,7 @@ export class GitlabProjectService {
         // 从模板项目的main分支中提取代码
         const commitFiles = await this.gitService.getFilesContent(
           templateProjectId,
-          'main',
+          templateProjectBranch,
           '',
           true,
         )

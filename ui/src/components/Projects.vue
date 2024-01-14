@@ -108,7 +108,6 @@ const DEFAULT_POST_DATA = {
   repo: "",
   name: "",
   repoName: "",
-  projectName: "",
   version: "2",
 };
 
