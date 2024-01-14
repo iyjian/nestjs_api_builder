@@ -3,7 +3,7 @@ version: "3.5"
 services:
   api:
     # image: iyjian/nestjs-builder-api  
-    image: iyjian-docker.pkg.coding.net/jcjy/docker/nestjs-builder-api:${IMAGE_TAG}
+    image: iyjian-docker.pkg.coding.net/jcjy/docker/nestjs-builder-api:feat-fullcolumns
     # image: iyjian/api
     # build:
     #   context: ./api    
@@ -14,7 +14,7 @@ services:
       - ./api/.env
   ui:
     # image: iyjian/nestjs-builder-ui
-    image: iyjian-docker.pkg.coding.net/jcjy/docker/nestjs-builder-ui:${IMAGE_TAG}
+    image: iyjian-docker.pkg.coding.net/jcjy/docker/nestjs-builder-ui:feat-fullcolumns
     # image: iyjian/devfront
     # build:
     #   context: ./ui
