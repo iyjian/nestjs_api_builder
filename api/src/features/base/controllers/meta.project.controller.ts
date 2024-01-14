@@ -49,7 +49,7 @@ export class MetaProjectController {
 
     await this.projectPriviledgeService.create({
       projectId: metaProject.id,
-      userId: user.id,
+      userId: user.userId,
     })
 
     // 异步创建gitlab仓库代码

@@ -166,7 +166,7 @@ export class MetaTableService extends BaseService {
       findAllQueryMetaTable
 
       payload[Op.and] = this.mysql.literal(
-        `MetaProject.id in (select projectId from t_project_priviledge where userId = ${user.id})`,
+        `MetaProject.id in (select projectId from t_project_priviledge where userId = ${user.userId})`,
       )
 
     const metaTables = await this.metaTableModel.findAndCountAll({
