@@ -4,8 +4,7 @@
       v-for="(label, idx) in labels"
       :key="idx"
       :label="label"
-      :name="label"
-    >
+      :name="label">
       <div class="codeMirrorWrapper">
         <template v-if="label !== 'relation' && codesByLabel[label]">
           <div>
@@ -18,8 +17,7 @@
             v-model:value="codesByLabel[label].showContent"
             :options="codesByLabel[label].codeMirrorOptions"
             border
-            @ready="(cm: any) => onCodeMirrorReady(cm, codesByLabel[label].label)"
-          />
+            @ready="(cm: any) => onCodeMirrorReady(cm, codesByLabel[label].label)" />
         </template>
       </div>
     </el-tab-pane>
@@ -30,8 +28,7 @@
           parentNodeId="0-0"
           :node="relations"
           :load="loadRelation"
-          @tree-updated="RelationTreeUpdated"
-        ></RelationTree>
+          @tree-updated="RelationTreeUpdated"></RelationTree>
       </div>
     </el-tab-pane>
     <el-tab-pane label="one" name="one">
@@ -41,8 +38,7 @@
           parentNodeId="0-0"
           :node="relationsOne"
           :load="loadRelation"
-          @tree-updated="RelationTreeUpdatedOne"
-        ></RelationTree>
+          @tree-updated="RelationTreeUpdatedOne"></RelationTree>
       </div>
     </el-tab-pane>
   </el-tabs>

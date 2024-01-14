@@ -4,36 +4,31 @@
       v-model="projectId"
       class="project"
       :teleported="false"
-      filterable
-    >
+      filterable>
       <el-option
         v-for="project in projects"
         :key="project['id']"
         :label="project['name']"
-        :value="project['id']"
-      />
+        :value="project['id']" />
     </el-select>
     <div class="searchRow">
       <el-input
         type="text"
         class="search"
         v-model="search"
-        placeholder="搜索"
-      />
+        placeholder="搜索" />
       <el-button
         :icon="PlusIcon"
         type="primary"
         size="small"
         class="newTable"
-        @click="openDialog"
-      ></el-button>
+        @click="openDialog"></el-button>
     </div>
   </div>
   <el-table
     :data="tabelsFiltered"
     v-loading="tableLoading"
-    class="table-customize"
-  >
+    class="table-customize">
     <el-table-column prop="id" label="编号" width="90" />
     <el-table-column prop="module" label="模块" width="120" />
     <el-table-column prop="name" label="表名" width="200" />
@@ -41,8 +36,7 @@
     <el-table-column
       prop="selectDisplayColumns"
       label="下拉显示列"
-      width="200"
-    />
+      width="200" />
     <el-table-column label="创建时间">
       <template #default="scope">
         {{ moment(scope.row.createdAt).format("YYYY-MM-DD HH:mm") }}
@@ -55,16 +49,16 @@
     </el-table-column>
     <el-table-column>
       <template #default="scope">
-        <el-icon class="icon" :size="25" @click="configEntity(scope.row)"
-          ><Edit
-        /></el-icon>
+        <el-icon class="icon" :size="25" @click="configEntity(scope.row)">
+          <Edit />
+        </el-icon>
         <el-icon
           class="icon"
           :size="25"
           @click="deleteTable(scope.row)"
-          style="color: #f56c6c"
-          ><DeleteFilled
-        /></el-icon>
+          style="color: #f56c6c">
+          <DeleteFilled />
+        </el-icon>
       </template>
     </el-table-column>
   </el-table>
@@ -78,8 +72,7 @@
             v-for="projectModule in projectModules"
             :key="projectModule['id']"
             :label="`${projectModule.name}(${projectModule.code})`"
-            :value="projectModule['code']"
-          />
+            :value="projectModule['code']" />
         </el-select>
       </el-form-item>
       <el-form-item label="表名">
@@ -99,14 +92,13 @@
       <span class="dialog-footer">
         <el-button
           @click="dialog.visible = false"
-          :loading="dialog.button.loading"
-          >取消</el-button
-        >
+          :loading="dialog.button.loading">
+          取消
+        </el-button>
         <el-button
           type="primary"
           @click="submit"
-          :loading="dialog.button.loading"
-        >
+          :loading="dialog.button.loading">
           确认
         </el-button>
       </span>

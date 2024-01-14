@@ -8,52 +8,45 @@
         type="text"
         style="width: 150px"
         v-model="table.project.name"
-        :disabled="true"
-      />
+        :disabled="true" />
 
       <el-input
         type="text"
         style="width: 80px"
         v-model="table.module"
         :disabled="!!table.id"
-        placeholder="所属模块"
-      />
+        placeholder="所属模块" />
 
       <el-input
         type="text"
         style="width: 180px"
         :disabled="!!table.id"
         v-model="table.name"
-        placeholder="表名t_****"
-      />
+        placeholder="表名t_****" />
 
       <el-input
         type="text"
         style="width: 180px"
         v-model="table.comment"
-        placeholder="表描述"
-      />
+        placeholder="表描述" />
 
       <el-input
         type="text"
         style="width: 80px"
         v-model="sourceBranch"
-        placeholder="基础分支"
-      ></el-input>
+        placeholder="基础分支"></el-input>
 
       <el-input
         type="text"
         style="width: 100px"
         v-model="gitCommitComment"
-        placeholder="提交信息"
-      ></el-input>
+        placeholder="提交信息"></el-input>
 
       <el-button
         type="danger"
         @click="saveAndSubmitPR('commit')"
         :loading="state.tableSaving"
-        :disabled="state.tableSaving"
-      >
+        :disabled="state.tableSaving">
         提交
       </el-button>
 
@@ -70,8 +63,7 @@
         type="success"
         @click="store.triggerCodePreviewAsync('saveButton')"
         :loading="state.tableSaving"
-        :disabled="state.tableSaving"
-      >
+        :disabled="state.tableSaving">
         保存
       </el-button>
 
@@ -79,21 +71,20 @@
         type="primary"
         @click="toggerViewMode"
         :loading="state.tableSaving"
-        :disabled="state.tableSaving"
-      >
+        :disabled="state.tableSaving">
         {{ previewButton }}
       </el-button>
 
       <el-button-group size="small" type="info">
         <el-button @click="setCodeTypes('entity')">仅实体</el-button>
-        <el-button @click="setCodeTypes('all')"> 全部 </el-button>
+        <el-button @click="setCodeTypes('all')">全部</el-button>
       </el-button-group>
     </div>
     <div class="info">
       <div class="info-left">
         <div style="margin-right: 10px">tableId: {{ table.id }}</div>
         <el-space>
-          <ERPreviewer :tableId="table.id"> </ERPreviewer>
+          <ERPreviewer :tableId="table.id"></ERPreviewer>
           <ColumnSummary :columns="computedReadyColumns"></ColumnSummary>
           <ParseImg />
           <IndexManager :tableId="store.table.id" />
@@ -140,31 +131,37 @@
           handle=".rank-icon"
           item-key="id"
           v-bind="dragOptions"
-          :component-data="{ type: 'transtion-group' }"
-        >
+          :component-data="{ type: 'transtion-group' }">
           <template #item="{ element: column, index }">
             <div
               class="table-row"
-              v-if="column.dataType?.dataType !== 'vrelation' && column.isEnable"
-            >
+              v-if="
+                column.dataType?.dataType !== 'vrelation' && column.isEnable
+              ">
               <!-- 表的基本定义 -->
-              <TableRow v-model="table.columns[index]" :groupedDataTypes="groupedDataTypes" :dataTypeByDataTypeId="dataTypeByDataTypeId"
-                @open-setting="openSetting" @delete-column="deleteColumn" />
+              <TableRow
+                v-model="table.columns[index]"
+                :groupedDataTypes="groupedDataTypes"
+                :dataTypeByDataTypeId="dataTypeByDataTypeId"
+                @open-setting="openSetting"
+                @delete-column="deleteColumn" />
             </div>
           </template>
         </draggable>
 
         <div class="text">DefaultColumn</div>
 
-
         <template v-for="(column, columnIndex) in table.columns">
-          <div class="table-row" v-if="!column.isEnable && column.dataType?.dataType != 'vrelation'">
+          <div
+            class="table-row"
+            v-if="!column.isEnable && column.dataType?.dataType != 'vrelation'">
             <!-- 表的基本定义 -->
-            <TableRow v-model="table.columns[columnIndex]"  :groupedDataTypes="groupedDataTypes" :dataTypeByDataTypeId="dataTypeByDataTypeId"/>
+            <TableRow
+              v-model="table.columns[columnIndex]"
+              :groupedDataTypes="groupedDataTypes"
+              :dataTypeByDataTypeId="dataTypeByDataTypeId" />
           </div>
-
         </template>
-
 
         <!-- 关系字段展示 这里仅展示hasOne和hasMany -->
         <div class="table-row" style="margin-top: 20px">
@@ -180,8 +177,7 @@
               column.relation &&
               column.dataType?.dataType === 'vrelation' &&
               column.relation !== 'BelongsTo'
-            "
-          >
+            ">
             <!-- 关系字段 不可删除 不可配置-->
             <div class="table-sub-row">
               <!-- 属性 -->
@@ -190,9 +186,7 @@
                   :disabled="!column.isEnable"
                   type="text"
                   v-model="column.name"
-                  placeholder=""
-                >
-                </el-input>
+                  placeholder=""></el-input>
               </div>
 
               <!-- 依赖表 -->
@@ -206,9 +200,7 @@
                     v-for="refTable in allTables"
                     :key="refTable.id"
                     :label="refTable.name"
-                    :value="refTable.id"
-                  >
-                  </el-option>
+                    :value="refTable.id"></el-option>
                 </el-select>
               </div>
 
@@ -220,18 +212,16 @@
                   "
                   filterable
                   v-model="column.relation"
-                  placeholder="关系"
-                >
+                  placeholder="关系">
                   <el-option
                     :disabled="true"
                     label="BelongsTo"
-                    value="BelongsTo"
-                  >
-                  </el-option>
-                  <el-option label="HasMany" value="HasMany"> </el-option>
-                  <el-option label="HasOne" value="HasOne"> </el-option>
-                  <el-option label="BelongsToMany" value="BelongsToMany">
-                  </el-option>
+                    value="BelongsTo"></el-option>
+                  <el-option label="HasMany" value="HasMany"></el-option>
+                  <el-option label="HasOne" value="HasOne"></el-option>
+                  <el-option
+                    label="BelongsToMany"
+                    value="BelongsToMany"></el-option>
                 </el-select>
               </div>
 
@@ -248,13 +238,11 @@
       <!-- codePreview组件+relation配置 -->
       <div
         class="code-wrapper"
-        v-loading="state.tableSaving || state.codePreviewing"
-      >
+        v-loading="state.tableSaving || state.codePreviewing">
         <CodePreivew
           ref="codemirror"
           :tableId="table.id"
-          :codes="gitInfo.codes"
-        ></CodePreivew>
+          :codes="gitInfo.codes"></CodePreivew>
       </div>
     </div>
 
@@ -264,8 +252,7 @@
       v-model="state.columnSettingDialogVisible"
       v-if="editingColumn"
       :title="`高级配置 - ${editingColumn?.name}`"
-      width="50%"
-    >
+      width="50%">
       <div class="setting-row">
         <div class="title"><span>关系字段</span></div>
         <div class="val">
@@ -275,8 +262,7 @@
               dataTypeByDataTypeId[editingColumn.dataTypeId]?.dataType !== 'int'
             "
             v-model="editingColumn.isFK"
-            size="small"
-          ></el-switch>
+            size="small"></el-switch>
         </div>
         <template v-if="editingColumn.isFK">
           <div class="title"><span>关联表</span></div>
@@ -292,15 +278,12 @@
               filterable
               v-model="editingColumn.refTableId"
               @change="(refTableId: number) => changeRefTable(editingColumn, refTableId)"
-              placeholder="依赖表"
-            >
+              placeholder="依赖表">
               <el-option
                 v-for="refTable in allTables"
                 :key="refTable.id"
                 :label="refTable.name"
-                :value="refTable.id"
-              >
-              </el-option>
+                :value="refTable.id"></el-option>
             </el-select>
           </div>
           <template
@@ -311,8 +294,7 @@
               allTables.filter(
                 (table) => table.id === editingColumn?.refTableId
               )[0]['name'] === 't_enum'
-            "
-          >
+            ">
             <div class="title"><span>枚举代码</span></div>
             <div class="val">
               <el-input v-model="editingColumn.enumTypeCode"></el-input>
@@ -327,8 +309,7 @@
           editingColumn.isFK &&
           editingColumn.relationColumn?.name &&
           editingColumn.relationColumn?.relation
-        "
-      >
+        ">
         <div class="title"><span>属性</span></div>
         <div class="val">
           <el-input
@@ -336,8 +317,7 @@
             v-if="editingColumn.isFK && editingColumn.relationColumn?.name"
             :disabled="!editingColumn.isEnable"
             type="text"
-            placeholder=""
-          />
+            placeholder="" />
         </div>
         <div class="title"><span>关系</span></div>
         <div class="select">
@@ -349,13 +329,14 @@
             "
             filterable
             v-model="editingColumn.relationColumn.relation"
-            placeholder="关系"
-          >
-            <el-option :disabled="true" label="BelongsTo" value="BelongsTo">
-            </el-option>
-            <el-option label="HasMany" value="HasMany"> </el-option>
-            <el-option label="HasOne" value="HasOne"> </el-option>
-            <el-option label="BelongsToMany" value="BelongsToMany"> </el-option>
+            placeholder="关系">
+            <el-option
+              :disabled="true"
+              label="BelongsTo"
+              value="BelongsTo"></el-option>
+            <el-option label="HasMany" value="HasMany"></el-option>
+            <el-option label="HasOne" value="HasOne"></el-option>
+            <el-option label="BelongsToMany" value="BelongsToMany"></el-option>
           </el-select>
         </div>
         <div class="title"><span>启用</span></div>
@@ -363,8 +344,7 @@
           <el-switch
             size="small"
             v-model="editingColumn.relationColumn.isEnable"
-            :disabled="editingColumn.relationColumn.relation === 'BelongsTo'"
-          />
+            :disabled="editingColumn.relationColumn.relation === 'BelongsTo'" />
         </div>
       </div>
 
@@ -373,16 +353,14 @@
         v-if="
           dataTypeByDataTypeId[editingColumn.dataTypeId]?.dataType !==
           'vrelation'
-        "
-      >
+        ">
         <div class="title"><span>默认值</span></div>
         <div class="val">
           <el-input
             :disabled="!editingColumn.isEnable"
             type="text"
             v-model="editingColumn.defaultValue"
-            placeholder=""
-          ></el-input>
+            placeholder=""></el-input>
         </div>
         <!--  -->
         <div class="title"><span>下拉框展示</span></div>
@@ -390,8 +368,7 @@
           <el-switch
             :disabled="!editingColumn.isEnable"
             v-model="editingColumn.forSelectDisplay"
-            size="small"
-          ></el-switch>
+            size="small"></el-switch>
         </div>
       </div>
 
@@ -401,24 +378,21 @@
           <el-switch
             :disabled="!editingColumn.isEnable"
             v-model="editingColumn.findable"
-            size="small"
-          ></el-switch>
+            size="small"></el-switch>
         </div>
         <div class="title">可创建</div>
         <div class="val">
           <el-switch
             :disabled="!editingColumn.isEnable"
             v-model="editingColumn.createable"
-            size="small"
-          ></el-switch>
+            size="small"></el-switch>
         </div>
         <div class="title">可更新</div>
         <div class="val">
           <el-switch
             :disabled="!editingColumn.isEnable"
             v-model="editingColumn.updateable"
-            size="small"
-          ></el-switch>
+            size="small"></el-switch>
         </div>
       </div>
 
@@ -428,8 +402,7 @@
           <el-input
             type="textarea"
             rows="3"
-            v-model="editingColumn.remark"
-          ></el-input>
+            v-model="editingColumn.remark"></el-input>
         </div>
       </div>
 
@@ -439,8 +412,7 @@
           <Codemirror
             class="code-edit-box"
             v-model:value="editingColumn.getCode"
-            :options="codeMirrorOption"
-          />
+            :options="codeMirrorOption" />
         </div>
       </div>
 
@@ -450,16 +422,15 @@
           <Codemirror
             class="code-edit-box"
             v-model:value="editingColumn.setCode"
-            :options="codeMirrorOption"
-          />
+            :options="codeMirrorOption" />
         </div>
       </div>
 
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="state.columnSettingDialogVisible = false"
-            >关闭</el-button
-          >
+          <el-button @click="state.columnSettingDialogVisible = false">
+            关闭
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -500,7 +471,7 @@ import "codemirror/mode/javascript/javascript.js";
 import "codemirror/theme/dracula.css";
 import SyncPreview from "@/components/SyncPreview.vue";
 
-import TableRow from './TableRow.vue'
+import TableRow from "./TableRow.vue";
 import { getCurrentInstance } from "vue";
 /** 两种用法
     1. 从getCurrentInstance 中获取
@@ -737,8 +708,7 @@ watch(
 watch(
   stringifiedTable,
   async (_newStringifiedTableDefinition, _oldStringifiedTableDefinition) => {
-
-    store.addDefaultColumn()
+    store.addDefaultColumn();
 
     console.log(`-------NestCodeGen-------`);
     console.log(_newStringifiedTableDefinition);
@@ -884,7 +854,7 @@ watch(
     padding 0px 10px
     height  100%
 
-  .text 
+  .text
     color: #ccc
     margin-top: 10px
     margin-left: 10px

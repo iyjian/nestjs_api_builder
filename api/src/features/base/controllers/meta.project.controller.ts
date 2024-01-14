@@ -59,6 +59,9 @@ export class MetaProjectController {
         undefined,
         undefined,
         async (project) => {
+          /**
+           * 仓库创建成功后将仓库信息更新到数据库
+           */
           this.logger.debug(
             `create - updateMetaProject - projectId: ${metaProject.id} repoId: ${project.id} repo: ${project.ssh_url_to_repo}`,
           )
@@ -70,7 +73,6 @@ export class MetaProjectController {
         },
       )
       .catch((error) => {
-        this.logger.error(error)
         console.log(error)
       })
 

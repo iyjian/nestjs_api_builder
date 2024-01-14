@@ -5,8 +5,7 @@
     title="ER关系图(一层)"
     width="50%"
     center
-    @closed="dialogVisible = false"
-  >
+    @closed="dialogVisible = false">
     <div class="wrapper">
       <div v-if="dialogVisible" class="mermaid" style="color: white">
         {{ diagram }}
