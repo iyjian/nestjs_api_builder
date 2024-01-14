@@ -52,8 +52,6 @@ export class MetaProjectController {
       userId: user.id,
     })
 
-    console.log(user, user.namespaceId)
-
     // 异步创建gitlab仓库代码
     this.gitlabProjectService
       .createProject(
