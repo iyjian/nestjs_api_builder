@@ -48,7 +48,10 @@ export class MetaTableController {
   }
 
   @Get('')
-  findAll(@RequestUser() user: any, @Query() findAllQueryMetaTable: FindAllMetaTableRequestDTO) {
+  findAll(
+    @RequestUser() user: any,
+    @Query() findAllQueryMetaTable: FindAllMetaTableRequestDTO,
+  ) {
     return this.metaTableService.findAllMetaTable(findAllQueryMetaTable, user)
   }
 

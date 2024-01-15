@@ -161,13 +161,16 @@ export class MetaTableService extends BaseService {
     }
   }
 
-  async findAllMetaTable(findAllQueryMetaTable: FindAllMetaTableRequestDTO, user?: any) {
+  async findAllMetaTable(
+    findAllQueryMetaTable: FindAllMetaTableRequestDTO,
+    user?: any,
+  ) {
     const { page, pageSize, skipPaging, simplify, ...payload } =
       findAllQueryMetaTable
 
-      payload[Op.and] = this.mysql.literal(
-        `MetaTable.projectId in (select projectId from t_project_priviledge where userId = ${user.userId})`,
-      )
+    payload[Op.and] = this.mysql.literal(
+      `MetaTable.projectId in (select projectId from t_project_priviledge where userId = ${user.userId})`,
+    )
 
     const metaTables = await this.metaTableModel.findAndCountAll({
       distinct: true,
