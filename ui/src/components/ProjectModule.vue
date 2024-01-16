@@ -176,7 +176,12 @@ export default defineComponent({
     async submit() {
       try {
         this.dialog.button.loading = true;
+
         if (this.dialog.openType === "create") {
+          if (!/a-z/.test(this.postData.code)) {
+            ElMessage.error("模块代码必须为英文小写字母");
+            return;
+          }
           await devToolApiClient.createProjectModule(this.postData);
         } else {
           if (this.postData && this.postData.id) {
@@ -186,15 +191,17 @@ export default defineComponent({
             );
           }
         }
-        this.dialog.button.loading = false;
+
         this.dialog.visible = false;
+
         this.refreshProjectModules();
       } catch (e: any) {
-        this.dialog.button.loading = false;
         ElMessage({
           type: "error",
           message: e.message,
         });
+      } finally {
+        this.dialog.button.loading = false;
       }
     },
     async openDialog(openType: string, payload?: any) {

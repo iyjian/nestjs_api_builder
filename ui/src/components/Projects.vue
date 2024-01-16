@@ -128,14 +128,19 @@ async function submit() {
     dialog.button.loading = true;
 
     if (dialog.type === "add") {
-      if (!postData.value.repoName || !(/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(postData.value.repoName))) {
-        ElMessage.error('非法仓库名，仓库名必填且需以字母开头，名称中只能包含字母，数字，_，-')
-        return
+      if (
+        !postData.value.repoName ||
+        !/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(postData.value.repoName)
+      ) {
+        ElMessage.error(
+          "非法仓库名，仓库名必填且需以字母开头，名称中只能包含字母，数字，_，-"
+        );
+        return;
       }
-      
+
       if (!postData.value.name) {
-        ElMessage.error('项目名称必填')
-        return
+        ElMessage.error("项目名称必填");
+        return;
       }
 
       await devToolApiClient.postProject(postData.value);
@@ -144,7 +149,7 @@ async function submit() {
     }
 
     await refreshTable();
-    
+
     dialog.visible = false;
   } catch (e) {
     console.log(e);
