@@ -16,6 +16,7 @@ import {
   UpdateMetaTableRequestDTO,
   MoveMetaTableRequestDTO,
 } from '../dto'
+import { RequestUser } from './../../../core'
 
 @Controller('metaTable')
 export class MetaTableController {
@@ -47,8 +48,11 @@ export class MetaTableController {
   }
 
   @Get('')
-  findAll(@Query() findAllQueryMetaTable: FindAllMetaTableRequestDTO) {
-    return this.metaTableService.findAllMetaTable(findAllQueryMetaTable)
+  findAll(
+    @RequestUser() user: any,
+    @Query() findAllQueryMetaTable: FindAllMetaTableRequestDTO,
+  ) {
+    return this.metaTableService.findAllMetaTable(findAllQueryMetaTable, user)
   }
 
   @Get(':id')

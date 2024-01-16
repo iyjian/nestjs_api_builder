@@ -5,23 +5,20 @@
         v-for="project in projects"
         :key="project['id']"
         :label="project['name']"
-        :value="project['id']"
-      />
+        :value="project['id']" />
     </el-select>
     <div class="searchRow">
       <el-input
         type="text"
         class="search"
         v-model="search"
-        placeholder="搜索"
-      />
+        placeholder="搜索" />
       <el-button
         :icon="PlusIcon"
         type="primary"
         size="small"
         class="newTable"
-        @click="openDialog('create')"
-      ></el-button>
+        @click="openDialog('create')"></el-button>
     </div>
   </div>
 
@@ -40,9 +37,9 @@
         <el-icon
           class="icon"
           :size="25"
-          @click="openDialog('modify', scope.row)"
-          ><Edit
-        /></el-icon>
+          @click="openDialog('modify', scope.row)">
+          <Edit />
+        </el-icon>
         <!-- <el-icon
           class="icon"
           :size="25"
@@ -59,20 +56,17 @@
       <el-form-item label="模块">
         <el-input
           v-model="postData.code"
-          :disabled="dialog.disabledKeys['code']"
-        />
+          :disabled="dialog.disabledKeys['code']" />
       </el-form-item>
       <el-form-item label="简称">
         <el-input
           v-model="postData.name"
-          :disabled="dialog.disabledKeys['name']"
-        />
+          :disabled="dialog.disabledKeys['name']" />
       </el-form-item>
       <el-form-item label="说明">
         <el-input
           v-model="postData.remark"
-          :disabled="dialog.disabledKeys['remark']"
-        />
+          :disabled="dialog.disabledKeys['remark']" />
       </el-form-item>
       <!-- <el-form-item label="所属项目">
         <el-input v-model="postData.comment" />
@@ -88,14 +82,13 @@
       <span class="dialog-footer">
         <el-button
           @click="dialog.visible = false"
-          :loading="dialog.button.loading"
-          >取消</el-button
-        >
+          :loading="dialog.button.loading">
+          取消
+        </el-button>
         <el-button
           type="primary"
           @click="submit"
-          :loading="dialog.button.loading"
-        >
+          :loading="dialog.button.loading">
           确认
         </el-button>
       </span>
@@ -174,7 +167,6 @@ export default defineComponent({
         return store.currentProjectId;
       },
       set(projectId: number) {
-        // store.commit("setCurrentProjectId", projectId);
         store.setCurrentProjectId(projectId);
       },
     },

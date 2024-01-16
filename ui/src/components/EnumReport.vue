@@ -4,14 +4,12 @@
       v-model="projectId"
       class="project"
       :teleported="false"
-      filterable
-    >
+      filterable>
       <el-option
         v-for="project in projects"
         :key="project['id']"
         :label="project['name']"
-        :value="project['id']"
-      />
+        :value="project['id']" />
     </el-select>
     缺失的枚举类型: {{ JSON.stringify(missingEnumType) }}
     <!-- <div class="searchRow">
@@ -101,7 +99,6 @@ export default defineComponent({
         return store.currentProjectId;
       },
       set(projectId: number) {
-        // store.commit("setCurrentProjectId", projectId);
         store.setCurrentProjectId(projectId);
       },
     },

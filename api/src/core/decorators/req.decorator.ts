@@ -6,3 +6,10 @@ export const RequestUserId = createParamDecorator(
     return parseInt(request['locals']['userId'])
   },
 )
+
+export const RequestUser = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest<Request>()
+    return request['locals']
+  },
+)

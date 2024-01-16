@@ -4,8 +4,7 @@
       v-for="item in routes"
       :key="item.name"
       :index="item.path"
-      :route="{ name: item.name }"
-    >
+      :route="{ name: item.name }">
       {{ item.meta.displayName }}
     </el-menu-item>
     <li class="el-menu-item logout">

@@ -5,16 +5,14 @@
     v-model="dialog.visible"
     :title="`字段导入`"
     width="80%"
-    center
-  >
+    center>
     <div class="wrapper">
       <div class="imageBoard" @paste.native="onPaste">
         <span v-if="!imgSrc" class="hint">粘贴表格图片至此</span>
         <img
           v-if="imgSrc"
           style="width: 98%; margin-top: 20px; margin-bottom: 20px"
-          :src="imgSrc"
-        />
+          :src="imgSrc" />
       </div>
       <!-- <input class="imageBoard" disabled /> -->
       <table class="classic" v-if="recoData && recoData.length > 0">
@@ -38,9 +36,9 @@
         <el-button
           @click="importColumns"
           type="primary"
-          :disabled="!recoData || recoData.length === 0"
-          >导入</el-button
-        >
+          :disabled="!recoData || recoData.length === 0">
+          导入
+        </el-button>
       </span>
     </template>
   </el-dialog>

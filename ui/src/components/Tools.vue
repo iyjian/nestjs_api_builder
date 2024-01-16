@@ -3,14 +3,12 @@
     <el-input
       v-model="input"
       style="width: 30%"
-      placeholder="智能判断, 支持JSON, epochTime, Base64 etc."
-    ></el-input>
+      placeholder="智能判断, 支持JSON, epochTime, Base64 etc."></el-input>
     <div class="content">
       <json-viewer
         v-if="result.dataType === 'jsonStr'"
         :value="JSON.parse(result.content)"
-        :expand-depth="5"
-      ></json-viewer>
+        :expand-depth="5"></json-viewer>
       <div v-else-if="result.dataType === 'img'">
         <img :src="result.content" />
       </div>

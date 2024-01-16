@@ -22,6 +22,7 @@ import {
   ApiDeleteResponse,
   codeGen,
   RequestUserId,
+  RequestUser,
 } from './../../../core'
 import { GitlabProjectService } from './../../coding/gitlab.project.service'
 import { ProjectPriviledgeService } from '../services/project.priviledge.service'
@@ -37,10 +38,10 @@ export class MetaProjectController {
 
   @Post('')
   async create(
-    @RequestUserId() userId: number,
+    @RequestUser() user: any,
     @Body() createMetaProject: CreateMetaProjectRequestDTO,
   ) {
-    createMetaProject.userId = userId
+    createMetaProject.userId = user.userId
 
     const metaProject = await this.metaProjectService.createMetaProject(
       createMetaProject,
@@ -48,17 +49,21 @@ export class MetaProjectController {
 
     await this.projectPriviledgeService.create({
       projectId: metaProject.id,
-      userId,
+      userId: user.userId,
     })
 
     // 异步创建gitlab仓库代码
     this.gitlabProjectService
       .createProject(
-        createMetaProject.name,
+        createMetaProject.repoName,
         undefined,
         undefined,
-        undefined,
+        user.namespaceId,
+        createMetaProject.version === 1 ? 'main' : 'simplified',
         async (project) => {
+          /**
+           * 仓库创建成功后将仓库信息更新到数据库
+           */
           this.logger.debug(
             `create - updateMetaProject - projectId: ${metaProject.id} repoId: ${project.id} repo: ${project.ssh_url_to_repo}`,
           )
@@ -70,7 +75,6 @@ export class MetaProjectController {
         },
       )
       .catch((error) => {
-        this.logger.error(error)
         console.log(error)
       })
 

@@ -35,7 +35,7 @@ export class MetaProjectService extends BaseService {
     const { page, pageSize, skipPaging, ...payload } = findAllQueryMetaProject
 
     payload[Op.and] = this.mysql.literal(
-      'MetaProject.id in (select projectId from t_project_priviledge)',
+      `MetaProject.id in (select projectId from t_project_priviledge where userId = ${userId})`,
     )
 
     const metaProjects = await this.metaProjectModel.findAndCountAll({

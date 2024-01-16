@@ -4,16 +4,17 @@
     v-if="props.level === 1"
     size="small"
     type="danger"
-    @click="resetRelation"
-    >reset</el-button
-  >
+    @click="resetRelation">
+    reset
+  </el-button>
   <div class="tree">
     <div class="node" v-if="_node">
       <el-checkbox
         v-model="_node.isChecked"
         style="margin-right: 8px"
-        @change="updateNode(_node!.nodeId, { isChecked: _node?.isChecked })"
-      ></el-checkbox>
+        @change="
+          updateNode(_node!.nodeId, { isChecked: _node?.isChecked })
+        "></el-checkbox>
       <!-- 把nodeClicked合并到updateNode -->
       <div @click="nodeClicked(_node!)">{{ _node.label }}</div>
     </div>
@@ -23,16 +24,14 @@
         :level="level + 1"
         :parentNodeId="node.nodeId"
         :load="load"
-        @nodeUpdated="updateNode"
-      ></RelationTree>
+        @nodeUpdated="updateNode"></RelationTree>
     </template>
   </div>
   <el-dialog
     v-if="tableConfig.table"
     v-model="tableConfig.dialogVisible"
     :title="`${tableConfig.table.comment}属性配置`"
-    width="50%"
-  >
+    width="50%">
     <!-- 表属性配置 -->
     <el-table
       :data="
@@ -40,8 +39,7 @@
           (column) => column.dataType?.dataType !== 'vrelation'
         )
       "
-      style="width: 100%"
-    >
+      style="width: 100%">
       <el-table-column prop="name" label="字段" width="180" />
       <el-table-column prop="comment" label="含义" width="180" />
       <el-table-column label="列表展示">
@@ -78,7 +76,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="tableConfig.dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveTableConfig"> 保存 </el-button>
+        <el-button type="primary" @click="saveTableConfig">保存</el-button>
       </span>
     </template>
   </el-dialog>
