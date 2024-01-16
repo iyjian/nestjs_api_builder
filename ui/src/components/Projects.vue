@@ -36,7 +36,7 @@
         <!-- TODO:锁住仓库名称修改 -->
         <el-input
           v-model="postData.repoName"
-          placeholder="仅支持英文、数字、_、-"
+          placeholder="仅支持英文，数字，_，-，且必须以英文开头"
           :disabled="dialog.type === 'edit'" />
       </el-form-item>
       <el-form-item label="项目名称">
@@ -84,6 +84,7 @@ import { devToolApiClient } from "@/plugins";
 import _ from "lodash";
 import { Plus, Delete, Edit } from "@element-plus/icons-vue";
 import { Project } from "@/types";
+import { ElMessage } from "element-plus";
 
 let table = reactive<Project[]>([]);
 
@@ -127,6 +128,16 @@ async function submit() {
     dialog.button.loading = true;
 
     if (dialog.type === "add") {
+      if (!postData.value.repoName || !(/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(postData.value.repoName))) {
+        ElMessage.error('非法仓库名，仓库名必填且需以字母开头，名称中只能包含字母，数字，_，-')
+        return
+      }
+      
+      if (!postData.value.name) {
+        ElMessage.error('项目名称必填')
+        return
+      }
+
       await devToolApiClient.postProject(postData.value);
     } else {
       await devToolApiClient.updateProject(postData.value);
