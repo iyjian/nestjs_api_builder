@@ -118,21 +118,14 @@ async function submit() {
   try {
     dialog.button.loading = true;
 
-    // 从模板项目初始化
-    // const result = await devToolApiClient.initProject({
-    //   projectName: postData.value.repoName,
-    // })
-
-    // 记录项目
-    // postData.value.repo = result.ssh_url_to_repo
-    // postData.value.repoId = result.id
-
     if (dialog.type === "add") {
       await devToolApiClient.postProject(postData.value);
     } else {
       await devToolApiClient.updateProject(postData.value);
     }
+
     await refreshTable();
+    
     dialog.visible = false;
   } catch (e) {
     console.log(e);
