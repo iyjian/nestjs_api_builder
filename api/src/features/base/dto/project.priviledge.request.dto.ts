@@ -15,10 +15,11 @@ export class CreateProjectPriviledgeRequestDTO {
   @codeGen('9587')
   @ApiProperty({
     description: '用户id',
-    required: false,
+    required: true,
   })
+  @IsNotEmpty()
   @Transform(getTransformer('numberTransformer'))
-  userId?: number
+  userId: number
 }
 
 export class UpdateProjectPriviledgeRequestDTO {

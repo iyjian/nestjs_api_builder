@@ -5,8 +5,7 @@
     title="索引管理器"
     width="50%"
     center
-    @closed="dialogVisible = false"
-  >
+    @closed="dialogVisible = false">
     <div class="wrapper">
       <el-button :icon="Plus" @click="addIndex"></el-button>
       <template v-for="(index, key) in indexes" :key="key">
@@ -15,8 +14,7 @@
             v-model="index.fields"
             multiple
             placeholder="请选择"
-            style="width: 400px; margin-right: 10px"
-          >
+            style="width: 400px; margin-right: 10px">
             <el-option
               v-for="column in columns.concat({
                 name: 'isActive',
@@ -24,24 +22,19 @@
               })"
               :key="column.id"
               :label="column.name"
-              :value="column.id"
-            >
-            </el-option>
+              :value="column.id"></el-option>
           </el-select>
           <el-select
             v-model="index.type"
             placeholder="请选择"
-            style="width: 120px; margin-right: 10px"
-          >
-            <el-option key="unique" label="唯一索引" value="unique">
-            </el-option>
-            <el-option key="btree" label="普通索引" value="btree"> </el-option>
+            style="width: 120px; margin-right: 10px">
+            <el-option key="unique" label="唯一索引" value="unique"></el-option>
+            <el-option key="btree" label="普通索引" value="btree"></el-option>
           </el-select>
           <el-button
             :icon="Delete"
             @click="deleteIndex(key)"
-            type="danger"
-          ></el-button>
+            type="danger"></el-button>
         </el-row>
       </template>
     </div>

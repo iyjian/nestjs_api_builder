@@ -25,10 +25,10 @@ export class ProjectPriviledge extends BaseModel<ProjectPriviledge> {
   projectId?: number
 
   @Column({
-    allowNull: true,
+    allowNull: false,
     type: DataType.INTEGER,
     comment: '用户id',
   })
   @codeGen('9587')
-  userId?: number
+  userId: number
 }

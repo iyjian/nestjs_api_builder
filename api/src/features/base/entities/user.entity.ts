@@ -46,4 +46,12 @@ export class User extends BaseModel<User> {
   })
   @codeGen('9321')
   isAdmin?: boolean
+
+  @Column({
+    allowNull: true,
+    type: DataType.INTEGER,
+    comment: 'gitlab组id',
+  })
+  @codeGen('9611')
+  namespaceId?: number
 }

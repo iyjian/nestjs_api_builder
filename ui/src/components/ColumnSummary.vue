@@ -5,8 +5,7 @@
     v-model="dialogVisible"
     title="字段预览"
     width="90%"
-    center
-  >
+    center>
     <div class="wrapper">
       <el-button @click="copyCommaSpeperate">复制逗号分隔的字段</el-button>
 

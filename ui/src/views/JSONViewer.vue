@@ -13,7 +13,6 @@
       padding: 0;
       overflow: hidden;
       z-index: 999999;
-    "
-  ></iframe>
+    "></iframe>
 </template>
 <script lang="ts" setup></script>
