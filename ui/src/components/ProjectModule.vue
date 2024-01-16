@@ -68,15 +68,6 @@
           v-model="postData.remark"
           :disabled="dialog.disabledKeys['remark']" />
       </el-form-item>
-      <!-- <el-form-item label="所属项目">
-        <el-input v-model="postData.comment" />
-      </el-form-item> -->
-      <!-- <el-form-item label="代码风格">
-        <el-select v-model="postData.version">
-          <el-option key="1" label="所有代码均在module目录" value="1" />
-          <el-option key="2" label="分service,controller目录" value="2" />
-        </el-select>
-      </el-form-item> -->
     </el-form>
     <template #footer>
       <span class="dialog-footer">
