@@ -4,14 +4,26 @@ import {
   DataType,
   BelongsTo,
   ForeignKey,
+  Scopes,
 } from 'sequelize-typescript'
 import { BaseModel, codeGen } from './../../../core'
 import { MetaProject } from './'
+import { MetaProject } from './meta.project.entity'
 
 @Table({
   tableName: 't_project_module',
   comment: '项目模块',
+  indexes: [{ fields: ['code', 'projectId', 'isActive'], unique: true }],
 })
+@codeGen('scopesGen')
+@Scopes(() => ({
+  findAll: {
+    include: [],
+  },
+  findOne: {
+    include: [],
+  },
+}))
 export class ProjectModule extends BaseModel<ProjectModule> {
   @Column({
     allowNull: false,
