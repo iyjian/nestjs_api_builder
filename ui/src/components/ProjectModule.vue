@@ -24,7 +24,7 @@
 
   <el-table :data="projectModules" class="table-customize">
     <el-table-column prop="id" label="编号" width="90" />
-    <el-table-column prop="code" label="模块" width="120" />
+    <el-table-column prop="code" label="模块代码" width="120" />
     <el-table-column prop="name" label="简称" width="200" />
     <el-table-column prop="remark" label="说明" />
     <el-table-column label="创建时间">
@@ -40,6 +40,7 @@
           @click="openDialog('modify', scope.row)">
           <Edit />
         </el-icon>
+        <!-- TODO: 未实现模块删除功能 -->
         <!-- <el-icon
           class="icon"
           :size="25"
@@ -53,7 +54,7 @@
 
   <el-dialog v-model="dialog.visible" :show-close="true" :title="dialog.title">
     <el-form :model="postData" label-width="120px">
-      <el-form-item label="模块">
+      <el-form-item label="模块代码">
         <el-input
           v-model="postData.code"
           :disabled="dialog.disabledKeys['code']" />
