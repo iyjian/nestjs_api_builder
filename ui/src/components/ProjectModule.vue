@@ -178,7 +178,7 @@ export default defineComponent({
         this.dialog.button.loading = true;
 
         if (this.dialog.openType === "create") {
-          if (!/a-z/.test(this.postData.code)) {
+          if (!/[a-z]+/.test(this.postData.code)) {
             ElMessage.error("模块代码必须为英文小写字母");
             return;
           }
