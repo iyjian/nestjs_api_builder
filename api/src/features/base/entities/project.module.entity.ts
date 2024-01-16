@@ -7,7 +7,6 @@ import {
   Scopes,
 } from 'sequelize-typescript'
 import { BaseModel, codeGen } from './../../../core'
-import { MetaProject } from './'
 import { MetaProject } from './meta.project.entity'
 
 @Table({
