@@ -377,8 +377,8 @@ export const projectTableStore = defineStore("projectTable", {
 
       const defaultColumns = [
         { name: "id", dataType: 1, defaultValue: "" },
-        { name: "syncKey", dataType: 4, defaultValue: "" },
-        { name: "isActive", dataType: 5, defaultValue: "1" },
+        { name: "syncKey", dataType: 22, defaultValue: "" },
+        { name: "isActive", dataType: 5, defaultValue: "true" },
         { name: "createdAt", dataType: 6, defaultValue: "" },
         { name: "updatedAt", dataType: 6, defaultValue: "" },
       ];
