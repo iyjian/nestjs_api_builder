@@ -29,19 +29,19 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/entities",
-        name: "Entities",
-        component: Entities,
-        meta: {
-          displayName: "表管理",
-        },
-      },
-      {
         path: "/projectModules",
         name: "ProjectModule",
         component: ProjectModule,
         meta: {
           displayName: "项目模块",
+        },
+      },      
+      {
+        path: "/entities",
+        name: "Entities",
+        component: Entities,
+        meta: {
+          displayName: "表管理",
         },
       },
       {
