@@ -36,8 +36,8 @@ ADD pnpm-lock.yaml .
 
 ENV VITE_API_ENDPOINT=/api
 
-RUN npm install -g pnpm --registry=https://registry.npm.taobao.org && \
-pnpm config set registry https://registry.npm.taobao.org && \
+RUN npm install -g pnpm --registry=https://registry.npmmirror.com && \
+pnpm config set registry https://registry.npmmirror.com && \
 pnpm i
 
 COPY . .
