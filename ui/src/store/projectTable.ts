@@ -50,8 +50,8 @@ const columnTemplate: Column = {
 function createDefaultColumn(
   name: string,
   dataTypeId: number,
-  defaultValue: string,
-  order: number
+  order: number,
+  defaultValue?: string
 ): Column {
   return {
     name,
@@ -376,9 +376,15 @@ export const projectTableStore = defineStore("projectTable", {
       }
 
       const defaultColumns = [
-        { name: "id", dataType: 1, defaultValue: "" },
-        { name: "syncKey", dataType: 4, defaultValue: "" },
-        { name: "isActive", dataType: 5, defaultValue: "1" },
+        { name: "id", dataType: 1 },
+        { name: "syncKey", dataType: 22, defaultValue: "", comment: "同步Key" },
+        {
+          name: "isActive",
+          dataType: 5,
+          defaultValue: "true",
+          comment: "是否有效",
+          allowNull: 1,
+        },
         { name: "createdAt", dataType: 6, defaultValue: "" },
         { name: "updatedAt", dataType: 6, defaultValue: "" },
       ];
@@ -387,8 +393,8 @@ export const projectTableStore = defineStore("projectTable", {
         const newColumn = createDefaultColumn(
           defaultColumn.name,
           defaultColumn.dataType,
-          defaultColumn.defaultValue,
-          this.totalColumns + 1
+          this.totalColumns + 1,
+          defaultColumn.defaultValue
         );
 
         this.addColumn(newColumn);
