@@ -11,6 +11,7 @@
       <el-table-column prop="repoId" label="仓库编号" />
       <el-table-column prop="repoName" label="仓库名称" />
       <el-table-column prop="name" label="项目名称" />
+      <el-table-column prop="user.name" label="所有者" />
       <el-table-column prop="repo" label="克隆地址" />
       <el-table-column label="操作" width="180">
         <template #default="scope">
