@@ -9,6 +9,7 @@ import {
   FindAllMetaProjectRequestDTO,
 } from '../dto'
 import { MetaProject } from '../entities/meta.project.entity'
+import { User } from './../entities/user.entity'
 
 @Injectable()
 export class MetaProjectService extends BaseService {
@@ -20,7 +21,13 @@ export class MetaProjectService extends BaseService {
     private readonly mysql: Sequelize,
   ) {
     super()
-    this.include = []
+    this.include = [
+      {
+        model: User,
+        as: 'user',
+        required: false,
+      },
+    ]
   }
 
   async createMetaProject(metaProjectObj: CreateMetaProjectRequestDTO) {
