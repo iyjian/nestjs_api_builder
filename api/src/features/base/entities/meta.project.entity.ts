@@ -7,6 +7,7 @@ import {
   Scopes,
 } from 'sequelize-typescript'
 import { BaseModel, codeGen } from './../../../core'
+import { User } from './user.entity'
 
 @Table({
   tableName: 't_meta_project',
@@ -21,7 +22,13 @@ import { BaseModel, codeGen } from './../../../core'
 @codeGen('scopesGen')
 @Scopes(() => ({
   findAll: {
-    include: [],
+    include: [
+      {
+        model: User,
+        as: 'user',
+        required: false,
+      },
+    ],
   },
   findOne: {
     include: [],
@@ -136,9 +143,12 @@ export class MetaProject extends BaseModel<MetaProject> {
   @codeGen('9145')
   gitlabHost?: string
 
+  @ForeignKey(() => User)
   @Column({
-    allowNull: true,
     type: DataType.INTEGER,
+    allowNull: true,
+    onUpdate: 'NO ACTION',
+    onDelete: 'NO ACTION',
     comment: '用户id',
   })
   @codeGen('9146')
@@ -161,4 +171,8 @@ export class MetaProject extends BaseModel<MetaProject> {
   })
   @codeGen('9154')
   status?: number
+
+  @BelongsTo(() => User, 'userId')
+  @codeGen('9663')
+  user: User
 }

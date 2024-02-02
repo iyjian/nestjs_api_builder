@@ -31,6 +31,11 @@ export const FindOneResponseSchema = {
   },
   userId: { type: 'number', example: '', description: '用户id' },
   isPublic: { type: 'boolean', example: '', description: '是否公开' },
+  status: {
+    type: 'number',
+    example: '0 - 创建中 1 - 创建成功',
+    description: '创建状态',
+  },
 }
 
 export const FindAllResponseSchema = {
@@ -66,4 +71,19 @@ export const FindAllResponseSchema = {
   },
   userId: { type: 'number', example: '', description: '用户id' },
   isPublic: { type: 'boolean', example: '', description: '是否公开' },
+  status: {
+    type: 'number',
+    example: '0 - 创建中 1 - 创建成功',
+    description: '创建状态',
+  },
+  user: {
+    type: 'object',
+    properties: {
+      name: { type: 'string', example: '', description: '名字' },
+      accountId: { type: 'string', example: '', description: '账户id' },
+      isEnable: { type: 'boolean', example: '', description: '是否启用' },
+      isAdmin: { type: 'boolean', example: '', description: '是否超管' },
+      namespaceId: { type: 'number', example: '', description: 'gitlab组id' },
+    },
+  },
 }
