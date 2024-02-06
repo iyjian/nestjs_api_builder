@@ -708,8 +708,6 @@ watch(
 watch(
   stringifiedTable,
   async (_newStringifiedTableDefinition, _oldStringifiedTableDefinition) => {
-    store.addDefaultColumn();
-
     console.log(`-------NestCodeGen-------`);
     console.log(_newStringifiedTableDefinition);
     console.log(_oldStringifiedTableDefinition);
@@ -725,6 +723,7 @@ watch(
     if (!_oldStringifiedTableDefinition) {
       // 首次加载则触发代码预览
       console.log(`NestCodeGen - watch stringifiedTable - new table(exit)`);
+      store.addDefaultColumn();
       await store.switchTableAsyncV2(table.value.id);
       await store.triggerCodePreviewAsync("switchTableAsync");
       return;
@@ -754,6 +753,7 @@ watch(
       console.log(
         `NestCodeGen - watch stringifiedTable - table switched - oldTableId: ${oldTable.id} newTableId: ${newTable.id}(exit) table.value.id: ${table.value.id}`
       );
+      store.addDefaultColumn();
       await store.switchTableAsyncV2(table.value.id);
       await store.triggerCodePreviewAsync("switchTableAsync");
       return;

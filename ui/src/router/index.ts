@@ -35,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           displayName: "项目模块",
         },
-      },      
+      },
       {
         path: "/entities",
         name: "Entities",
