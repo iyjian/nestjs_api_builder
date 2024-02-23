@@ -51,11 +51,12 @@ function createDefaultColumn(
   name: string,
   dataTypeId: number,
   order: number,
-  defaultValue?: string
+  defaultValue?: string,
+  comment?: string
 ): Column {
   return {
     name,
-    comment: "",
+    comment,
     dataTypeId,
     allowNull: false,
     refTableId: undefined,
@@ -394,7 +395,8 @@ export const projectTableStore = defineStore("projectTable", {
           defaultColumn.name,
           defaultColumn.dataType,
           this.totalColumns + 1,
-          defaultColumn.defaultValue
+          defaultColumn.defaultValue,
+          defaultColumn.comment
         );
 
         this.addColumn(newColumn);
