@@ -5,6 +5,7 @@ import { MetaTableService } from '../../base/services/meta.table.service'
 import { MetaColumnService } from '../../base/services/meta.column.service'
 import { MetaProjectService } from '../../base/services/meta.project.service'
 import _ from 'lodash'
+import { Op } from 'sequelize'
 import { DbMigrateLogService } from './../../base/services/db.migrate.log.service'
 import { FindAllMetaColumnRequestDTO } from './../../base/dto'
 
@@ -511,7 +512,12 @@ export class DBSyncService {
     // }
     // console.log(tableId === undefined, tableId, '-----')
 
-    const condition: FindAllMetaColumnRequestDTO = { skipPaging: true }
+    const condition: FindAllMetaColumnRequestDTO = { 
+      name: {
+        [Op.notIn]: ['syncKey','deleted','createdAt','updatedAt','id','isActive']
+      } as any,
+      skipPaging: true 
+    }
 
     if (tableId) {
       condition.tableId = tableId
